@@ -1,0 +1,317 @@
+/* .gap-auto{
+    gap: 5%;
+}
+ */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    background-color: #161618;
+    max-width: 500px;
+}
+
+/* .container-fluid{
+    max-width: 500px;
+}
+ */
+.container-fixed {
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    overflow-y: auto;
+    margin-top: 78.25px;
+    height: 191.75px;
+    background: linear-gradient(180deg, var(--Fondo, #161618) 93.8%, rgba(22, 22, 24, 0.00) 100%);
+    padding-bottom: 20px;
+    gap: 30px;
+    max-width: 500px;
+}
+
+.container-fixed .header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.container-fixed .header img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.container-fixed .header div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.container-fixed .datos {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 0 16px;
+
+    /* Scroll horizontal */
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+
+    /* No mostrar scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer */
+}
+
+.container-fixed .datos::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+.container-fixed .datos p {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.container-fixed .datos a {
+    text-decoration: none;
+    color: white;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.container-fixed .datos a.activo {
+    opacity: 1;
+    border-bottom: 3px solid #733BDE;
+}
+
+/* Contenido */
+
+.contenido {
+    display: flex;
+    justify-content: center;
+    padding: 270px 16px 75px 16px;
+}
+
+.seccion {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-width: 450px;
+}
+
+/* Seccion 'General' */
+
+.img-76 {
+    width: 76px;
+    height: 76px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.img-45 {
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+#seccion-general .titulo {
+    margin-bottom: 10px;
+}
+
+.container-gris {
+    justify-content: center;
+    text-align: center;
+    padding: 10px 16px;
+    gap: 15px;
+    border-radius: 15px;
+    background: var(--Terciario, #535368);
+    box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+#seccion-general .container-1 .container-principal {
+    gap: 20px;
+    width: 100%;
+}
+
+#seccion-general .container-1 .container-gris div {
+    justify-content: center;
+}
+
+#seccion-general .container-1 .container-gris div div {
+    width: 100%;
+    text-align: center;
+}
+
+#seccion-general .gap-3.d-flex.flex-row.w-100 .contenedor-gris{
+    gap: 6px;
+}
+
+#seccion-general .container-2.d-flex.flex-column.align-items-start {
+    margin-top: 40px;
+}
+
+/* Sección 'Jugadores' */
+
+#seccion-jugadores {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.container-posicion {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+}
+
+.container-posicion .container-header {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    text-align: center;
+    align-items: center;
+}
+
+.container-posicion .container-header div {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.container-posicion .container-header .icono-delanteros {
+    border-radius: 20px;
+    background: #E63E58;
+    gap: 5px;
+    padding: 5px;
+}
+
+.container-posicion .container-header .icono-mediocampistas {
+    border-radius: 20px;
+    background: #0DA013;
+    gap: 5px;
+    padding: 5px;
+}
+
+.container-posicion .container-header .icono-defensores {
+    border-radius: 20px;
+    background: #0992D5;
+    gap: 5px;
+    padding: 5px;
+}
+
+.container-posicion .container-header .icono-arqueros {
+    border-radius: 20px;
+    background: #B2B315;
+    gap: 5px;
+    padding: 5px;
+}
+
+.container-posicion .container-header .icono-versatiles {
+    border-radius: 20px;
+    background: #9315B3;
+    gap: 5px;
+    padding: 5px;
+}
+
+.container-posicion .jugador-card {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+}
+
+#seccion-jugadores .container-delanteros {
+    border-radius: 15px;
+    background: linear-gradient(180deg, #E63E58 0%, #802331 100%);
+
+    /* Sombra */
+    box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+#seccion-jugadores .container-mediocampistas {
+    border-radius: 15px;
+    background: linear-gradient(180deg, #0DA013 0%, #053A07 100%);
+
+    /* Sombra */
+    box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+#seccion-jugadores .container-defensores {
+    border-radius: 15px;
+    background: linear-gradient(180deg, #0892D5 0%, #044C6F 100%);
+
+    /* Sombra */
+    box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+#seccion-jugadores .container-arqueros {
+    border-radius: 15px;
+    background: linear-gradient(180deg, #B2B315 0%, #4C4D09 100%);
+
+    /* Sombra */
+    box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+#seccion-jugadores .container-versatiles {
+    border-radius: 15px;
+    background: linear-gradient(180deg, #9315B3 0%, #3F094D 100%);
+
+    /* Sombra */
+    box-shadow: 0 54px 15px 0 rgba(89, 0, 255, 0.00), 0 34px 14px 0 rgba(89, 0, 255, 0.01), 0 19px 12px 0 rgba(89, 0, 255, 0.05), 0 9px 9px 0 rgba(89, 0, 255, 0.09), 0 2px 5px 0 rgba(89, 0, 255, 0.10);
+}
+
+/* Sección 'Estadísticas' */
+
+#seccion-estadisticas{
+    padding-top: 20px;
+    gap: 20px;
+}
+
+#seccion-estadisticas .container-gris{
+    padding: 5px 5px 5px 10px !important;
+}
+
+#seccion-estadisticas .container-gris .container-1 .texto-transparente.d-flex.flex-row.align-items-center.gap-1{
+    margin: 0 5px;
+}
+
+#seccion-estadisticas .container-gris .container-2{
+    margin: 0 5px;
+    padding-bottom: 5px !important;
+}
+
+#seccion-estadisticas .container-gris .container-promedio{
+    padding: 10px 8px;
+    gap: 5px;
+    background: #3F374E;
+    border-radius: 10px;
+}
+
+#seccion-estadisticas .container-promedio-dato{
+    gap: 5px !important;
+}
+
+#seccion-estadisticas .container-cantidad-icono{
+    gap: 6px !important;
+}
+
+/* Sección 'Historial' */
+
+#seccion-historial {
+    padding-top: 20px;
+    gap: 10px;
+}

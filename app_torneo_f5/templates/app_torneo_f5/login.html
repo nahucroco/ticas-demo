@@ -1,0 +1,335 @@
+{% load static widget_tweaks %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ingresar — Ticas</title>
+
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/Outfit-Regular.woff2' %}" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/CalSans-Regular.woff2' %}" crossorigin>
+
+    <link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+
+    <link rel="preload" as="image" href="{% static 'images/logo.png' %}">
+    <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+    <meta name="theme-color" content="#4F9639">
+
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+      .btn-open-app{
+        display:inline-block;padding:12px 18px;border-radius:10px;
+        background:#733BDE;color:#fff;text-decoration:none;font:600 16px system-ui, sans-serif
+      }
+      /* Si está instalada como PWA o abierta como TWA, no mostrar */
+      @media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+        #open-in-app { display:none !important; }
+      }
+      /* Bloque de errores generales */
+      .form-errors { margin: 0 0 14px; }
+      .form-errors .error {
+        color: #b00020; font: 600 14px system-ui, sans-serif; margin: 6px 0;
+      }
+      .opacity { opacity: 0; height: 0; overflow: hidden; }
+      .demo-access { display:flex; flex-direction:column; align-items:stretch; gap:8px; margin:18px 0 6px; }
+      .demo-note { margin:0; text-align:center; font:500 13px system-ui, sans-serif; opacity:.75; }
+      .demo-btn { width:100%; justify-content:center; cursor:pointer; }
+      /* Slot de error: siempre reserva espacio, pero si está vacío no muestra texto */
+.error-slot{
+  min-height: 20px;           /* altura mínima para reservar espacio */
+  color: var(--Error, #FF0C0C);
+font-family: Outfit;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+/* Si no hay nada dentro, dibuja un espacio no separable para mantener la altura */
+.error-slot:empty::before{
+  content: "\00a0";
+}
+
+.btn-primario[disabled],
+.btn-primario:disabled{
+  background: #6b6b6b !important;
+  color: #ddd !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  opacity: .9;
+}
+
+    </style>
+  </head>
+  <body>
+    <!-- Overlay/modal base (tu mini “SweetAlert”) -->
+    <div id="swa-overlay" class="swa-overlay swa--hidden" role="presentation" aria-hidden="true">
+      <div id="swa-dialog" class="swa swa--info" role="dialog"
+           aria-modal="true" aria-labelledby="swa-title" aria-describedby="swa-desc" data-swa-root tabindex="-1">
+        <div class="swa__content">
+          <h2 id="swa-title" class="swa__title M-Subtitulos"></h2>
+          <p  id="swa-desc"   class="swa__message M-body"></p>
+        </div>
+        <div id="swa-actions" class="swa__actions">
+          <button id="swa-btn-cancel"  class="swa__btn swa__btn--cancel"  type="button" data-swa-action="cancel">
+            <span class="swa__btn-text">Cancelar</span>
+          </button>
+          <button id="swa-btn-confirm" class="swa__btn swa__btn--confirm" type="button" data-swa-action="confirm">
+            <span class="swa__btn-text">Aceptar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Overlay/modal base (tu mini “SweetAlert”) -->
+
+    <div class="login-container">
+      <div class="logo-container-image">
+        <img class="logo" src="{% static 'images/logo.png' %}" width="150" height="150" fetchpriority="high" alt="foto">
+        <div style="text-align:center">
+          <p>tus partidos, tus números</p>
+        </div>
+      </div>
+
+      <form method="post" class="login-form-container" autocomplete="off">
+        {% csrf_token %}
+        <div class="label-username-form">
+          <div class="label-user-group">
+  <label for="id_username" class="label-user-user">Usuario</label>
+  {{ form.username|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:Usuario"|attr:"autocomplete:username"|attr:"required:required"}}
+
+  <div class="error-slot">
+    {# Mensajes globales dirigidos a este campo (via extra_tags='username') #}
+    {% if messages %}
+      {% for message in messages %}
+        {% if 'username' in message.tags %}
+          {{ message }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {# Errores propios del campo (form.errors) #}
+    {% for err in form.username.errors %}
+      {{ err }}
+    {% endfor %}
+  </div>
+</div>
+
+
+          <div class="label-passwor-group">
+  <label for="id_password" class="label-user-pass">Contraseña</label>
+  {{ form.password|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:Contraseña"|attr:"autocomplete:current-password"|attr:"required:required"  }}
+
+  <div class="error-slot">
+    {% if messages %}
+      {% for message in messages %}
+        {% if 'password' in message.tags %}
+          {{ message }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% for err in form.password.errors %}
+      {{ err }}
+    {% endfor %}
+  </div>
+          </div>
+
+        </div>
+
+        <div class="button-container" style="display:flex;justify-content:right;">
+          <button type="submit" class="btn-primario" id="login-submit" style="cursor:pointer" disabled>
+  <span class="M-boton" style="margin:0">Ingresar</span>
+</button>
+        </div>
+
+        {# Demo: entra directo con el usuario de ejemplo, sin registrarse. #}
+        <div class="demo-access">
+          <p class="demo-note">Esta es una demo con datos ficticios que se reinician en cada despliegue.</p>
+          <button type="submit" formaction="{% url 'demo_login' %}" formnovalidate class="btn-primario demo-btn">
+            <span class="M-boton" style="margin:0">Entrar como invitado</span>
+          </button>
+        </div>
+
+        {% if google_enabled %}
+        <div class="social-container">
+          <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-btn">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M22.3055 10.0415H21.5V10H12.5V14H18.1515C17.327 16.3285 15.1115 18 12.5 18C9.1865 18 6.5 15.3135 6.5 12C6.5 8.6865 9.1865 6 12.5 6C14.0295 6 15.421 6.577 16.4805 7.5195L19.309 4.691C17.523 3.0265 15.134 2 12.5 2C6.9775 2 2.5 6.4775 2.5 12C2.5 17.5225 6.9775 22 12.5 22C18.0225 22 22.5 17.5225 22.5 12C22.5 11.3295 22.431 10.675 22.3055 10.0415Z" fill="#FFC107"/>
+              <path d="M3.65295 7.3455L6.93845 9.755C7.82745 7.554 9.98045 6 12.5 6C14.0295 6 15.421 6.577 16.4805 7.5195L19.309 4.691C17.523 3.0265 15.134 2 12.5 2C8.65895 2 5.32795 4.1685 3.65295 7.3455Z" fill="#FF3D00"/>
+              <path d="M12.5 22C15.083 22 17.43 21.0115 19.2045 19.404L16.1095 16.785C15.072 17.5745 13.8038 18.0014 12.5 18C9.89903 18 7.69053 16.3415 6.85853 14.027L3.59753 16.5395C5.25253 19.778 8.61353 22 12.5 22Z" fill="#4CAF50"/>
+              <path d="M22.3055 10.0415H21.5V10H12.5V14H18.1515C17.7571 15.1082 17.0467 16.0766 16.108 16.7855L16.1095 16.7845L19.2045 19.4035C18.9855 19.6025 22.5 17 22.5 12C22.5 11.3295 22.431 10.675 22.3055 10.0415Z" fill="#1976D2"/>
+            </svg>
+            Continuar con Google
+          </a>
+        </div>
+        {% endif %}
+
+      {# ==== Errores generales ==== #}
+      {% if form.non_field_errors %}
+
+          {% for error in form.non_field_errors %}
+          <script>
+            console.log("{{ error }}");
+          </script>
+          {% endfor %}
+
+      {% endif %}
+
+      {% if messages %}
+          {% for message in messages %}
+                  <script>
+            console.log("{{ error }}");
+          </script>
+          {% endfor %}
+      {% endif %}
+
+
+        <div class="divider">
+          <span>¿No tenés cuenta?</span>
+        </div>
+
+        <div class="btn-container">
+          <a class="btn-secundario-registro" href="{% url 'registro_usuario' %}" style="text-decoration: none;">Registrarme</a>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Toggle estilos input según valor
+      document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll(".form-control");
+        inputs.forEach(i=>{
+          const apply=el=>{
+            if(el.value.trim()!==""){
+              el.classList.remove("input-sin-valor"); el.classList.add("input-con-valor");
+            }else{
+              el.classList.remove("input-con-valor"); el.classList.add("input-sin-valor");
+            }
+          };
+          apply(i);
+          i.addEventListener("input", ()=>apply(i));
+        });
+      });
+    </script>
+
+    <script>
+      // Opacidad label según autofill/valor
+      document.addEventListener("DOMContentLoaded", () => {
+        const inputs = document.querySelectorAll(".form-control");
+        function updateLabel(input) {
+          const group = input.closest("div"); if (!group) return;
+          const label = group.querySelector("label"); if (!label) return;
+          label.classList.add("label-fade");
+          const hasValue = (input.value || "").trim().length > 0;
+          label.style.opacity = hasValue ? "0.5" : "0";
+        }
+        function updateAll() { inputs.forEach(updateLabel); }
+        inputs.forEach((input) => {
+          updateLabel(input);
+          ["input","change","blur","keyup","focus"].forEach(evt =>
+            input.addEventListener(evt, () => updateLabel(input))
+          );
+        });
+        [60, 180, 500, 1200].forEach(ms => setTimeout(updateAll, ms));
+        const pollStart = Date.now();
+        const poll = setInterval(() => {
+          updateAll();
+          if (Date.now() - pollStart > 1500) clearInterval(poll);
+        }, 100);
+        document.addEventListener("animationstart", (e) => {
+          if (e.animationName === "onAutoFillStart") updateAll();
+        }, true);
+        window.addEventListener("pageshow", updateAll);
+        document.addEventListener("visibilitychange", () => { if (!document.hidden) updateAll(); });
+        setTimeout(() => {
+          inputs.forEach(input => { try { if (input.matches(":-webkit-autofill")) updateLabel(input); } catch {} });
+        }, 300);
+      });
+    </script>
+
+    <script src="{% static 'js/modal.js' %}"></script>
+
+    <script>
+      (function () {
+        // ¿Coincide /login/?register=ok ?
+        function isLoginRegisterOk() {
+          const path = location.pathname.replace(/\/+$/, '/');
+          const params = new URLSearchParams(location.search);
+          return path.endsWith('/login/') && params.get('register') === 'ok';
+        }
+        // Mostrar el Sweet (tu mini-API swa)
+        function showRegisterSentModal() {
+          swa.fire({
+            title: 'Ya casi estas en Ticas',
+            text: 'Te enviamos un correo para confirmar tu registro. Revisá tu bandeja de entrada y el spam, por las dudas, para activar tu cuenta.',
+            confirmButtonText: 'Entendido',
+            showCancelButton: false,
+            allowOutsideClick: true,
+          });
+          // Limpia el query para evitar re-disparo si el usuario refresca
+          try {
+            const cleanUrl = location.pathname + location.hash;
+            history.replaceState(null, '', cleanUrl);
+          } catch (_) {}
+        }
+        // Espera a que exista window.swa.fire
+        function whenSwaReady(cb, retries = 40) {
+          if (window.swa && typeof window.swa.fire === 'function') return cb();
+          if (retries <= 0) return;
+          setTimeout(() => whenSwaReady(cb, retries - 1), 100);
+        }
+        function init() {
+          if (isLoginRegisterOk()) whenSwaReady(showRegisterSentModal);
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+      })();
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form   = document.querySelector(".login-form-container");
+  const user   = document.getElementById("id_username");
+  const pass   = document.getElementById("id_password");
+  const submit = document.getElementById("login-submit");
+
+  function canSubmit(){
+    const uOk = (user?.value || "").trim().length > 0;
+    const pOk = (pass?.value || "").trim().length > 0;
+    return uOk && pOk;
+  }
+  function updateBtn(){
+    if (!submit) return;
+    submit.disabled = !canSubmit();
+  }
+
+  // eventos normales
+  ["input","change","keyup","blur"].forEach(ev=>{
+    user?.addEventListener(ev, updateBtn);
+    pass?.addEventListener(ev, updateBtn);
+  });
+
+  // primer chequeo + casos de autofill (aplican luego de pintar)
+  updateBtn();
+  setTimeout(updateBtn, 80);
+  setTimeout(updateBtn, 300);
+  setTimeout(updateBtn, 800);
+  window.addEventListener("pageshow", updateBtn);
+
+  // si usás los keyframes de autofill, reacciona al evento
+  document.addEventListener("animationstart", (e)=>{
+    if (e.animationName === "onAutoFillStart" || e.animationName === "onAutoFillCancel") {
+      updateBtn();
+    }
+  }, true);
+});
+</script>
+
+  </body>
+</html>

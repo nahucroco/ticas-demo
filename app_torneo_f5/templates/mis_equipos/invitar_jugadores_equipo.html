@@ -1,0 +1,251 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/configuracion_equipo.css' %}">
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/busqueda.css' %}">
+<link rel="stylesheet" href="{% static 'css/invitar_jugadores_equipo.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Invitar{% endblock %}
+
+{% block content %}
+<div class="main">
+
+    <!-- Botón de volver -->
+    <div class="container-volver">
+        <button onclick="window.history.back()" class="icono-volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Buscador -->
+    <form id="form-busqueda" autocomplete="off">
+        <div class="search-container">
+            <span class="search-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.5">
+                        <path
+                            d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+                            stroke="white" stroke-width="1.5" />
+                        <path d="M18.5 18.5L22 22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </g>
+                </svg>
+            </span>
+            <input type="text" name="q" placeholder="Busca jugadores..." class="search-input">
+        </div>
+    </form>
+
+    <!-- Lista de jugadores invitados -->
+    <div id="contenedor-invitados">
+        {% include 'mis_equipos/_lista_invitados.html' with invitados=invitados_pendientes %}
+    </div>
+
+    <!-- Lista de jugadores -->
+    <div id="contenedor-jugadores" data-equipo-id="{{ equipo.id }}" data-partido-id="{{ partido.id }}">
+        {% include 'mis_equipos/_lista_jugadores.html' %}
+    </div>
+
+</div>
+
+
+
+<!-- Script principal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contenedorJugadores = document.getElementById('contenedor-jugadores');
+        const equipoId = contenedorJugadores.dataset.equipoId;
+
+        // Delegación de eventos para que funcione también con jugadores recién cargados
+        contenedorJugadores.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-agregar-invitado');
+            if (!btn) return;
+
+            e.preventDefault();
+            const jugadorId = btn.dataset.jugadorId;
+
+            fetch(`/equipos/${equipoId}/buscar-jugadores/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `jugador_id=${jugadorId}&accion=invitar`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('contenedor-invitados').innerHTML = data.invitados_html;
+                        document.getElementById('contenedor-jugadores').innerHTML = data.html;
+                    } else {
+                        alert(data.error || 'Error al invitar jugador');
+                    }
+                });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contenedorInvitados = document.getElementById('contenedor-invitados');
+        const contenedorJugadores = document.getElementById('contenedor-jugadores');
+        const equipoId = contenedorJugadores.dataset.equipoId;
+
+        contenedorInvitados.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-agregar-invitado');
+            if (!btn) return;
+
+            e.preventDefault();
+            const jugadorId = btn.dataset.jugadorId;
+
+            fetch(`/equipos/${equipoId}/buscar-jugadores/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `jugador_id=${jugadorId}&accion=eliminar`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        contenedorInvitados.innerHTML = data.invitados_html;
+                        contenedorJugadores.innerHTML = data.html;
+                    } else {
+                        alert(data.error || 'Error al eliminar invitación');
+                    }
+                });
+        });
+    });
+</script>
+<script>
+    document.getElementById('btn-confirmar-eliminacion').addEventListener('click', function () {
+        if (jugadorAEliminarId) {
+            fetch(`/equipo/eliminar-jugador/${jugadorAEliminarId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    location.reload(); // o remover del DOM sin recargar
+                } else {
+                    alert("Ocurrió un error al eliminar el jugador");
+                }
+            });
+        }
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const jugadoresEliminados = new Set();
+
+        document.querySelectorAll('.btn-eliminar-jugador').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const container = this.closest('.container-jugador');
+                const jugadorId = container.dataset.jugadorId;
+                const jugadorNombre = container.dataset.jugadorNombre;
+
+                if (confirm(`¿Eliminar a ${jugadorNombre} del equipo?`)) {
+                    container.style.display = 'none';
+                    jugadoresEliminados.add(jugadorId);
+                    document.getElementById('jugadores-eliminados').value = Array.from(jugadoresEliminados).join(',');
+                }
+            });
+
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputBusqueda = document.querySelector('.search-input');
+        const contenedorJugadores = document.getElementById('contenedor-jugadores');
+        const contenedorInvitados = document.getElementById('contenedor-invitados');
+        const equipoId = contenedorJugadores.dataset.equipoId;
+        const partidoId = contenedorJugadores.dataset.partidoId;
+
+        inputBusqueda.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            // Ocultar o mostrar contenedor de invitados según si hay búsqueda
+            if (query.length > 0) {
+                contenedorInvitados.style.display = 'none';
+            } else {
+                contenedorInvitados.style.display = '';
+            }
+
+            fetch(`/equipos/${equipoId}/buscar-jugadores/?q=${encodeURIComponent(query)}&partido_id=${partidoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    contenedorJugadores.innerHTML = data.html;
+                });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputs = document.querySelectorAll('.input-precio');
+
+        inputs.forEach(input => {
+            const wrapper = input.closest('.input-wrapper');
+
+            // Función para actualizar clases según valor
+            function actualizarClase() {
+                if (input.value.trim() !== '') {
+                    wrapper.classList.remove('input-sin-valor');
+                    wrapper.classList.add('input-con-valor');
+                } else {
+                    wrapper.classList.remove('input-con-valor');
+                    wrapper.classList.add('input-sin-valor');
+                }
+            }
+
+            // Llamar al cargar
+            actualizarClase();
+
+            // Llamar al escribir
+            input.addEventListener('input', actualizarClase);
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputs = document.querySelectorAll('.input-precio');
+        const botonGuardar = document.getElementById('btn-guardar');
+
+        function actualizarEstadoInputs() {
+            let todosTienenValor = true;
+
+            inputs.forEach(input => {
+                const wrapper = input.closest('.input-wrapper');
+
+                if (input.value.trim() !== '') {
+                    wrapper.classList.remove('input-sin-valor');
+                    wrapper.classList.add('input-con-valor');
+                } else {
+                    wrapper.classList.remove('input-con-valor');
+                    wrapper.classList.add('input-sin-valor');
+                    todosTienenValor = false;
+                }
+            });
+
+            botonGuardar.disabled = !todosTienenValor;
+        }
+
+        // Ejecutar al cargar y al escribir
+        actualizarEstadoInputs();
+        inputs.forEach(input => {
+            input.addEventListener('input', actualizarEstadoInputs);
+        });
+    });
+</script>
+
+{% endblock %}

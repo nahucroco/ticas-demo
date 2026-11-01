@@ -1,0 +1,269 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_3.css' %}">
+<!-- En <head> -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+{% block content %}
+<div class="main">
+
+    <div class="container-titulo">
+        <p class="M-subtitulos">Creando partido amistoso</p>
+    </div>
+
+    <div class="container-progress">
+        <div class="circle-container">
+            <div class="circle-progress" id="progressCircle"></div>
+            <div class="M-titulo circle-center" id="circleLabel">3/3</div>
+        </div>
+    </div>
+
+    <div class="container-selects">
+        <div class="container-1">
+            <div class="campo-slider">
+                <label for="jugadores" class="label-slider">
+                    <p>Cantidad de jugadores (máxima)</p>
+                    <span id="valor-jugadores">10</span>
+                </label>
+
+                <input type="range" id="jugadores" min="8" max="26" step="2" value="10">
+            </div>
+        </div>
+        <div class="container-2">
+            <div class="campo-precio">
+                <span class="icono-precio"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                        <path d="M12 17V17.5V18" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M12 6V6.5V7" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path
+                            d="M15 9.5C15 8.11929 13.6569 7 12 7C10.3431 7 9 8.11929 9 9.5C9 10.8807 10.3431 12 12 12C13.6569 12 15 13.1193 15 14.5C15 15.8807 13.6569 17 12 17C10.3431 17 9 15.8807 9 14.5"
+                            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg></span>
+                <div class="input-precio-wrapper input-sin-valor">
+                    <div class="campo">
+                        <input type="text" id="precio" class="input-precio input-text"
+                            placeholder="Precio total de cancha (ARS)">
+                    </div>
+                </div>
+            </div>
+            <p class="texto-ayuda">El valor por jugador se calcula automáticamente según la cantidad máxima de
+                participantes.</p>
+        </div>
+    </div>
+</div>
+<div class="footer-boton">
+    <button href="{% url 'crear_partido_2' %}" id="btn-anterior" type="button" class="btn-secundario">
+        <p class="M-boton">Volver</p>
+    </button>
+    <button href="{% url 'crear_partido_final' %}" id="btn-siguiente" type="button" class="btn-primario btn-disabled"
+        disabled>
+        <p class="M-boton">Crear</p>
+    </button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // -------------------------------
+        // CONSTANTES Y REFERENCIAS
+        // -------------------------------
+        const STORAGE_JUGADORES = "partidoAmistoso_jugadores";
+        const STORAGE_PRECIO = "partidoAmistoso_precio";
+
+        const inputJugadores = document.getElementById("jugadores");
+        const valorJugadores = document.getElementById("valor-jugadores");
+        const inputPrecio = document.getElementById("precio");
+        const wrapper = inputPrecio.closest('.input-precio-wrapper');
+        const botonSiguiente = document.getElementById("btn-siguiente");
+        const botonAnterior = document.getElementById("btn-anterior");
+
+        // -------------------------------
+        // PERSISTENCIA LOCALSTORAGE
+        // -------------------------------
+        const jugadoresGuardados = localStorage.getItem(STORAGE_JUGADORES);
+        const precioGuardado = localStorage.getItem(STORAGE_PRECIO);
+
+        if (jugadoresGuardados) {
+            inputJugadores.value = jugadoresGuardados;
+            valorJugadores.textContent = jugadoresGuardados;
+        } else {
+            localStorage.setItem(STORAGE_JUGADORES, inputJugadores.value);
+        }
+
+        if (precioGuardado) {
+            inputPrecio.value = parseInt(precioGuardado, 10).toLocaleString('es-AR');
+            wrapper.classList.add("input-con-valor");
+            botonSiguiente.disabled = false;
+            botonSiguiente.classList.remove("btn-disabled");
+        }
+
+        // -------------------------------
+        // SLIDER DE JUGADORES
+        // -------------------------------
+        const actualizarFondoSlider = () => {
+            const min = parseInt(inputJugadores.min);
+            const max = parseInt(inputJugadores.max);
+            const val = parseInt(inputJugadores.value);
+            const porcentaje = ((val - min) * 100) / (max - min);
+            inputJugadores.style.background = `
+      linear-gradient(to right, #8B42F4 0%, #8B42F4 ${porcentaje}%, #2b2b2e ${porcentaje}%, #2b2b2e 100%)`;
+        };
+
+        inputJugadores.addEventListener("input", () => {
+            valorJugadores.textContent = inputJugadores.value;
+            localStorage.setItem(STORAGE_JUGADORES, inputJugadores.value);
+            actualizarFondoSlider();
+        });
+
+        actualizarFondoSlider();
+        valorJugadores.textContent = inputJugadores.value;
+
+        // -------------------------------
+        // INPUT DE PRECIO
+        // -------------------------------
+        const actualizarPrecio = () => {
+            let valor = inputPrecio.value.replace(/\D/g, '');
+            if (valor.length === 0) {
+                wrapper.classList.remove("input-con-valor");
+                inputPrecio.value = "";
+                botonSiguiente.disabled = true;
+                botonSiguiente.classList.add("btn-disabled");
+            } else {
+                inputPrecio.value = parseInt(valor, 10).toLocaleString('es-AR');
+                wrapper.classList.add("input-con-valor");
+                botonSiguiente.disabled = false;
+                botonSiguiente.classList.remove("btn-disabled");
+                localStorage.setItem(STORAGE_PRECIO, valor);
+            }
+        };
+        inputPrecio.addEventListener("input", actualizarPrecio);
+
+        // -------------------------------
+        // NAVEGACIÓN
+        // -------------------------------
+        botonSiguiente.addEventListener("click", () => {
+            window.location.href = "{% url 'crear_partido_final' %}";
+        });
+        botonAnterior.addEventListener("click", () => {
+            window.location.href = "{% url 'crear_partido_2' %}";
+        });
+
+        // -------------------------------
+        // ETIQUETAS FLOTANTES
+        // -------------------------------
+        document.querySelectorAll('.campo > .input-text').forEach((input) => {
+            if (!input.parentElement.querySelector('.label-flotante')) {
+                const label = document.createElement('label');
+                label.className = 'label-flotante';
+                label.textContent = input.getAttribute('placeholder') || '';
+                label.setAttribute('for', input.id || '');
+                input.parentElement.prepend(label);
+            }
+        });
+
+        // -------------------------------
+        // SINCRONIZACIÓN DE FONDOS Y FLATPICKR
+        // -------------------------------
+        const actualizarFondo = (input) => {
+            const tieneValor = (input.value || '').trim() !== '';
+            input.classList.toggle('filled', tieneValor);
+            input.classList.toggle('con-valor', tieneValor);
+            const campo = input.closest('.campo');
+            if (campo) campo.classList.toggle('activo', tieneValor);
+        };
+
+        // Inicializa el listener en todos los inputs
+        const inicializarFondos = () => {
+            document.querySelectorAll(
+                ".input-text, .input-custom, .input-fecha-custom, .input-hora-custom"
+            ).forEach(input => {
+                ["input", "change", "blur"].forEach(evt =>
+                    input.addEventListener(evt, () => actualizarFondo(input))
+                );
+                actualizarFondo(input);
+            });
+        };
+
+        // Aplica a todos los inputs visibles al cargar
+        inicializarFondos();
+
+        // -------------------------------
+        // FLATPICKR - integración inmediata con fondos
+        // -------------------------------
+        const fechaInput = document.querySelector(".input-fecha-custom");
+        const horaInput = document.querySelector(".input-hora-custom");
+
+        if (fechaInput) {
+            flatpickr(fechaInput, {
+                altInput: true,
+                altFormat: "d / M / y",
+                dateFormat: "Y-m-d",
+                locale: "es",
+                disableMobile: true,
+                minDate: "today",
+                onChange: function (selectedDates, dateStr, instance) {
+                    actualizarFondo(instance._input); // aplica .filled apenas selecciona fecha
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    actualizarFondo(instance._input); // aplica .filled al cargar si ya hay valor
+                }
+            });
+        }
+
+        if (horaInput) {
+            flatpickr(horaInput, {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                locale: "es",
+                disableMobile: true,
+                onChange: function (selectedDates, dateStr, instance) {
+                    actualizarFondo(instance._input);
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    actualizarFondo(instance._input);
+                }
+            });
+        }
+
+
+        // Esperar flatpickr si aún no generó sus inputs
+        const esperarFlatpickr = () => {
+            const fpInputs = document.querySelectorAll(".flatpickr-input");
+            if (fpInputs.length > 0) {
+                inicializarFondos();
+                fpInputs.forEach(inp => {
+                    inp.addEventListener('input', () => actualizarFondo(inp));
+                    inp.addEventListener('change', () => actualizarFondo(inp));
+                });
+            } else {
+                setTimeout(esperarFlatpickr, 200);
+            }
+        };
+        esperarFlatpickr();
+
+        // Rechequeo por autofill del navegador
+        setTimeout(inicializarFondos, 400);
+    });
+</script>
+
+
+
+
+
+{% endblock %}

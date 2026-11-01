@@ -1,0 +1,83 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+  .row.row-cols-1.row-cols-md-2 {
+    gap: 20px;
+  }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/mistorneos.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Mis Torneos{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h2 class="M-titulo">Mis Torneos</h2>
+  <div class="container-torneos row row-cols-1 row-cols-md-2">
+    {% for torneo in torneos %}
+    <div class="col">
+      <a href="{% url 'detalle_torneo' torneo.id %}" class="">
+        <div class="card-torneo">
+          <div class="card-image">
+            {% if torneo.foto %}
+            <img src="{{ torneo.foto.url }}" alt="Imagen del torneo" class="img-fluid">
+            {% else %}
+            <img src="{% static 'images/copas-default/copa-default.png' %}" alt="Imagen del torneo" class="img-fluid">
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <div class="container-1">
+              <p class="M-subtitulos">{{ torneo.nombre }}</p>
+            </div>
+            <div class="container-2">
+              <p class="M-body">{{ torneo.tipo_cancha.nombre }}</p>
+              <p class="M-body">{{ torneo.duracion_partido }} min</p>
+              <p class="M-body"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                  fill="none">
+                  <path
+                    d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+                    stroke="white" stroke-width="1.5" />
+                  <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white"
+                    stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white" stroke-width="1.5"
+                    stroke-linecap="round" />
+                  <path
+                    d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+                    stroke="white" stroke-width="1.5" />
+                  <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="white"
+                    stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="white"
+                    stroke-width="1.5" stroke-linecap="round" />
+                </svg> {{ torneo.cantidad_equipos }}</p>
+            </div>
+            <div class="container-3">
+              <div class="formato-torneo-violeta">
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 5L15 12L9 19" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% empty %}
+    <div class="d-flex flex-column justify-content-center align-items-center">
+      <img src="{% static 'svg/mistorneos-vacio.svg' %}" alt="" style="width: 130px;">
+      <p class="M-body texto-transparente" style="text-align: center;">No estás participando en ningún torneo en este
+        momento...</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

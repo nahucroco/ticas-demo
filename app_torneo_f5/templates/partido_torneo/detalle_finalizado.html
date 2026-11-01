@@ -1,0 +1,784 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/editar_partido.css' %}">
+{% endblock %}
+{% block title %}Ticas - Partido Programado{% endblock %}
+{% block content %}
+
+<style>
+  .pantalla-crear {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    gap: 15px;
+  }
+
+  .descripcion-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 328px;
+
+  }
+
+  .estado-partido-en-curso,
+  .estado-partido-esperando {
+    background-color: #733bde;
+    color: white;
+    border-radius: 12px;
+    padding: 10px 20px;
+    text-align: center;
+    margin: 0 !important;
+  }
+
+  .reloj-partido {
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+
+  .btn-detalles {
+    background: transparent;
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: 100%;
+  }
+
+  .detalles-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .detalles-content {
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .partido-detalles {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .partido-detalles .fecha,
+  .partido-detalles .horario,
+  .partido-detalles .precio {
+    padding: 0;
+    width: 83px;
+  }
+
+  .cancha-info,
+  .tipo-partido {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .equipo-panel {
+    margin-top: 5px;
+    width: 100%;
+  }
+
+  .tab-selector {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    background-color: #2b2830;
+    border-radius: 10px;
+    padding: 5px;
+    overflow: hidden;
+    /* por si el fondo se anima en borde */
+  }
+
+  .tab {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: color 0.25s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    /* evita saltos raros */
+  }
+
+  .tab.active {
+    color: white;
+    background-color: transparent;
+  }
+
+  .tab-background {
+    /* width: 50% !important; */
+    position: absolute;
+    top: 5px;
+    left: 0;
+    /* punto de referencia dentro del contenedor */
+    height: calc(100% - 10px);
+    /* respeta padding superior/inferior */
+    width: 0;
+    /* se ajusta por JS */
+    background-color: #733BDE;
+    border-radius: 5px;
+    z-index: 1;
+    transform: translateX(0);
+    /* base para animación */
+    transition: transform 0.28s ease, width 0.28s ease;
+    /* animación suave */
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .equipo-lista-jugadores {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #535368;
+    padding: 15px 10px;
+    border-radius: 10px;
+  }
+
+  .equipo-jugador-card {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .icono-capitan {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .equipo-jugador-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+  }
+
+  .equipo-jugador-nombre {
+    font-weight: 600;
+  }
+
+  .equipo-jugador-id {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+
+  .linea-divisora {
+    width: 100%;
+    height: 1px;
+    background-color: #733BDE;
+    margin: 5px 0 10px 0;
+  }
+
+  .usuario-card {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .equipo-usuario-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .equipo-usuario-estadistica {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .estadistica-aag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .stat-value {
+    color: var(--Texto, #FFF);
+    text-align: center;
+    font-family: Outfit;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .goles-box {
+    width: 100%;
+    max-width: 328px;
+    margin-top: 6px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .goles-piramide {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .goles-icon {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .95;
+    margin-bottom: 2px;
+  }
+
+  .goles-line {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    /* espacio entre nombres */
+    width: 100%;
+  }
+
+  .gol-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    /* espacio nombre vs numero */
+    max-width: 150px;
+  }
+
+  .gol-name {
+    font-size: 16px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .gol-count {
+    font-size: 16px;
+    line-height: 1.1;
+    opacity: .7;
+  }
+</style>
+
+<p class="M-titulo">Partido de torneo</p>
+<div class="d-flex flex-row justify-content-center" style="gap: 5px; margin-bottom: 10px;">
+  {% if partido.torneo.imagen %}
+  <img src="{{ partido.torneo.imagen.url }}" width="30" height="30" style="border-radius: 2px;">
+  {% else %}
+  <img src="{% static 'images/copas-default/copa-default.png' %}" width="30" height="30">
+  {% endif %}
+  <p id="torneo-nombre" class="M-subtitulos">
+    {{ partido.torneo.nombre|default:"" }}
+  </p>
+
+</div>
+
+<!-- DETALLES -->
+<div class="btn-detalles" id="detalles-card">
+  <div class="detalles-head">
+    <p class="M-subtitulos">Detalles</p>
+    <svg class="icono-flecha" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 9.5L12 15.5L5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </svg>
+  </div>
+
+  <div class="detalles-content">
+    <div class="info-partido">
+      <div class="container-datos">
+        <div class="partido-detalles">
+          <div class="fecha">
+            <p>Día</p>
+            <strong>{{ partido.dia|date:"d / M" }}</strong>
+          </div>
+          <div class="horario">
+            <p>Horario</p>
+            <strong>{{ partido.hora_inicio|time:"H:i" }}</strong>
+          </div>
+          <div class="precio">
+            <p>Precio c/u</p>
+            <strong>-</strong>
+          </div>
+        </div>
+        <div class="cancha-info">
+          <p class="cancha-box">Cancha:</p>
+          <p class="cancha-nombre">{{ partido.cancha_text }}</p>
+          <p class="cancha-localidad">{{ partido.cancha.direccion }}</p>
+        </div>
+        <div class="tipo-partido">
+          <p>{{ partido.tipo_cancha.nombre }}</p>
+          <p>{{ partido.duracion }} minutos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ENCABEZADO -->
+<div class="descripcion-header">
+
+  <div class="d-flex flex-column justify-content-between align-items-center w-100" style="gap: 4px; padding: 10px;">
+    <div class="d-flex flex-row justify-content-between w-100">
+      <div>
+        <img id="escudo-local" src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76"
+          style="border-radius: 5px;">
+      </div>
+      <div class="d-flex flex-column justify-content-between align-items-center">
+        <p class="M-body" id="numero-fecha">Fecha —</p>
+        <div class="d-flex flex-row" style="gap: 10px;">
+          <p class="M-titulo" id="marcador-local">-</p>
+          <p class="M-titulo">-</p>
+          <p class="M-titulo" id="marcador-visitante">-</p>
+        </div>
+      </div>
+      <div>
+        <img id="escudo-visitante" src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76"
+          style="border-radius: 5px;">
+      </div>
+    </div>
+    <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+      <p class="M-body equipo-nombre izq"></p>
+      <p class="M-body equipo-nombre der"></p>
+    </div>
+  </div>
+</div>
+
+<!-- GOLES (placeholder) -->
+<!-- <div id="goles-box" class="goles-box"></div> esto lo deje me falta un toque -->
+
+
+
+
+<!-- PANEL DE JUGADORES -->
+<div class="equipo-panel">
+  <div class="tab-selector">
+    <div class="tab-background"></div>
+    <button class="M-body tab active" data-tab="equipo-1">{{ partido.equipo_1.nombre }}</button>
+    <button class="M-body tab" data-tab="equipo-2">{{ partido.equipo_2.nombre }}</button>
+  </div>
+
+  <div class="equipo-lista-jugadores" id="equipo-1">
+    {% for jugador in jugadores_equipo_1 %}
+    <div class="equipo-jugador-card">
+      <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+      <div>
+        <p class="M-body equipo-jugador-nombre">{{ jugador.nombre }}</p><br>
+        <p class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="equipo-lista-jugadores hidden" id="equipo-2">
+    {% for jugador in jugadores_equipo_2 %}
+    <div class="equipo-jugador-card">
+      <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+      <div>
+        <p class="M-body equipo-jugador-nombre">{{ jugador.nombre }}</p><br>
+        <p class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const partidoId = "{{ partido_id }}";
+
+    const urlPartido = `/api/partido/${partidoId}/`;
+    const urlStats = `/api/partido/${partidoId}/estadisticas/`;
+
+    // =========================
+    // UI: Detalles expandibles
+    // =========================
+    const detallesCard = document.getElementById("detalles-card");
+    if (detallesCard) {
+      const content = detallesCard.querySelector(".detalles-content");
+      if (content) {
+        content.style.maxHeight = "0";
+        content.style.opacity = "0";
+
+        detallesCard.addEventListener("click", () => {
+          const isOpen = detallesCard.classList.toggle("activo");
+          if (isOpen) {
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.opacity = "1";
+          } else {
+            content.style.maxHeight = "0";
+            content.style.opacity = "0";
+          }
+        });
+      }
+    }
+
+    // =========================
+    // UI: Tabs + background
+    // =========================
+    const selector = document.querySelector(".tab-selector");
+    const tabs = selector ? Array.from(selector.querySelectorAll(".tab")) : [];
+    const equiposContainers = Array.from(document.querySelectorAll(".equipo-lista-jugadores"));
+    let background = selector?.querySelector(".tab-background");
+
+    function moveBackground(toEl) {
+      if (!toEl || !background) return;
+      background.style.width = `${toEl.offsetWidth}px`;
+      background.style.transform = `translateX(${toEl.offsetLeft}px)`;
+    }
+
+    function initTabs() {
+      if (!selector) return;
+
+      if (!background) {
+        background = document.createElement("div");
+        background.className = "tab-background";
+        selector.prepend(background);
+      }
+
+      // init: mostrar equipo-1
+      equiposContainers.forEach(el => el.classList.add("hidden"));
+      document.getElementById("equipo-1")?.classList.remove("hidden");
+
+      const activeTab = selector.querySelector(".tab.active") || tabs[0];
+      requestAnimationFrame(() => requestAnimationFrame(() => moveBackground(activeTab)));
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          moveBackground(tab);
+
+          equiposContainers.forEach(el => el.classList.add("hidden"));
+          document.getElementById(tab.dataset.tab)?.classList.remove("hidden");
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        moveBackground(selector.querySelector(".tab.active") || tabs[0]);
+      });
+    }
+
+    initTabs();
+
+    // =========================
+    // SVGs
+    // =========================
+    const SVG_AMARILLA = `
+    <svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="10.625" height="13.4583" rx="3.54167"
+        transform="matrix(-1 0 0 1 11.1562 0.53125)"
+        fill="#FFD949" stroke="#FFD949" stroke-width="1.0625"/>
+    </svg>
+  `;
+
+    const SVG_ROJA = `
+    <svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="10.625" height="13.4583" rx="3.54167"
+        transform="matrix(-1 0 0 1 11.1562 0.53125)"
+        fill="#D70B22" stroke="#D70B22" stroke-width="1.0625"/>
+    </svg>
+  `;
+
+    // Pegá tus SVG completos acá (si no, dejalos vacío y no se renderizan)
+    const SVG_ATAJADAS = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1778_8222)">
+<path d="M15.1149 9.08236C15.1224 9.07032 15.1288 9.05755 15.1352 9.04479C15.3737 8.60512 15.4058 8.07509 15.2236 7.59208C15.0996 7.26232 14.8912 6.98278 14.6237 6.77965C14.6824 6.71415 14.7435 6.64615 14.8011 6.58237L14.827 6.55385L14.8472 6.52173C15.0216 6.24016 15.1111 5.92052 15.1092 5.58985L15.1146 5.58125L15.1028 5.4459C15.0879 5.27099 15.0482 5.09976 14.9842 4.93804L14.9683 4.89845C14.8025 4.50011 14.5073 4.18199 14.1369 3.99502C14.1441 3.9516 14.1486 3.90883 14.1521 3.86626C14.2252 3.04291 13.7032 2.26179 12.9106 2.00728C12.65 1.92441 12.3837 1.90521 12.1215 1.95091C11.9908 1.97197 11.8584 2.01205 11.7275 2.069L11.676 1.99186C11.4609 1.69372 11.1648 1.46864 10.8368 1.35304L10.8213 1.34332L10.7689 1.33122C10.203 1.1575 9.61299 1.26686 9.14778 1.63213L9.12793 1.64845L7.06868 3.72865L7.05555 3.51009L7.03914 3.45981C6.63657 2.23627 5.6085 1.79635 4.76791 1.90356C3.92431 2.01048 3.03486 2.70756 2.94894 4.02265C2.90635 4.67004 2.9309 5.34677 2.95428 6.00119C2.9742 6.55666 2.99479 7.13016 2.9731 7.66912C2.95868 8.02071 2.93012 8.37063 2.88671 8.71363C2.87307 8.71626 2.86036 8.71867 2.84786 8.72202C2.32908 8.84014 1.18661 10.1301 1.10585 10.2345C0.451763 11.0929 0.831877 11.6338 1.2778 12.1145C1.96677 12.8589 2.72652 13.5734 3.46176 14.2645C4.1563 14.9172 4.87478 15.593 5.52358 16.2842L5.55948 16.3187C5.5989 16.3515 5.6399 16.3804 5.68235 16.4071C6.04888 16.6372 6.54209 16.663 6.93267 16.4611C7.25485 16.2932 8.22764 15.2774 8.39974 15.0503C8.54371 14.8592 8.71764 14.5822 8.7261 14.2325C10.2126 13.4504 11.6504 12.629 12.9388 11.3843C12.9972 11.3282 13.067 11.2616 13.1455 11.1862C13.9939 10.3762 14.8448 9.54695 15.1089 9.09305L15.1154 9.08272L15.1149 9.08236ZM13.0645 9.53201L12.5501 10.052C12.5501 10.052 11.0877 11.472 10.9098 11.6051C10.7477 11.7256 10.5767 11.835 10.399 11.9321L9.97611 12.1624L7.8518 13.3973L3.90688 9.51643C4.03281 9.01013 4.09072 8.48992 4.11862 7.97165C4.18789 6.69328 3.98296 5.24918 4.10155 4.00817C4.11269 3.89362 4.115 3.74473 4.15456 3.63842C4.48898 2.73763 5.81199 2.87971 5.94567 3.91124C5.9902 4.25427 5.88856 5.59948 6.01512 5.78129C6.31877 6.21982 6.72366 5.75831 6.94006 5.49513L7.49569 4.93874L7.85491 4.55251L9.13041 3.26854L9.76158 2.63002C9.78612 2.59985 9.81317 2.57205 9.84294 2.54756C10.0164 2.40375 10.2771 2.35151 10.485 2.43169C10.8645 2.57876 10.9743 3.06751 10.7664 3.3872L9.60312 4.5625L9.05971 5.11217L9.05914 5.11181L8.93864 5.23368C8.84887 5.32446 8.85008 5.47156 8.94049 5.56191L9.13595 5.75499C9.22694 5.8457 9.37404 5.84449 9.46475 5.7535L9.784 5.43094L11.8262 3.36644C11.8648 3.32028 11.9043 3.2803 11.9447 3.2465C12.2177 3.01409 12.5195 3.03401 12.73 3.18534C12.7462 3.19636 12.7624 3.20888 12.7778 3.22255C12.7893 3.2322 12.7999 3.24205 12.8107 3.25284C12.815 3.2563 12.8194 3.26068 12.8229 3.26529C12.8355 3.27716 12.8473 3.29017 12.8578 3.30398C12.8761 3.32584 12.8932 3.34942 12.9078 3.37458C12.9153 3.38565 12.9209 3.39715 12.927 3.409C13.0214 3.58343 13.0377 3.80716 12.9239 4.02919L12.9206 4.03191L12.9195 4.03363L12.5871 4.36951L12.064 4.89834L11.635 5.33194L11.0654 5.90677L11.0636 5.90963L9.92926 7.0567C9.83891 7.14712 9.84012 7.29422 9.93053 7.38457L10.126 7.57764C10.2173 7.66778 10.3641 7.66714 10.4548 7.57615L10.9901 7.03421L12.6462 5.36062L12.6522 5.35481L12.6537 5.35252C12.6966 5.30192 12.7458 5.25285 12.7978 5.20708L12.8018 5.20321C12.9622 5.06239 13.1566 4.95259 13.3553 4.95335C13.3797 4.95268 13.4036 4.95409 13.4279 4.95737C13.464 4.9624 13.5014 4.97152 13.5384 4.98516C13.5508 4.98971 13.5627 4.99483 13.5747 4.99995C13.5797 5.00226 13.5852 5.00492 13.5907 5.00759C13.5945 5.00918 13.5983 5.01077 13.6018 5.01293C13.6067 5.01523 13.6117 5.01754 13.6162 5.02042C13.6267 5.0254 13.6374 5.0313 13.6472 5.03743C13.6897 5.06257 13.728 5.09215 13.7625 5.12503C13.7937 5.15424 13.8207 5.18638 13.8438 5.22089C13.8501 5.2288 13.8559 5.23728 13.8611 5.24691C13.8719 5.26409 13.882 5.28242 13.8911 5.30096C13.9007 5.31892 13.9094 5.33804 13.9164 5.35758C13.9314 5.39738 13.9425 5.43954 13.9493 5.4822C13.9516 5.49642 13.9535 5.51121 13.9548 5.52564C13.956 5.53519 13.9566 5.54438 13.9569 5.55415C13.9577 5.56427 13.9576 5.57461 13.9575 5.58495C13.9576 5.59378 13.9573 5.60318 13.957 5.61258C13.9567 5.62199 13.956 5.63197 13.9553 5.64194C13.9541 5.65156 13.9534 5.66154 13.9522 5.67116C13.9502 5.68587 13.9476 5.70022 13.9449 5.71457C13.9436 5.72175 13.9423 5.72893 13.9401 5.73632C13.9339 5.76279 13.9258 5.7897 13.9159 5.81552C13.9128 5.82557 13.8119 5.95329 13.8119 5.95329L13.416 6.3533L13.2712 6.49989L13.1582 6.61366L12.8801 6.89488L12.8786 6.89717L12.8773 6.89796L12.8766 6.8991L12.8759 6.90025L12.4082 7.37269L11.8951 7.89184L10.9853 8.81122C10.9728 8.8234 10.9627 8.83702 10.9537 8.85136C10.8971 8.94141 10.9079 9.06175 10.9868 9.14002L11.1822 9.3331C11.2736 9.42323 11.4203 9.42259 11.5104 9.33124L11.6452 9.19433L12.3356 8.49706C12.3356 8.49706 13.1691 7.64968 13.1758 7.64273C13.1794 7.64094 13.1832 7.63858 13.1868 7.6368L13.1875 7.63565C13.3871 7.52664 13.6064 7.54037 13.7873 7.62918C13.79 7.63004 13.7926 7.63091 13.7949 7.63235C14.083 7.74923 14.2752 8.0698 14.1533 8.38995C14.1491 8.40172 14.1446 8.41406 14.1389 8.42567C14.1341 8.43708 14.1281 8.44927 14.1215 8.4611C14.1204 8.46282 14.1202 8.46433 14.1192 8.46605L14.1181 8.46777L14.0601 8.52573L13.5457 9.04567L13.0645 9.53201ZM3.07972 9.87356C3.2253 9.80343 3.45494 10.1675 3.56854 10.2604L2.33906 11.5501C2.27221 11.4146 1.8789 11.1876 1.92377 11.0423C1.97927 10.8596 2.91141 10.1022 3.07972 9.87356ZM7.6187 14.2169L6.36245 15.497L2.86367 12.0634L4.11991 10.7833L7.6187 14.2169Z" fill="white"/>
+<path d="M6.46096 7.2612L6.32777 7.39295C6.18332 7.53584 6.15877 7.74523 6.27293 7.86064L8.37576 9.98641C8.48992 10.1018 8.69957 10.0795 8.84402 9.93665L8.9772 9.8049C9.12165 9.66201 9.1462 9.45262 9.03204 9.33721L6.92922 7.21144C6.81505 7.09603 6.60541 7.11831 6.46096 7.2612Z" fill="white"/>
+<path d="M5.22999 8.18469L5.09477 8.31845C4.94812 8.46352 4.92179 8.67467 5.03595 8.79008L8.05421 11.8413C8.16837 11.9567 8.3798 11.9326 8.52645 11.7876L8.66166 11.6538C8.80831 11.5087 8.83465 11.2976 8.72049 11.1822L5.70223 8.13099C5.58807 8.01558 5.37664 8.03963 5.22999 8.18469Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_1778_8222">
+<rect width="17" height="17" fill="white" transform="matrix(-1 0 0 1 17 0)"/>
+</clipPath>
+</defs>
+</svg>
+`;
+    const SVG_ASISTENCIAS = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.79167 12.0416L9.20834 13.4583C9.34787 13.5978 9.51351 13.7085 9.69582 13.784C9.87812 13.8595 10.0735 13.8984 10.2708 13.8984C10.4682 13.8984 10.6636 13.8595 10.8459 13.784C11.0282 13.7085 11.1938 13.5978 11.3333 13.4583C11.4729 13.3188 11.5835 13.1531 11.6591 12.9708C11.7346 12.7885 11.7734 12.5931 11.7734 12.3958C11.7734 12.1985 11.7346 12.0031 11.6591 11.8208C11.5835 11.6385 11.4729 11.4728 11.3333 11.3333" stroke="white" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M9.91666 9.91666L11.6875 11.6875C11.9693 11.9693 12.3515 12.1276 12.75 12.1276C13.1485 12.1276 13.5307 11.9693 13.8125 11.6875C14.0943 11.4057 14.2526 11.0235 14.2526 10.625C14.2526 10.2265 14.0943 9.84428 13.8125 9.56249L11.0642 6.81416C10.6657 6.41621 10.1256 6.19269 9.56249 6.19269C8.99937 6.19269 8.45926 6.41621 8.06083 6.81416L7.43749 7.43749C7.1557 7.71928 6.77351 7.87759 6.37499 7.87759C5.97648 7.87759 5.59429 7.71928 5.31249 7.43749C5.0307 7.1557 4.87239 6.77351 4.87239 6.37499C4.87239 5.97648 5.0307 5.59428 5.31249 5.31249L7.30291 3.32207C7.94908 2.67759 8.79175 2.26705 9.69753 2.15543C10.6033 2.04381 11.5204 2.2375 12.3037 2.70582L12.6367 2.90416C12.9383 3.08619 13.2969 3.14932 13.6425 3.08124L14.875 2.83332" stroke="white" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.875 2.12512L15.5833 9.91679H14.1667M2.12501 2.12512L1.41667 9.91679L6.02084 14.521C6.30263 14.8027 6.68482 14.9611 7.08334 14.9611C7.48185 14.9611 7.86405 14.8027 8.14584 14.521C8.42763 14.2392 8.58594 13.857 8.58594 13.4585C8.58594 13.0599 8.42763 12.6777 8.14584 12.396M2.12501 2.83346H7.79167" stroke="white" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+    const SVG_GOLES = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.2975 12.5729C14.5909 12.5729 14.8288 12.3351 14.8288 12.0417C14.8288 11.7483 14.5909 11.5104 14.2975 11.5104V12.5729ZM9.54841 15.0614C9.45569 15.3398 9.60621 15.6405 9.88458 15.7332C10.163 15.8259 10.4638 15.6754 10.5565 15.397L9.54841 15.0614ZM2.8317 11.5104C2.5383 11.5104 2.30045 11.7483 2.30045 12.0417C2.30045 12.3351 2.5383 12.5729 2.8317 12.5729V11.5104ZM6.57275 15.397C6.66544 15.6754 6.96624 15.8259 7.24463 15.7332C7.523 15.6405 7.67352 15.3398 7.58087 15.0614L6.57275 15.397ZM3.93551 3.86711C3.85964 3.58368 3.56839 3.41541 3.28496 3.49127C3.00154 3.56712 2.83327 3.85838 2.90912 4.14181L3.93551 3.86711ZM1.15274 8.49145C0.907982 8.65323 0.840719 8.98282 1.00251 9.22755C1.16431 9.47235 1.49388 9.53957 1.73864 9.37779L1.15274 8.49145ZM14.1199 4.14187C14.1958 3.85845 14.0275 3.56719 13.7441 3.49133C13.4607 3.41548 13.1694 3.58375 13.0935 3.86717L14.1199 4.14187ZM15.2904 9.37786C15.5352 9.53964 15.8648 9.47242 16.0265 9.22762C16.1883 8.98289 16.121 8.6533 15.8763 8.49152L15.2904 9.37786ZM11.3973 2.71735C11.6371 2.54825 11.6943 2.21679 11.5252 1.97703C11.3561 1.73726 11.0246 1.67997 10.7849 1.84908L11.3973 2.71735ZM6.10257 1.6976C5.86651 1.52335 5.53389 1.57346 5.35965 1.80952C5.1854 2.04557 5.23551 2.37819 5.47157 2.55244L6.10257 1.6976ZM15.0357 8.50002C15.0357 12.1192 12.1054 15.0521 8.49186 15.0521V16.1146C12.6933 16.1146 16.0982 12.7048 16.0982 8.50002H15.0357ZM8.49186 15.0521C4.8783 15.0521 1.94792 12.1192 1.94792 8.50002H0.885422C0.885422 12.7048 4.29034 16.1146 8.49186 16.1146V15.0521ZM1.94792 8.50002C1.94792 4.88083 4.8783 1.94794 8.49186 1.94794V0.885437C4.29034 0.885437 0.885422 4.29518 0.885422 8.50002H1.94792ZM8.49186 1.94794C12.1054 1.94794 15.0357 4.88083 15.0357 8.50002H16.0982C16.0982 4.29518 12.6933 0.885437 8.49186 0.885437V1.94794ZM8.59861 7.1255L9.89946 8.12042L10.545 7.27645L9.24404 6.28153L8.59861 7.1255ZM9.96101 8.31373L9.45009 9.9691L10.4653 10.2825L10.9763 8.6271L9.96101 8.31373ZM9.28172 10.0938H7.70193V11.1563H9.28172V10.0938ZM7.53356 9.9691L7.02261 8.31373L6.00737 8.6271L6.51831 10.2825L7.53356 9.9691ZM7.08419 8.12042L8.38504 7.1255L7.73961 6.28153L6.43872 7.27645L7.08419 8.12042ZM14.2975 11.5104H13.1535V12.5729H14.2975V11.5104ZM9.96463 13.8112L9.54841 15.0614L10.5565 15.397L10.9727 14.1469L9.96463 13.8112ZM13.1535 11.5104C12.6735 11.5104 12.2688 11.5097 11.9393 11.5473C11.5962 11.5865 11.2812 11.672 10.9953 11.8783L11.6171 12.7399C11.7017 12.6788 11.8183 12.6305 12.0599 12.6029C12.3153 12.5737 12.649 12.5729 13.1535 12.5729V11.5104ZM10.9727 14.1469C11.1322 13.6677 11.2386 13.351 11.347 13.1176C11.4497 12.8966 11.5323 12.801 11.6171 12.7399L10.9953 11.8783C10.7095 12.0845 10.529 12.3565 10.3835 12.6698C10.2436 12.9708 10.1164 13.3553 9.96463 13.8112L10.9727 14.1469ZM2.8317 12.5729H3.97573V11.5104H2.8317V12.5729ZM6.15651 14.1469L6.57275 15.397L7.58087 15.0614L7.16458 13.8112L6.15651 14.1469ZM3.97573 12.5729C4.48021 12.5729 4.81392 12.5737 5.06925 12.6029C5.31098 12.6305 5.42745 12.6788 5.51215 12.7399L6.13387 11.8783C5.84799 11.672 5.53306 11.5865 5.18991 11.5473C4.86036 11.5097 4.45571 11.5104 3.97573 11.5104V12.5729ZM7.16458 13.8112C7.01281 13.3553 6.88564 12.9708 6.74579 12.6698C6.60019 12.3565 6.41971 12.0845 6.13387 11.8783L5.51215 12.7399C5.59689 12.801 5.67953 12.8966 5.78223 13.1176C5.89068 13.351 5.997 13.6677 6.15651 14.1469L7.16458 13.8112ZM2.90912 4.14181L3.20522 5.24813L4.2316 4.97343L3.93551 3.86711L2.90912 4.14181ZM2.25117 7.76534L1.15274 8.49145L1.73864 9.37779L2.83706 8.65175L2.25117 7.76534ZM3.20522 5.24813C3.33578 5.73594 3.4214 6.05897 3.45935 6.31357C3.49529 6.55467 3.47891 6.68009 3.44177 6.77808L4.43528 7.15468C4.56022 6.8251 4.56119 6.49873 4.51025 6.15693C4.46131 5.82863 4.35584 5.43763 4.2316 4.97343L3.20522 5.24813ZM2.83706 8.65175C3.23763 8.38697 3.57572 8.16441 3.82996 7.9512C4.0947 7.72928 4.31033 7.48434 4.43528 7.15468L3.44177 6.77808C3.40464 6.87602 3.33384 6.98065 3.14728 7.13712C2.95022 7.3023 2.67215 7.4871 2.25117 7.76534L2.83706 8.65175ZM13.0935 3.86717L12.7975 4.97349L13.8238 5.24819L14.1199 4.14187L13.0935 3.86717ZM14.192 8.65182L15.2904 9.37786L15.8763 8.49152L14.7779 7.76541L14.192 8.65182ZM12.7975 4.97349C12.6732 5.4377 12.5677 5.82869 12.5188 6.15699C12.4679 6.49879 12.4688 6.82517 12.5937 7.15475L13.5873 6.77814C13.5501 6.68016 13.5338 6.55474 13.5697 6.31363C13.6077 6.05903 13.6932 5.73601 13.8238 5.24819L12.7975 4.97349ZM14.7779 7.76541C14.3569 7.48717 14.0788 7.30237 13.8818 7.13712C13.6952 6.98071 13.6244 6.87609 13.5873 6.77814L12.5937 7.15475C12.7187 7.48441 12.9343 7.72935 13.1991 7.95127C13.4533 8.16448 13.7914 8.38704 14.192 8.65182L14.7779 7.76541ZM10.7849 1.84908L9.84966 2.5087L10.462 3.37697L11.3973 2.71735L10.7849 1.84908ZM7.16196 2.47962L6.10257 1.6976L5.47157 2.55244L6.53099 3.33446L7.16196 2.47962ZM9.84966 2.5087C9.4372 2.79957 9.16393 2.99133 8.93839 3.11471C8.72483 3.23154 8.60186 3.25924 8.4976 3.25811L8.48605 4.32055C8.83859 4.32436 9.14523 4.21263 9.44825 4.04687C9.73931 3.88767 10.0696 3.65372 10.462 3.37697L9.84966 2.5087ZM6.53099 3.33446C6.91732 3.61963 7.2425 3.86067 7.53001 4.02612C7.82943 4.1984 8.13358 4.31673 8.48605 4.32055L8.4976 3.25811C8.39333 3.25698 8.271 3.22662 8.05999 3.1052C7.83715 2.97698 7.56805 2.77934 7.16196 2.47962L6.53099 3.33446ZM9.89946 8.12042C9.92935 8.14323 9.95032 8.17412 9.96108 8.20889L10.9763 7.89546C10.902 7.65498 10.7545 7.43674 10.545 7.27645L9.89946 8.12042ZM9.96108 8.20889C9.97143 8.24247 9.97185 8.27874 9.96101 8.31373L10.9763 8.6271C11.0516 8.38307 11.0482 8.12843 10.9763 7.89546L9.96108 8.20889ZM12.8873 6.47562L10.2654 7.56134L10.6719 8.54302L13.2938 7.45728L12.8873 6.47562ZM9.24404 6.28153C9.02212 6.11179 8.7567 6.02681 8.49186 6.02681V7.0893C8.52968 7.0893 8.56694 7.10127 8.59861 7.1255L9.24404 6.28153ZM8.49186 6.02681C8.22701 6.02681 7.96153 6.11179 7.73961 6.28153L8.38504 7.1255C8.4167 7.10127 8.45396 7.0893 8.49186 7.0893V6.02681ZM9.02311 6.55806V3.78933H7.96061V6.55806H9.02311ZM9.45009 9.9691C9.43918 10.0046 9.41815 10.0343 9.39052 10.056L10.0479 10.8908C10.2407 10.7389 10.3892 10.5291 10.4653 10.2825L9.45009 9.9691ZM9.39052 10.056C9.35992 10.0802 9.32217 10.0938 9.28172 10.0938V11.1563C9.56697 11.1563 9.83493 11.0584 10.0479 10.8908L9.39052 10.056ZM11.7081 11.9616L10.1211 10.1259L9.31728 10.8209L10.9044 12.6565L11.7081 11.9616ZM7.70193 10.0938C7.66148 10.0938 7.62373 10.0802 7.59313 10.056L6.93581 10.8908C7.14872 11.0584 7.41668 11.1563 7.70193 11.1563V10.0938ZM7.59313 10.056C7.5655 10.0343 7.54446 10.0046 7.53356 9.9691L6.51831 10.2825C6.59445 10.5291 6.74293 10.7389 6.93581 10.8908L7.59313 10.056ZM6.24084 12.6372L7.6823 10.8015L6.84664 10.1453L5.40518 11.981L6.24084 12.6372ZM7.02261 8.31373C7.01179 8.27874 7.01223 8.24247 7.02261 8.20889L6.00737 7.89546C5.93548 8.12843 5.93205 8.38307 6.00737 8.6271L7.02261 8.31373ZM7.02261 8.20889C7.03333 8.17412 7.05433 8.14323 7.08419 8.12042L6.43872 7.27645C6.22917 7.43674 6.08161 7.65498 6.00737 7.89546L7.02261 8.20889ZM6.7213 7.56261L4.14484 6.47683L3.73221 7.45594L6.30868 8.54174L6.7213 7.56261Z" fill="white"/>
+</svg>
+`;
+
+    // =========================
+    // Helpers render
+    // =========================
+    const n = (v) => Number(v || 0);
+
+    function normalizeUrl(url) {
+      if (!url) return "";
+      if (typeof url === "string" && !url.startsWith("http") && !url.startsWith("/")) {
+        return "/" + url; // "media/..." -> "/media/..."
+      }
+      return url;
+    }
+
+    function renderStatBlock({ cls, svg, value }) {
+      const val = n(value);
+      if (val <= 0) return "";
+      if (!svg || String(svg).includes("REEMPLAZAR_POR_TU_SVG")) return ""; // no pegaste svg real
+      return `
+      <div class="${cls}">
+        ${svg}
+        <p class="stat-value">${val}</p>
+      </div>
+    `;
+    }
+
+    function renderJugadorCard(j, capitanJugadorId = null) {
+      const est = j?.estadisticas || {};
+
+      const amarillas = n(est.tarjetas_amarillas);
+      const roja = Boolean(est.tarjeta_roja);
+      const atajadas = n(est.atajadas);
+      const asistencias = n(est.asistencias);
+      const goles = n(est.goles);
+
+      // ✅ tu API devuelve jugador_img (NO "foto")
+      const foto = normalizeUrl(j?.jugador_img) || "/static/jugador.png";
+      const nombre = `${j?.first_name || ""} ${j?.last_name || ""}`.trim() || j?.nombre || "Jugador sin nombre";
+      const dorsal = (j?.dorsal ?? "-");
+
+      // ✅ tu API devuelve jugador_id (NO "id")
+      const jugadorId = j?.jugador_id ?? null;
+      const esCapitan = capitanJugadorId && jugadorId && Number(capitanJugadorId) === Number(jugadorId);
+
+      return `
+      <div class="usuario-card" style="position:relative;">
+        <img src="${foto}" alt="${nombre}" class="equipo-jugador-img">
+
+        <div class="equipo-usuario-info">
+          <p class="M-body equipo-jugador-nombre">${nombre}</p>
+          <p class="M-Boton equipo-jugador-idx">${dorsal}</p>
+        </div>
+
+        <div class="equipo-usuario-estadistica">
+          ${amarillas > 0 ? `
+            <div class="estadistica-amarilla">
+              ${SVG_AMARILLA}
+            </div>
+          ` : ""}
+
+          ${roja ? `
+            <div class="estadistica-roja">
+              ${SVG_ROJA}
+            </div>
+          ` : ""}
+
+          ${renderStatBlock({ cls: "estadistica-aag", svg: SVG_ATAJADAS, value: atajadas })}
+          ${renderStatBlock({ cls: "estadistica-asistencias", svg: SVG_ASISTENCIAS, value: asistencias })}
+          ${renderStatBlock({ cls: "estadistica-goles", svg: SVG_GOLES, value: goles })}
+        </div>
+
+        
+      </div>
+    `;
+    }
+
+    function renderLista(contenedor, jugadores, capitanJugadorId = null) {
+      if (!contenedor) return;
+      if (!jugadores || jugadores.length === 0) {
+        contenedor.innerHTML = `<p class="M-body-s texto-transparente">Sin jugadores</p>`;
+        return;
+      }
+      contenedor.innerHTML = jugadores.map(j => renderJugadorCard(j, capitanJugadorId)).join("");
+    }
+
+
+    function buildGoleadoresFromLista(jugadores = []) {
+      return jugadores
+        .map(j => ({
+          // si tu API ya trae "nombre" completo, usalo
+          nombre: j?.nombre || `${j?.first_name || ""} ${j?.last_name || ""}`.trim() || "Jugador",
+          goles: Number(j?.estadisticas?.goles || 0),
+        }))
+        .filter(x => x.goles > 0)
+        .sort((a, b) => b.goles - a.goles);
+    }
+
+    // ✅ Pirámide centrada: 2 arriba, 2 abajo (si existen)
+    function renderGolesBoxPiramide(goleadores = []) {
+      const box = document.getElementById("goles-box");
+      if (!box) return;
+
+      if (!goleadores.length) {
+        box.innerHTML = "";
+        return;
+      }
+
+      const topLine = goleadores.slice(0, 2);
+      const bottomLine = goleadores.slice(2, 4);
+
+      const renderLine = (arr) => {
+        if (!arr.length) return "";
+        return `
+      <div class="goles-line">
+        ${arr.map(g => `
+          <div class="gol-item">
+            <span class="gol-name">${g.nombre}</span>
+            <span class="gol-count">${g.goles}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+      };
+
+      box.innerHTML = `
+    <div class="goles-piramide">
+      <div class="goles-icon">${SVG_GOLES}</div>
+      ${renderLine(topLine)}
+      ${renderLine(bottomLine)}
+    </div>
+  `;
+    }
+
+
+
+    // =========================
+    // Fetch + Render
+    // =========================
+    try {
+
+
+      const [resPartido, resStats] = await Promise.all([
+        fetch(urlPartido, { headers: { "Accept": "application/json" } }),
+        fetch(urlStats, { headers: { "Accept": "application/json" } }),
+      ]);
+
+      if (!resPartido.ok) throw new Error(`PARTIDO HTTP ${resPartido.status}`);
+      if (!resStats.ok) throw new Error(`STATS HTTP ${resStats.status}`);
+
+      const partido = await resPartido.json();
+      const stats = await resStats.json();
+
+      // ---------- Header / detalles (API partido) ----------
+      const eq1 = partido?.equipo_local;
+      const eq2 = partido?.equipo_visitante;
+
+      document.querySelector(".equipo-nombre.izq").textContent = eq1?.nombre || "Equipo Local";
+      document.querySelector(".equipo-nombre.der").textContent = eq2?.nombre || "Equipo Visitante";
+
+      const imgLocal = document.getElementById("escudo-local");
+      const imgVisit = document.getElementById("escudo-visitante");
+      if (imgLocal) imgLocal.src = eq1?.escudo || "{% static 'images/escudo-equipo/equipo-a.png' %}";
+      if (imgVisit) imgVisit.src = eq2?.escudo || "{% static 'images/escudo-equipo/equipo-b.png' %}";
+
+      const torneoNombreEl = document.getElementById("torneo-nombre");
+      if (torneoNombreEl) {
+        torneoNombreEl.textContent = partido?.torneo?.nombre || stats?.torneo?.nombre || "-";
+      }
+
+      const numeroFechaEl = document.getElementById("numero-fecha");
+      if (numeroFechaEl) {
+        numeroFechaEl.textContent = partido?.fecha ? `Fecha ${partido.fecha}` : "Fecha a definir";
+      }
+
+      const ml = document.getElementById("marcador-local");
+      const mv = document.getElementById("marcador-visitante");
+
+      const gl = Number.isFinite(+partido?.goles_local) ? +partido.goles_local : null;
+      const gv = Number.isFinite(+partido?.goles_visitante) ? +partido.goles_visitante : null;
+
+      if (partido?.equipos_definidos && gl !== null && gv !== null) {
+        if (ml) ml.textContent = gl;
+        if (mv) mv.textContent = gv;
+      } else {
+        if (ml) ml.textContent = "-";
+        if (mv) mv.textContent = "-";
+      }
+
+      const diaEl = document.querySelector(".fecha strong");
+      if (diaEl) diaEl.textContent = partido?.dia_formateado || "A definir";
+
+      const horaEl = document.querySelector(".horario strong");
+      if (horaEl) horaEl.textContent = partido?.hora_inicio ? String(partido.hora_inicio).slice(0, 5) : "A definir";
+
+      const canchaNombre = document.querySelector(".cancha-nombre");
+      const canchaLoc = document.querySelector(".cancha-localidad");
+      if (canchaNombre) canchaNombre.textContent = partido?.cancha || "-";
+      if (canchaLoc) canchaLoc.textContent = partido?.ubicacion || "-";
+
+      const tipoPartido = document.querySelector(".tipo-partido");
+      if (tipoPartido) {
+        tipoPartido.innerHTML = `
+        <p>${partido?.torneo?.tipo_cancha?.nombre || "-"}</p>
+        <p>${partido?.torneo?.duracion_partido || 0} minutos</p>
+      `;
+      }
+
+      // Tabs text
+      const b1 = document.querySelector("button[data-tab='equipo-1']");
+      const b2 = document.querySelector("button[data-tab='equipo-2']");
+      if (b1) b1.textContent = eq1?.nombre_corto || eq1?.nombre || "Local";
+      if (b2) b2.textContent = eq2?.nombre_corto || eq2?.nombre || "Visitante";
+
+      // Recalcular fondo por cambio de texto
+      if (selector && background) {
+        const activeTab = selector.querySelector(".tab.active") || tabs[0];
+        requestAnimationFrame(() => requestAnimationFrame(() => moveBackground(activeTab)));
+      }
+
+      // ---------- Listas (API stats) ----------
+      const contLocal = document.getElementById("equipo-1");
+      const contVisit = document.getElementById("equipo-2");
+
+      const jugadoresLocal = stats?.equipo_local?.jugadores_equipo_local || [];
+      const jugadoresVisit = stats?.equipo_visitante?.jugadores_equipo_visitante || [];
+
+      const jugadores = [...jugadoresLocal, ...jugadoresVisit];
+
+      const goleadores = jugadores
+        .map(j => ({ nombre: j?.nombre || "Jugador", goles: Number(j?.estadisticas?.goles || 0) }))
+        .filter(x => x.goles > 0)
+        .sort((a, b) => b.goles - a.goles);
+
+      renderGolesBoxPiramide(goleadores);
+
+
+      // capitan_id viene del endpoint viejo /api/partido/<id>/
+      renderLista(contLocal, jugadoresLocal, eq1?.capitan_id);
+      renderLista(contVisit, jugadoresVisit, eq2?.capitan_id);
+
+    } catch (err) {
+      console.error("❌ Error:", err);
+    }
+  });
+</script>
+
+{% endblock %}

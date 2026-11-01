@@ -1,0 +1,431 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .jugador-foto {
+        width: 45px;
+        height: 45px;
+        border-radius: 5px;
+        object-fit: cover;
+    }
+
+    .boton-fijo-inferior {
+        background: linear-gradient(0deg, var(--Fondo, #161618) 66.83%, rgba(22, 22, 24, 0.00) 100%) !important;
+    }
+
+    .pantalla-crear {
+        height: 100dvh;
+        padding-top: 85px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9998;
+
+        /* para que haga fade in/out */
+        opacity: 0;
+    }
+
+    .modal-overlay[hidden] {
+        display: none;
+    }
+
+    .modal-card {
+        width: min(520px, 92vw);
+        border-radius: 16px;
+        background: var(--Fondo, #161618);
+        color: #fff;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+        border: 1px solid rgba(255, 255, 255, .08);
+        overflow: hidden;
+
+        /* estado inicial (desde) */
+        transform: translateY(12px);
+        opacity: 0;
+    }
+
+    /* Abrir (forward) */
+    .modal-overlay.is-open {
+        animation: overlayFade .25s ease-out both;
+        pointer-events: auto;
+    }
+
+    .modal-overlay.is-open .modal-card {
+        animation: modalIn .25s ease-out both;
+    }
+
+    /* Cerrar (reverse de la MISMA animación) */
+    .modal-overlay.is-closing {
+        animation: overlayFade .22s ease-in reverse both;
+        pointer-events: none;
+    }
+
+    .modal-overlay.is-closing .modal-card {
+        animation: modalIn .22s ease-in reverse both;
+    }
+
+    /* Keyframes únicos */
+    @keyframes modalIn {
+        from {
+            transform: translateY(12px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes overlayFade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+
+    .modal-header,
+    .modal-footer {
+        padding: 14px 16px;
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04));
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: 0;
+        color: #fff;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .modal-body {
+        padding: 16px;
+        display: grid;
+        gap: 10px;
+        background-color: #FFF;
+    }
+
+    .modal-body p {
+        margin: 0;
+        color: #161618 !important;
+    }
+
+    .btn-primario-modal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 0;
+        cursor: pointer;
+        background: #733BDE;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .linea-1 {
+        margin: 1.5px 0;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<div id="intro-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="intro-modal-title">
+    <div class="modal-card">
+        <div style="background: #221140; height: 212px; display: flex; justify-content: center; align-items: center;">
+            <img src="{% static 'svg/ticas-logo.svg' %}" alt="" width="170px">
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+            <p class="M-titulo" style="text-align: center; font-size: 20px;">¿Cómo te fue en la cancha?</p>
+            <p style="text-align: center;" class="M-body">Probá cómo sería registrar tus estadísticas en Ticas con esta
+                demo rápida</p>
+            <button type="button" class="btn-primario" style="width: 100%; margin-top: 15px;" data-modal-close>
+                <p class="M-boton" style="color: #FFF !important;">Registrar partido</p>
+            </button>
+        </div>
+    </div>
+</div>
+
+<form method="POST" onsubmit="localStorage.removeItem('calificaciones_jugadores')">
+    {% csrf_token %}
+    <div class="cargar_estadisticas_1">
+
+        <div class="header">
+            <div class="container-2">
+                <div class="container-icons">
+                    <div class="icon-container-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <hr class="linea-1">
+                    <div class="icon-container-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 22H2" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M21 22V14.5C21 13.6716 20.3284 13 19.5 13H16.5C15.6716 13 15 13.6716 15 14.5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M15 22V5C15 3.58579 15 2.87868 14.5607 2.43934C14.1213 2 13.4142 2 12 2C10.5858 2 9.87868 2 9.43934 2.43934C9 2.87868 9 3.58579 9 5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M9 22V9.5C9 8.67157 8.32843 8 7.5 8H4.5C3.67157 8 3 8.67157 3 9.5V22"
+                                stroke="white" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <hr class="linea-2">
+                    <div class="icon-container-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="18.5" cy="4.5" r="2.5" stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M9 17L7.99923 18.2009C7.262 19.0856 6.89338 19.5279 6.38945 19.764C5.88552 20 5.30973 20 4.15813 20H3"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M13.6503 21.9999C13.6503 22.4141 13.9861 22.7499 14.4003 22.7499C14.8145 22.7499 15.1503 22.4141 15.1503 21.9999H13.6503ZM12.5649 16.2457L13.0178 15.6479L13.0178 15.6479L12.5649 16.2457ZM13.7493 17.261L14.3365 16.7945L14.3365 16.7945L13.7493 17.261ZM14.3062 18.3817L15.0327 18.1954L15.0327 18.1954L14.3062 18.3817ZM13.5045 11.555C13.811 11.2763 13.8336 10.802 13.555 10.4955C13.2763 10.189 12.802 10.1664 12.4955 10.445L13.5045 11.555ZM10.8523 13.1644L11.5555 13.4252L11.5555 13.4252L10.8523 13.1644ZM10.922 14.72L10.2449 15.0426H10.2449L10.922 14.72ZM14.4003 19.9389H13.6503V21.9999H14.4003H15.1503V19.9389H14.4003ZM12.5649 16.2457L12.112 16.8436C12.7756 17.3463 12.9992 17.5226 13.162 17.7276L13.7493 17.261L14.3365 16.7945C14.0282 16.4065 13.6192 16.1035 13.0178 15.6479L12.5649 16.2457ZM14.4003 19.9389H15.1503C15.1503 19.1844 15.1558 18.6754 15.0327 18.1954L14.3062 18.3817L13.5797 18.5681C13.6448 18.8216 13.6503 19.1063 13.6503 19.9389H14.4003ZM13.7493 17.261L13.162 17.7276C13.3588 17.9753 13.5011 18.2617 13.5797 18.5681L14.3062 18.3817L15.0327 18.1954C14.9017 17.6847 14.6645 17.2073 14.3365 16.7945L13.7493 17.261ZM13 11L12.4955 10.445C12.0759 10.8265 11.5507 11.2813 11.1415 11.6686C10.9321 11.8668 10.7317 12.0669 10.5681 12.2554C10.4196 12.4266 10.2415 12.6544 10.1491 12.9037L10.8523 13.1644L11.5555 13.4252C11.5478 13.4461 11.5696 13.39 11.7011 13.2385C11.8175 13.1044 11.9771 12.9431 12.1726 12.758C12.5731 12.3789 13.0371 11.9799 13.5045 11.555L13 11ZM12.5649 16.2457L13.0178 15.6479C12.5303 15.2786 12.2 15.0277 11.9623 14.8161C11.7288 14.6083 11.6414 14.4864 11.5991 14.3975L10.922 14.72L10.2449 15.0426C10.412 15.3935 10.6684 15.6725 10.965 15.9366C11.2574 16.1969 11.6439 16.4889 12.112 16.8436L12.5649 16.2457ZM10.8523 13.1644L10.1491 12.9037C9.89078 13.6003 9.92532 14.3719 10.2449 15.0426L10.922 14.72L11.5991 14.3975C11.4538 14.0926 11.4381 13.7419 11.5555 13.4252L10.8523 13.1644Z"
+                                fill="white" />
+                            <path
+                                d="M5.43568 8.82067L5.06517 8.16858L5.06517 8.16858L5.43568 8.82067ZM3.62949 8.98431C3.26935 9.18893 3.14328 9.64677 3.34791 10.0069C3.55253 10.367 4.01037 10.4931 4.37051 10.2885L3.62949 8.98431ZM13.4066 7.35719L13.1211 8.05073V8.05073L13.4066 7.35719ZM10.4467 6.64289L10.3924 5.89487L10.4467 6.64289ZM21 12.75C21.4142 12.75 21.75 12.4142 21.75 12C21.75 11.5858 21.4142 11.25 21 11.25V12.75ZM15.7681 9.53622L15.0973 9.87163V9.87163L15.7681 9.53622ZM5.43568 8.82067L5.06517 8.16858L3.62949 8.98431L4 9.6364L4.37051 10.2885L5.80619 9.47277L5.43568 8.82067ZM13.4066 7.35719L13.6921 6.66365C12.3481 6.1104 11.6111 5.80624 10.3924 5.89487L10.4467 6.64289L10.5011 7.39092C11.3248 7.33103 11.7575 7.48943 13.1211 8.05073L13.4066 7.35719ZM5.43568 8.82067L5.80619 9.47277C8.30813 8.05121 9.35849 7.47401 10.5011 7.39092L10.4467 6.64289L10.3924 5.89487C8.83282 6.00827 7.4432 6.81743 5.06517 8.16858L5.43568 8.82067ZM19.7546 12V12.75H21V12V11.25H19.7546V12ZM15.7681 9.53622L15.0973 9.87163C15.9793 11.6357 17.7823 12.75 19.7546 12.75V12V11.25C18.3505 11.25 17.0669 10.4567 16.4389 9.20082L15.7681 9.53622ZM15.7681 9.53622L16.4389 9.20082C15.8611 8.0451 14.8765 7.15119 13.6921 6.66365L13.4066 7.35719L13.1211 8.05073C13.9811 8.40473 14.6864 9.04993 15.0973 9.87163L15.7681 9.53622Z"
+                                fill="white" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="container-textos">
+                    <p class="M-body-s text-container-1">Equipo</p>
+                    <p class="M-body-s text-container-2">Rendimiento</p>
+                    <p class="M-body-s text-container-3">Participacion</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-main">
+            <div class="d-flex flex-column justify-content-center align-items-center" style="gap: 10px;">
+                <p class="M-subtitulos">¿Que tal jugaron tus compañeros?</p>
+            </div>
+            <div class="lista-jugadores">
+
+                <div class="container-jugador">
+                    <div class="d-flex flex-row justify-content-between align-items-center" style="padding: 5px 10px;">
+                        <div class="d-flex flex-row justify-content-center align-items-center" style="gap: 6px;">
+                        </div>
+                        <div class="d-flex flex-row" style="gap: 3px;">
+                            <span id="valor_{{ jugador.id }}" class="M-boton">0</span>
+                            <p class="M-boton">pts.</p>
+                        </div>
+                    </div>
+                    <div style="height: 25px;">
+                        <input type="range" min="0" max="10" step="1" name="calificacion_{{ jugador.id }}"
+                            id="calificacion_{{ jugador.id }}" value="0" oninput="actualizarValor('{{ jugador.id }}')"
+                            class="slider" required>
+                        <div class="slider-overlay"></div>
+                    </div>
+                    <div class="d-flex flex-row justify-content-between">
+                        <p class="M-body-s">Muy mal</p>
+                        <p class="M-body-s">Normal</p>
+                        <p class="M-body-s">Muy bien</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="boton-fijo-inferior">
+        <button class="btn-primario">
+            <p class="M-boton">Siguiente</p>
+        </button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const sliders = document.querySelectorAll(".slider");
+        let calificaciones = JSON.parse(localStorage.getItem("calificaciones_jugadores")) || {};
+
+        sliders.forEach(slider => {
+            const id = slider.id.split("_")[1];
+            const span = document.getElementById(`valor_${id}`);
+
+            // Si hay un valor guardado, restaurarlo
+            if (calificaciones[id] && parseInt(calificaciones[id]) > 0) {
+                slider.value = calificaciones[id];
+                span.textContent = calificaciones[id];
+            }
+
+            const actualizar = () => {
+                const min = parseFloat(slider.min) || 0;
+                const max = parseFloat(slider.max) || 10;
+                const val = parseFloat(slider.value);
+                const porcentaje = ((val - min) / (max - min)) * 100;
+
+                // Actualizar visual
+                slider.style.background = `
+                linear-gradient(90deg,
+                    var(--Lista-equipos-4-Equipo-2, #F54B58),
+                    var(--Lista-equipos-3-Equipo-2, #98CC09))`;
+                slider.style.backgroundSize = `${porcentaje}% 100%`;
+                slider.style.backgroundRepeat = 'no-repeat';
+                slider.style.backgroundColor = '#3b3b3b';
+
+                // Mostrar valor
+                if (span) {
+                    span.textContent = val;
+                }
+
+                // Guardar en localStorage si > 0, si no, eliminar
+                if (val > 0) {
+                    calificaciones[id] = val;
+                } else {
+                    delete calificaciones[id];
+                }
+                localStorage.setItem("calificaciones_jugadores", JSON.stringify(calificaciones));
+            };
+
+            slider.addEventListener("input", actualizar);
+            actualizar(); // actualizar al cargar
+        });
+    });
+</script>
+<script>
+    (function () {
+        const modal = document.getElementById('intro-modal');
+        if (!modal) return;
+
+        const CLOSE_ATTR = '[data-modal-close]';
+        const OPEN_ONCE_KEY = 'modal_cargar_estadisticas_v1';
+        const showOnce = false; // ponelo en true si querés mostrarlo solo la primera vez
+
+        function openModal() {
+            // reset de estado de cierre
+            modal.classList.remove('is-closing');
+
+            // mostrar y forzar reflow antes de agregar .is-open (para que anime)
+            modal.hidden = false;
+            void modal.offsetWidth;
+            modal.classList.add('is-open');
+
+            document.body.style.overflow = 'hidden';
+
+            // foco accesible
+            const focusable = modal.querySelector(CLOSE_ATTR) ||
+                modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            focusable && focusable.focus();
+        }
+
+        function closeModal() {
+            if (modal.hidden || modal.classList.contains('is-closing')) return;
+
+            modal.classList.remove('is-open');
+            modal.classList.add('is-closing');
+
+            // soltar clics al contenido de abajo mientras anima
+            modal.style.pointerEvents = 'none';
+
+            const cleanup = () => {
+                // evitar ejecutar dos veces
+                if (modal.hidden) return;
+                modal.hidden = true;
+                modal.classList.remove('is-closing');
+                modal.style.pointerEvents = '';
+                document.body.style.overflow = '';
+                if (showOnce) {
+                    try { localStorage.setItem(OPEN_ONCE_KEY, '1'); } catch (_) { }
+                }
+            };
+
+            const card = modal.querySelector('.modal-card');
+
+            // cuando termina la animación del card
+            card.addEventListener('animationend', cleanup, { once: true });
+
+            // extra: si por algún motivo la del overlay termina antes
+            modal.addEventListener('animationend', (e) => {
+                if (e.target === modal) cleanup();
+            }, { once: true });
+
+            // fallback por si algún navegador no emite animationend
+            setTimeout(cleanup, 450);
+        }
+
+
+        // Cerrar por botón u overlay (soporta clicks en hijos del botón)
+        modal.addEventListener('click', (e) => {
+            if (e.target.closest(CLOSE_ATTR)) {
+                e.preventDefault(); // evita submits o focos raros
+                closeModal();
+                return;
+            }
+            // Clic fuera (overlay)
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+
+        // Cerrar con Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.hidden) closeModal();
+        });
+
+        // Abrir al cargar la vista
+        document.addEventListener('DOMContentLoaded', () => {
+            const alreadyShown = (() => {
+                try { return localStorage.getItem(OPEN_ONCE_KEY) === '1'; } catch (_) { return false; }
+            })();
+            if (showOnce && alreadyShown) return;
+            openModal();
+        });
+    })();
+
+</script>
+
+
+
+
+
+{% endblock %}

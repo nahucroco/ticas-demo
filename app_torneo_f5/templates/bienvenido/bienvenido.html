@@ -1,0 +1,418 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #221140;
+    }
+
+    .pantalla-crear {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .historia-container {
+        height: 100%;
+        box-sizing: border-box;
+        /* overflow: hidden; */
+        background-color: #221140;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        padding: 0px 0px 40px 0px;
+    }
+
+    .slides {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .slide {
+        display: none;
+        /* height: 100%; */
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        /* padding: 22px 10px; */
+        flex: 1;
+    }
+
+    .slide.active {
+        display: flex;
+    }
+
+    .indicadores {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin: 20px 0;
+        width: 100px;
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 8px;
+        background-color: #3f3f3f;
+        border-radius: 5px;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .progress-inner {
+        height: 100%;
+        width: 0%;
+        background-color: #9c63ff;
+        transition: width 0s;
+    }
+
+    .dot.active {
+        background-color: #9c63ff;
+    }
+
+    #btn-crear-perfil {
+        z-index: 100;
+        width: 100%;
+        color: #FFF;
+    }
+
+    .navegacion-historias {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 90vh !important;
+        z-index: 10;
+    }
+
+    .M-titulo {
+        /* margin-bottom: 20px; */
+    }
+
+    .container-texto {
+        height: 200px;
+        padding: 0 16px !important;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalletorneo.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}
+{% block title %}Ticas - Bienvenido!{{ torneo.nombre }}{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="historia-container">
+
+    <div class="slides">
+        <div class="slide active">
+            <div class="d-flex flex-row align-items-center" style="height: 100%; align-items: center;">
+                <div class="d-flex flex-row align-items-end">
+                    <div class="d-flex align-items-center">
+                        <div id="lottie-container-1" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column container-texto justify-content-end" style="gap: 20px;">
+                <p class="M-titulo">Bienvenido a Ticas</p>
+                <p class="M-body">Organizá tus partidos, llevá tus estadísticas y armá tu perfil de jugador como si fueras profesional. Todo desde un solo lugar.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="d-flex flex-row align-items-center" style="height: 100%; align-items: center;">
+                <div class="d-flex flex-row align-items-end">
+                    <div class="d-flex align-items-center">
+                        <div id="lottie-container-2" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column container-texto justify-content-end" style="gap: 20px;">
+                <p class="M-titulo">Creá y sumate a partidos</p>
+                <p class="M-body">Elegí zona, armá el equipo, coordiná con otros jugadores y subí tus estadísticas
+                    cuando
+                    termine el partido.</p>
+            </div>
+        </div>
+
+        <div class="slide justify-content-center" id="slide-estadisticas">
+            <div class="d-flex flex-row align-items-center" style="height: 100%; align-items: center;">
+                <div class="d-flex flex-row align-items-end">
+                    <div class="d-flex align-items-center">
+                        <div id="lottie-container-3" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column container-texto justify-content-end" style="gap: 20px;">
+                <p class="M-titulo">Armá tu equipo con amigos</p>
+                <p class="M-body"> Creá tu grupo, poné una zona de referencia, participen de torneos y empiecen a jugar
+                    con
+                    identidad propia.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="d-flex flex-row align-items-center" style="height: 100%; align-items: center;">
+                <div class="d-flex flex-row align-items-end">
+                    <div class="d-flex align-items-center">
+                        <div id="lottie-container-4" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column container-texto justify-content-end" style="gap: 20px;">
+                <p class="M-titulo">Jugá torneos y sumá competencia</p>
+                <p class="M-body">Participá en torneos amateur, llevá el seguimiento de tu rendimiento y el de tu equipo
+                    durante cada fecha.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="d-flex align-items-center" style="height: 100%; align-items: center;">
+                <div id="lottie-container-5" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="d-flex flex-column container-texto justify-content-end" style="gap: 20px;">
+                <p class="M-titulo">Tu perfil, tus números</p>
+                <p class="M-body">Registrá goles, asistencias, atajadas y más. Armá tu historial y seguí tu evolución
+                    partido a partido.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="indicadores">
+        {% for i in "12345" %}
+        <div class="progress-bar">
+            <div class="progress-inner"></div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="navegacion-historias"></div>
+    
+    <div class="container-boton w-100" style="padding: 0 16px 20px 16px; z-index: 999;">
+        <button id="btn-crear-perfil" class="btn-primario w-100">Crear perfil</button>
+    </div>
+
+</div>
+<script src="https://unpkg.com/lottie-web@5.7.4/build/player/lottie.min.js"></script>
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressInners = document.querySelectorAll('.progress-inner');
+    const storyDuration = 5000;
+    let autoAdvanceTimeout = null;
+    let isPaused = false;
+    let remainingTime = storyDuration;
+    let lastStartTime = null;
+
+    // Mostrar el slide actual y reiniciar barra de progreso
+    function mostrarSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+        });
+
+        progressInners.forEach((bar, i) => {
+            bar.style.transition = 'none';
+            if (i < index) {
+                bar.style.width = '100%';
+            } else if (i > index) {
+                bar.style.width = '0%';
+            }
+        });
+
+        // Si estamos en el slide de la animación Lottie (último)
+        if (index === 0 && lottieAnimation1) {
+            lottieAnimation1.stop();
+            lottieAnimation1.goToAndPlay(0, true);
+        }
+        if (index === 1 && lottieAnimation2) {
+            lottieAnimation2.stop();
+            lottieAnimation2.goToAndPlay(0, true);
+        }
+        if (index === 2 && lottieAnimation3) {
+            lottieAnimation3.stop();
+            lottieAnimation3.goToAndPlay(0, true);
+        }
+        if (index === 3 && lottieAnimation4) {
+            lottieAnimation4.stop();
+            lottieAnimation4.goToAndPlay(0, true);
+        }
+        if (index === 4 && lottieAnimation5) {
+            lottieAnimation5.stop();
+            lottieAnimation5.goToAndPlay(0, true);
+        }
+
+
+        // 🎬 Controlar video
+        const video = document.getElementById('video-slide');
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
+        if (index === slides.length - 1 && video) {
+            video.play();
+        }
+
+        // Reiniciar barra actual
+        const currentBar = progressInners[index];
+        currentBar.style.width = '0%';
+        void currentBar.offsetWidth; // Forzar reflow
+        currentBar.style.transition = `width ${storyDuration}ms linear`;
+        currentBar.style.width = '100%';
+
+        // Reset temporizador
+        clearTimeout(autoAdvanceTimeout);
+        lastStartTime = Date.now();
+        autoAdvanceTimeout = setTimeout(() => {
+            cambiarSlide('siguiente');
+        }, storyDuration);
+    }
+
+    function cambiarSlide(direccion) {
+        if (direccion === 'siguiente') {
+            currentSlide = (currentSlide + 1) % slides.length;
+        } else if (direccion === 'anterior') {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        }
+        mostrarSlide(currentSlide);
+    }
+
+    // Navegación por clic izquierdo/derecho
+    document.querySelector('.navegacion-historias').addEventListener('click', function (event) {
+        if (event.target.closest('#btn-crear-perfil')) return;
+        const x = event.clientX;
+        const ancho = window.innerWidth;
+        cambiarSlide(x < ancho / 2 ? 'anterior' : 'siguiente');
+    });
+
+    // Pausa al mantener presionado
+    const contenedor = document.querySelector('.navegacion-historias');
+    const boton = document.getElementById('btn-crear-perfil');
+
+    function pausarHistoria() {
+        if (isPaused) return;
+        isPaused = true;
+
+        clearTimeout(autoAdvanceTimeout);
+
+        const elapsed = Date.now() - lastStartTime;
+        remainingTime = storyDuration - elapsed;
+
+        // Pausar barra
+        const currentBar = progressInners[currentSlide];
+        const computed = window.getComputedStyle(currentBar);
+        const width = computed.width;
+        currentBar.style.transition = 'none';
+        currentBar.style.width = width;
+    }
+
+    function reanudarHistoria() {
+        if (!isPaused) return;
+        isPaused = false;
+
+        // Reanudar barra
+        const currentBar = progressInners[currentSlide];
+        void currentBar.offsetWidth;
+        currentBar.style.transition = `width ${remainingTime}ms linear`;
+        currentBar.style.width = '100%';
+
+        lastStartTime = Date.now();
+        autoAdvanceTimeout = setTimeout(() => {
+            cambiarSlide('siguiente');
+        }, remainingTime);
+    }
+
+    ['mousedown', 'touchstart'].forEach(evt => {
+        contenedor.addEventListener(evt, e => {
+            if (!boton.contains(e.target)) pausarHistoria();
+        });
+    });
+    ['mouseup', 'touchend'].forEach(evt => {
+        contenedor.addEventListener(evt, e => {
+            if (!boton.contains(e.target)) reanudarHistoria();
+        });
+    });
+
+
+</script>
+
+<script>
+    document.getElementById('btn-crear-perfil').addEventListener('click', () => {
+        window.location.href = "{% url 'crear_perfil_1' %}";
+    });
+</script>
+<script>
+    let lottieAnimation1 = null;
+    let lottieAnimation2 = null;
+    let lottieAnimation3 = null;
+    let lottieAnimation4 = null;
+    let lottieAnimation5 = null;
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        lottieAnimation1 = lottie.loadAnimation({
+            container: document.getElementById('lottie-container-1'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animaciones/bienvenida_1.json" %}'
+        });
+
+        lottieAnimation2 = lottie.loadAnimation({
+            container: document.getElementById('lottie-container-2'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animaciones/bienvenida_2.json" %}'
+        });
+
+        lottieAnimation3 = lottie.loadAnimation({
+            container: document.getElementById('lottie-container-3'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animaciones/bienvenida_3.json" %}'
+        });
+
+        lottieAnimation4 = lottie.loadAnimation({
+            container: document.getElementById('lottie-container-4'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animaciones/bienvenida_4.json" %}'
+        });
+
+        lottieAnimation5 = lottie.loadAnimation({
+            container: document.getElementById('lottie-container-5'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animaciones/bienvenida_5.json" %}'
+        });
+
+        mostrarSlide(currentSlide);
+
+    });
+
+</script>
+
+
+
+
+{% endblock %}

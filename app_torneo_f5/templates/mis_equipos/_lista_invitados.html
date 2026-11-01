@@ -1,0 +1,26 @@
+{% load static %}
+<p class="M-subtitulos" style="margin-bottom: 15px;">Jugadores invitados</p>
+<div id="lista-invitados" class="lista-jugadores">
+    {% for invitacion in invitados %}
+    <div class="jugador-card">
+        <img src="{{ invitacion.jugador.foto.url }}" alt="">
+        <div class="d-flex w-100 flex-column">
+            <div>{{ invitacion.jugador.nombre }}</div>
+            <div class="d-flex flex-row justify-content-between">
+                <p class="texto-transparente" style="font-size: 12px;">
+                    {{ invitacion.jugador.provincia|cut:" "|first|upper }}{{ invitacion.jugador.provincia|cut:" "|slice:"1:"|first|upper }}
+                    {{ invitacion.jugador.ciudad }}
+                </p>
+                <p class="texto-transparente" style="font-size: 12px;">
+                    #{{ invitacion.jugador.id|stringformat:"04d" }}
+                </p>
+            </div>
+        </div>
+        <a href="#" class="d-flex align-items-center btn-agregar-invitado" data-jugador-id="{{ invitacion.jugador.id }}">
+            <img src="{% static 'svg/x.svg' %}" alt="" style="width: 24px; height: 24px;">
+        </a>
+    </div>
+    {% empty %}
+    <li>No hay invitaciones pendientes</li>
+    {% endfor %}
+</div>

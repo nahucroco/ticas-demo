@@ -1,0 +1,482 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/editar_partido.css' %}">
+<link rel="stylesheet" href="{% static 'css/armar_equipos.css' %}">
+{% endblock %}
+{% block title %}Ticas - Partidos{% endblock %}
+{% block content %}
+
+<div id="datos-partido" data-id="{{ partido.id }}" data-dia="{{ partido.dia|date:'Y-m-d' }}"
+  data-hora-inicio="{{ partido.hora_inicio|time:'H:i' }}" data-duracion="{{ partido.duracion }}">
+</div>
+
+<div class="info-partido">
+  <p class="M-titulo" style="text-align: center;">Partido amistoso</p>
+  <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 15px;">
+
+    <div class="partido-detalles" style="margin: 0;">
+      <div class="fecha">
+        <p>Día</p>
+        <strong>{{ partido.dia|date:"d/M" }}</strong>
+      </div>
+      <div class="horario">
+        <p>Horario</p>
+        <strong>{{ partido.hora_inicio|time:"H:i" }}</strong>
+      </div>
+      <div class="precio">
+        <p>Precio c/u</p>
+        <strong>${{ precio_por_jugador }}</strong>
+      </div>
+    </div>
+
+    <div class="cancha-info" style="margin-bottom: 0;">
+      <p class="cancha-box">Cancha:</p>
+      <p class="cancha-nombre">{{ partido.cancha }}</p>
+      <p class="cancha-localidad"><span class="Iata-Localidad">SF</span> {{ partido.ubicacion }}</p>
+    </div>
+
+    <div class="tipo-partido" style="margin-bottom: 0;">
+      <p>{{ partido.tipo_cancha }}</p>
+      <p>{{ partido.duracion }} minutos</p>
+    </div>
+  </div>
+</div>
+
+<div class="armado-equipos">
+  <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path opacity="0.5"
+      d="M22.5 12.5C22.5 6.97715 18.0228 2.5 12.5 2.5C6.97715 2.5 2.5 6.97715 2.5 12.5C2.5 18.0228 6.97715 22.5 12.5 22.5C18.0228 22.5 22.5 18.0228 22.5 12.5Z"
+      fill="white" />
+    <path
+      d="M12.5 6.75C12.9142 6.75 13.25 7.08579 13.25 7.5V13.5C13.25 13.9142 12.9142 14.25 12.5 14.25C12.0858 14.25 11.75 13.9142 11.75 13.5V7.5C11.75 7.08579 12.0858 6.75 12.5 6.75Z"
+      fill="white" />
+    <path
+      d="M12.5 17.5C13.0523 17.5 13.5 17.0523 13.5 16.5C13.5 15.9477 13.0523 15.5 12.5 15.5C11.9477 15.5 11.5 15.9477 11.5 16.5C11.5 17.0523 11.9477 17.5 12.5 17.5Z"
+      fill="white" />
+  </svg>
+  <p class="titulo-armado">Armando los equipos.</p>
+</div>
+
+<div class="separador" style="background: #733BDE; height: 1px; width: 100%;">
+</div>
+
+<div class="boton-aleatorio-wrapper" style="width: 100%;">
+  <button class="btn-primario" id="btnAleatorizar" style="font-weight: 400; width: 100%;">
+    <img src="{% static 'images/aleatorio.svg' %}" alt="Aleatorio" class="icono-aleatorio">
+    <p class="M-boton" style="font-weight: 400;">Aleatorizar equipos</p>
+  </button>
+</div>
+
+<div class="equipos-vs">
+  <div class="equipox equipo-1 {{ color_equipo_local }}">
+    <p class="M-subtitulos">Equipo 1</p> <span class="cantidad M-subtitulos" id="contador-equipo-a">(0)</span>
+  </div>
+  <div class="vs-text">
+    <p class="M-titulo">VS</p>
+  </div>
+  <div class="equipox equipo-2 {{ color_equipo_visitante }}">
+    <p class="M-subtitulos">Equipo 2</p> <span class="cantidad M-subtitulos" id="contador-equipo-b">(0)</span>
+  </div>
+</div>
+
+<div class="container-jugadores">
+  {% for jugador in jugadores_ordenados %}
+  <div class="card-usuario equipo-a {{ color_equipo_local }}" data-jugador-id="{{ jugador.id }}"
+    data-color-a="{{ color_equipo_local }}" data-color-b="{{ color_equipo_visitante }}">
+    <div class="contenido-jugador">
+      <img class="avatar" src="{{ jugador.foto.url }}" alt="avatar">
+      <div class="nombre-container">
+        <span class="nombre">{{ jugador.nombre }}</span>
+        <span class="apellido">{{ jugador.apellido }}</span>
+      </div>
+    </div>
+    <div class="icono-mover-wrapper">
+      <img class="flecha" src="{% static 'svg/flecha.svg' %}" alt="flecha">
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if error %}
+<div class="error-message">
+  {{ error }}
+</div>
+{% endif %}
+<div id="error-container"></div>
+
+<div class="div-crearequipo" style="width: 100%;">
+  <button class="boton-crearequipo btn-primario" style="width: 100%;">
+    <p class="M-boton">Confirmar equipos</p>
+  </button>
+  <button class="btn-secundario" id="btnCrearPartido" style="width: 100%;">
+    <p class="M-boton">Cancelar Partido</p>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+<!-- ====== LÓGICA DE MOVER JUGADORES / LOCALSTORAGE ====== -->
+<!-- <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    function actualizarContadores() {
+      const jugadoresA = document.querySelectorAll(".card-usuario:not(.equipo-b)").length;
+      const jugadoresB = document.querySelectorAll(".card-usuario.equipo-b").length;
+      const a = document.getElementById("contador-equipo-a");
+      const b = document.getElementById("contador-equipo-b");
+      if (a) a.textContent = `(${jugadoresA})`;
+      if (b) b.textContent = `(${jugadoresB})`;
+    }
+
+    function guardarEstadoEnLocalStorage(id, equipo) {
+      let estado = JSON.parse(localStorage.getItem('estado_equipos')) || {};
+      estado[id] = equipo;
+      localStorage.setItem('estado_equipos', JSON.stringify(estado));
+    }
+
+    function restaurarDesdeLocalStorage() {
+      const estado = JSON.parse(localStorage.getItem('estado_equipos')) || {};
+      document.querySelectorAll(".card-usuario").forEach(card => {
+        const idJugador = card.getAttribute("data-jugador-id");
+        const colorA = card.dataset.colorA;
+        const colorB = card.dataset.colorB;
+
+        if (estado[idJugador] === 'B') {
+          card.classList.add("equipo-b");
+          card.classList.remove(colorA);
+          card.classList.add(colorB);
+        } else {
+          card.classList.remove("equipo-b");
+          card.classList.remove(colorB);
+          card.classList.add(colorA);
+        }
+      });
+      actualizarContadores();
+    }
+
+    // Mover jugador con la flecha y guardar estado
+    document.querySelectorAll(".card-usuario").forEach(card => {
+      const btnFlecha = card.querySelector(".icono-mover-wrapper");
+      if (!btnFlecha) return;
+
+      btnFlecha.addEventListener("click", () => {
+        card.classList.add("animando");
+
+        setTimeout(() => {
+          const esEquipoB = card.classList.toggle("equipo-b");
+          const colorA = card.dataset.colorA;
+          const colorB = card.dataset.colorB;
+
+          if (esEquipoB) {
+            card.classList.remove(colorA);
+            card.classList.add(colorB);
+          } else {
+            card.classList.remove(colorB);
+            card.classList.add(colorA);
+          }
+
+          card.classList.remove("animando");
+          actualizarContadores();
+
+          const jugadorId = card.getAttribute("data-jugador-id");
+          guardarEstadoEnLocalStorage(jugadorId, esEquipoB ? 'B' : 'A');
+        }, 400);
+      });
+    });
+
+    // Restaurar SOLO una vez (antes estaba dentro del forEach)
+    restaurarDesdeLocalStorage();
+  });
+</script> -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const DUR = 350;
+
+    function actualizarContadores() {
+      const jugadoresA = document.querySelectorAll(".card-usuario:not(.equipo-b)").length;
+      const jugadoresB = document.querySelectorAll(".card-usuario.equipo-b").length;
+      const a = document.getElementById("contador-equipo-a");
+      const b = document.getElementById("contador-equipo-b");
+      if (a) a.textContent = `(${jugadoresA})`;
+      if (b) b.textContent = `(${jugadoresB})`;
+    }
+
+    function guardarEstadoEnLocalStorage(id, equipo) {
+      let estado = JSON.parse(localStorage.getItem('estado_equipos')) || {};
+      estado[id] = equipo;
+      localStorage.setItem('estado_equipos', JSON.stringify(estado));
+    }
+
+    // FLIP para N elementos hijos de la card (contenido y flecha)
+    function flipChildren(card, toggleToB) {
+      const contenido = card.querySelector(".contenido-jugador");
+      const flecha = card.querySelector(".icono-mover-wrapper");
+      if (!contenido || !flecha) return;
+
+      const firstContenido = contenido.getBoundingClientRect();
+      const firstFlecha = flecha.getBoundingClientRect();
+
+      const colorA = card.dataset.colorA;
+      const colorB = card.dataset.colorB;
+      card.classList.add("animando");
+
+      if (toggleToB) {
+        card.classList.add("equipo-b");
+        card.classList.remove(colorA);
+        card.classList.add(colorB);
+      } else {
+        card.classList.remove("equipo-b");
+        card.classList.remove(colorB);
+        card.classList.add(colorA);
+      }
+
+      // LAST
+      contenido.style.transition = "none";
+      flecha.style.transition = "none";
+      const lastContenido = contenido.getBoundingClientRect();
+      const lastFlecha = flecha.getBoundingClientRect();
+
+      const dxC = firstContenido.left - lastContenido.left;
+      const dyC = firstContenido.top - lastContenido.top;
+      const dxF = firstFlecha.left - lastFlecha.left;
+      const dyF = firstFlecha.top - lastFlecha.top;
+
+      // 👇 Mantener rotación según el estado destino
+      const rot = toggleToB ? " rotate(180deg)" : " rotate(0deg)";
+
+      contenido.style.transform = `translate(${dxC}px, ${dyC}px)`;
+      // IMPORTANTE: componer translate + rotate
+      flecha.style.transform = `translate(${dxF}px, ${dyF}px)${rot}`;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const trans = `transform 350ms cubic-bezier(.2,.7,.2,1)`;
+          contenido.style.transition = trans;
+          flecha.style.transition = trans;
+
+          contenido.style.transform = "translate(0,0)";
+          flecha.style.transform = `translate(0,0)${rot}`; // mantener rotación mientras anima
+
+          const onEnd = () => {
+            // limpiamos inline para que quede la rotación del CSS por clase
+            contenido.style.transition = "";
+            flecha.style.transition = "";
+            contenido.style.transform = "";
+            flecha.style.transform = "";
+            card.classList.remove("animando");
+            contenido.removeEventListener("transitionend", onEnd);
+          };
+          contenido.addEventListener("transitionend", onEnd, { once: true });
+        });
+      });
+    }
+
+
+    // Click en flecha: animamos el SWAP interno
+    document.querySelectorAll(".card-usuario").forEach(card => {
+      const btnFlecha = card.querySelector(".icono-mover-wrapper");
+      if (!btnFlecha) return;
+
+      btnFlecha.addEventListener("click", () => {
+        const toB = !card.classList.contains("equipo-b"); // si no está en B, va a B
+        flipChildren(card, toB);
+
+        // Persistencia + contadores
+        const jugadorId = card.getAttribute("data-jugador-id");
+        guardarEstadoEnLocalStorage(jugadorId, toB ? 'B' : 'A');
+        requestAnimationFrame(actualizarContadores);
+      });
+    });
+  });
+</script>
+
+
+
+<!-- ====== ALEATORIZAR EQUIPOS ====== -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnAleatorizar = document.getElementById("btnAleatorizar");
+    if (!btnAleatorizar) return;
+
+    btnAleatorizar.addEventListener("click", () => {
+      const jugadores = Array.from(document.querySelectorAll(".card-usuario"));
+
+      // Mezclar aleatoriamente (Fisher-Yates)
+      for (let i = jugadores.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [jugadores[i], jugadores[j]] = [jugadores[j], jugadores[i]];
+      }
+
+      const mitad = Math.ceil(jugadores.length / 2);
+
+      jugadores.forEach((card, index) => {
+        const idJugador = card.getAttribute("data-jugador-id");
+        const colorA = card.dataset.colorA;
+        const colorB = card.dataset.colorB;
+
+        if (index < mitad) {
+          card.classList.remove("equipo-b");
+          card.classList.remove(colorB);
+          card.classList.add(colorA);
+          guardarEstadoEnLocalStorage(idJugador, 'A');
+        } else {
+          card.classList.add("equipo-b");
+          card.classList.remove(colorA);
+          card.classList.add(colorB);
+          guardarEstadoEnLocalStorage(idJugador, 'B');
+        }
+      });
+
+      actualizarContadores();
+    });
+
+    function guardarEstadoEnLocalStorage(id, equipo) {
+      let estado = JSON.parse(localStorage.getItem('estado_equipos')) || {};
+      estado[id] = equipo;
+      localStorage.setItem('estado_equipos', JSON.stringify(estado));
+    }
+
+    function actualizarContadores() {
+      const jugadoresA = document.querySelectorAll(".card-usuario:not(.equipo-b)").length;
+      const jugadoresB = document.querySelectorAll(".card-usuario.equipo-b").length;
+      const a = document.getElementById("contador-equipo-a");
+      const b = document.getElementById("contador-equipo-b");
+      if (a) a.textContent = `(${jugadoresA})`;
+      if (b) b.textContent = `(${jugadoresB})`;
+    }
+  });
+</script>
+
+<!-- ====== VALIDACIÓN + ENVÍO (UNIFICADO y CORREGIDO) ====== -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnConfirmar = document.querySelector(".boton-crearequipo");
+    if (!btnConfirmar) return;
+
+    btnConfirmar.addEventListener("click", () => {
+      const jugadoresA = [];
+      const jugadoresB = [];
+
+      // Construir A/B
+      document.querySelectorAll(".card-usuario").forEach(card => {
+        const idJugador = card.getAttribute("data-jugador-id");
+        (card.classList.contains("equipo-b") ? jugadoresB : jugadoresA).push(idJugador);
+      });
+
+      const contenedorError = document.getElementById("error-container");
+      if (contenedorError) contenedorError.innerHTML = "";
+
+      // Datos partido
+      const datosPartido = document.getElementById("datos-partido");
+      const partidoId = datosPartido?.dataset.id;
+
+      const fecha = datosPartido?.dataset.dia;
+      const horaInicio = datosPartido?.dataset.horaInicio; // <- de data-hora-inicio (OK)
+      const duracion = parseInt(datosPartido?.dataset.duracion || "0", 10);
+
+      // Validación por tiempo: no permitir confirmar si ya finalizó
+      if (fecha && horaInicio && duracion) {
+        const fechaHoraInicio = new Date(`${fecha}T${horaInicio}:00`);
+        const fechaHoraFin = new Date(fechaHoraInicio.getTime() + duracion * 60000);
+        const ahora = new Date();
+
+        if (ahora >= fechaHoraFin) {
+          Swal.fire({
+            icon: 'error',
+            title: 'El partido ya finalizó',
+            text: 'No podés confirmar los equipos porque el horario del partido ya pasó.',
+            confirmButtonText: 'Editar partido'
+          }).then(() => {
+            if (partidoId) window.location.href = `/partido/amistoso/${partidoId}/configuracion`;
+          });
+          return;
+        }
+      }
+
+      // Validaciones lógicas de equipos
+      const total = jugadoresA.length + jugadoresB.length;
+      let mensaje = null;
+      let tipo = "error"; // por defecto bloquea
+
+      if (jugadoresA.length === 0 || jugadoresB.length === 0) {
+        mensaje = "Ambos equipos deben tener al menos un jugador.";
+      } else if (jugadoresA.length !== jugadoresB.length) {
+        mensaje = "Los equipos no están equilibrados.";
+        tipo = "advertencia"; // solo advierte
+      }
+
+      const enviarEquipos = () => {
+        fetch(`/partido/${partidoId}/confirmar-equipos/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({ equipo_a: jugadoresA, equipo_b: jugadoresB })
+        }).then(response => {
+          if (response.ok) {
+            localStorage.removeItem('estado_equipos');
+            window.location.href = `/partido/amistoso/${partidoId}/`;
+          } else {
+            Swal.fire("Error", "No se pudo confirmar los equipos.", "error");
+          }
+        }).catch(() => {
+          Swal.fire("Error", "No se pudo confirmar los equipos.", "error");
+        });
+      };
+
+      // Mostrar errores/advertencias
+      if (mensaje) {
+        if (tipo === "error") {
+          if (contenedorError) {
+            const div = document.createElement("div");
+            div.className = `error-message fade-in`;
+            div.innerHTML = `<strong>Error:</strong> ${mensaje}`;
+            contenedorError.appendChild(div);
+          } else {
+            Swal.fire("Error", mensaje, "error");
+          }
+          return; // bloquea
+        } else {
+          // Advertencia: permitir continuar
+          Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: mensaje,
+            showCancelButton: true,
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar',
+          }).then((result) => {
+            if (result.isConfirmed) enviarEquipos();
+          });
+          return;
+        }
+      }
+
+      // Sin mensajes -> enviar directo
+      enviarEquipos();
+    });
+  });
+</script>
+
+{% endblock %}

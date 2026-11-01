@@ -1,0 +1,108 @@
+body, html{
+    margin: 0;
+    padding: 0;
+}
+
+.main {
+    width: 100%;
+    overflow: hidden;
+    padding-bottom: 50px;
+}
+
+.container-titulo {
+    padding-left: 16px;
+    display: flex;
+    width: 100%;
+    margin-bottom: 112px;
+}
+
+.carrusel-contenedor {
+    position: relative;
+    /* overflow: hidden; */
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+}
+
+.carrusel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    width: 160px;
+    /* mismo que escudo */
+    margin: 0 15px;
+    /* separación de 30px entre slides */
+    opacity: 0.5;
+    transform: scale(0.9);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    flex-shrink: 0;
+    /* evitar que el slide se achique */
+}
+
+.slide.activo {
+    transform: scale(1);
+    opacity: 1;
+    z-index: 2;
+}
+
+.equipo-card {
+    border-radius: 1rem;
+    text-align: center;
+    /* padding: 1.5rem; */
+}
+
+.escudo-wrapper {
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+
+.escudo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.nombre-equipo {
+    color: white;
+    margin: 0;
+}
+
+.btn-ver-equipo {
+    text-decoration: none;
+    color: inherit;
+}
+
+.botones-inferiores {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 40px;
+}
+
+.btn-flecha-local {
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* #btn-ver-equipo-fijo {
+  display: block;
+  position: relative;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #44c662;
+  color: white;
+  border-radius: 999px;
+  text-decoration: none;
+  padding: 0.5rem 1.2rem;
+  z-index: 10;
+} */

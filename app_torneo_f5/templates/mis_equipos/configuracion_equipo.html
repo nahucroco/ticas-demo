@@ -1,0 +1,217 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/configuracion_equipo.css' %}">
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Configurar equipo{% endblock %}
+
+{% block content %}
+<div class="main">
+    <!-- Botón de volver -->
+    <div class="container-volver">
+        <a href="{{ url_volver }}" class="icono-volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+    </div>
+
+    <!-- Titulo -->
+    <div class="container-titulo">
+        <p class="M-subtitulos titulo">Configurar equipo</p>
+    </div>
+    <form method="POST" action="{% url 'configuracion_equipo' equipo.id %}">
+        {% csrf_token %}
+        <!-- Nombre, tag y ciudad -->
+        <div class="container-selects container-selects-1">
+            <!-- Nombre equipo -->
+            <div class="container-input">
+                <label for="nombre_equipo" class="M-body texto-transparente">Nombre</label>
+                <div class="input-wrapper input-sin-valor">
+                    <input name="nombre_equipo" type="text" class="input-precio" placeholder="Nombre"
+                        value="{{ equipo.nombre }}">
+                </div>
+            </div>
+            <!-- Tag equipo -->
+            <div class="container-input">
+                <label for="tag_equipo" class="M-body texto-transparente">Tag</label>
+                <div class="input-wrapper input-sin-valor">
+                    <input name="tag_equipo" type="text" class="input-precio" placeholder="Tag"
+                        value="{{ equipo.nombre_corto|upper }}">
+                </div>
+            </div>
+            <!-- Ciudad equipo -->
+            <div class="container-input">
+                <label for="ciudad_equipo" class="M-body texto-transparente">Ciudad</label>
+                <div class="input-wrapper input-sin-valor">
+                    <input name="ciudad_equipo" type="text" class="input-precio" placeholder="Ciudad"
+                        value="{{ equipo.ciudad }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="linea-divisora"></div>
+
+        <!-- Input oculto para jugadores -->
+        <input type="hidden" name="jugadores_eliminados" id="jugadores-eliminados">
+
+        <div class="container-fichajes">
+            <p class="M-body texto-transparente">Fichajes</p>
+            <div class="container-jugadores">
+                {% for jugador in jugadores_equipo %}
+                <div class="container-jugador" data-jugador-id="{{ jugador.id }}"
+                    data-jugador-nombre="{{ jugador.nombre }}">
+                    <img src="{{ jugador.foto.url }}" alt="{{ jugador.nombre }}" class="jugador-foto img-45">
+                    <p class="M-body texto-blanco">{{ jugador.nombre }}</p>
+                    {% if jugador == capitan %}
+                    <div class="container-icono">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                            <path
+                                d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    {% else %}
+                    <!-- Ícono para eliminar jugador -->
+                    <div class="container-icono">
+                        <button type="button" class="btn-eliminar-jugador">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+                                fill="none">
+                                <path
+                                    d="M2 12.5C2 7.78595 2 5.42893 3.46447 3.96447C4.92893 2.5 7.28595 2.5 12 2.5C16.714 2.5 19.0711 2.5 20.5355 3.96447C22 5.42893 22 7.78595 22 12.5C22 17.214 22 19.5711 20.5355 21.0355C19.0711 22.5 16.714 22.5 12 22.5C7.28595 22.5 4.92893 22.5 3.46447 21.0355C2 19.5711 2 17.214 2 12.5Z"
+                                    stroke="white" stroke-width="1.5" />
+                                <path
+                                    d="M14.1213 14.6213L12 12.5M12 12.5L9.87866 10.3787M12 12.5L14.1213 10.3786M12 12.5L9.87868 14.6213"
+                                    stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <a href="{% url 'invitar_jugadores_equipo' equipo.id %}" class="btn-invitar">
+                    <p class="M-boton">Invitar jugadores</p>
+                </a>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-guardar-configuracion btn-primario" id="btn-guardar" style="color: #FFF;">
+            Guardar configuración
+        </button>
+    </form>
+
+</div>
+
+
+
+<!-- Script principal -->
+<script>
+    document.getElementById('btn-confirmar-eliminacion').addEventListener('click', function () {
+        if (jugadorAEliminarId) {
+            fetch(`/equipo/eliminar-jugador/${jugadorAEliminarId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    location.reload(); // o remover del DOM sin recargar
+                } else {
+                    alert("Ocurrió un error al eliminar el jugador");
+                }
+            });
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const jugadoresEliminados = new Set();
+
+        document.querySelectorAll('.btn-eliminar-jugador').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const container = this.closest('.container-jugador');
+                const jugadorId = container.dataset.jugadorId;
+                const jugadorNombre = container.dataset.jugadorNombre;
+
+                if (confirm(`¿Eliminar a ${jugadorNombre} del equipo?`)) {
+                    container.style.display = 'none';
+                    jugadoresEliminados.add(jugadorId);
+                    document.getElementById('jugadores-eliminados').value = Array.from(jugadoresEliminados).join(',');
+                }
+            });
+
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputs = document.querySelectorAll('.input-precio');
+
+        inputs.forEach(input => {
+            const wrapper = input.closest('.input-wrapper');
+
+            // Función para actualizar clases según valor
+            function actualizarClase() {
+                if (input.value.trim() !== '') {
+                    wrapper.classList.remove('input-sin-valor');
+                    wrapper.classList.add('input-con-valor');
+                } else {
+                    wrapper.classList.remove('input-con-valor');
+                    wrapper.classList.add('input-sin-valor');
+                }
+            }
+
+            // Llamar al cargar
+            actualizarClase();
+
+            // Llamar al escribir
+            input.addEventListener('input', actualizarClase);
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputs = document.querySelectorAll('.input-precio');
+        const botonGuardar = document.getElementById('btn-guardar');
+
+        function actualizarEstadoInputs() {
+            let todosTienenValor = true;
+
+            inputs.forEach(input => {
+                const wrapper = input.closest('.input-wrapper');
+
+                if (input.value.trim() !== '') {
+                    wrapper.classList.remove('input-sin-valor');
+                    wrapper.classList.add('input-con-valor');
+                } else {
+                    wrapper.classList.remove('input-con-valor');
+                    wrapper.classList.add('input-sin-valor');
+                    todosTienenValor = false;
+                }
+            });
+
+            botonGuardar.disabled = !todosTienenValor;
+        }
+
+        // Ejecutar al cargar y al escribir
+        actualizarEstadoInputs();
+        inputs.forEach(input => {
+            input.addEventListener('input', actualizarEstadoInputs);
+        });
+    });
+</script>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,633 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #161618 !important;
+        padding: 25px 16px 0 16px;
+        height: 100dvh;
+    }
+
+    .pantalla-crear {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .container-1 {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .container-1 label {
+        margin-left: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .container-1 label p {
+        opacity: 0.5;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .input-custom {
+        border: none;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        flex: 1;
+        padding: 13px 10px 13px 50px;
+        border-radius: 5px;
+        width: 160px;
+    }
+
+    .input-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.con-valor {
+        background-color: #3F374E;
+        color: white;
+    }
+
+    .input-text.con-valor {
+        background-color: #3F374E;
+        color: white;
+    }
+
+    .input-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .campo-fecha {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    select.input-text {
+        appearance: none;
+        /* limpia estilos nativos */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: none;
+    }
+
+    .selector-fecha {
+        position: relative;
+    }
+
+    .selector-hora {
+        position: relative;
+    }
+
+    .container-icono {
+        position: absolute;
+        margin-top: 8px;
+        margin-left: 13px;
+        pointer-events: none;
+        color: white;
+        font-size: 18px;
+        z-index: 1;
+    }
+
+    .flatpickr-input::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.form-control.input.active {
+        background-color: #3F374E !important;
+    }
+
+    .input-text {
+        width: 100%;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        padding: 13px 10px;
+        border-radius: 5px;
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .input-text:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input.con-valor {
+        background-color: #3F374E;
+    }
+
+    .container-posicion {
+        background: #3F374E;
+        padding: 10px;
+        border-radius: 5px;
+        width: 308px;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .icono-posicion {
+        width: 24px;
+        height: 25px;
+        flex-shrink: 0;
+    }
+
+    .checkbox-wrapper {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+    }
+
+    .custom-checkbox {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        background-color: #3F374E;
+        border: 2px solid #FFF;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        display: inline-block;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox {
+        background-color: #FFF;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox::after {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid #161618;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .btn-disabled {
+        background-color: #5E605E !important;
+        color: #ffffff50 !important;
+        cursor: initial !important;
+    }
+
+    .container-botones button {
+        width: 49% !important;
+    }
+
+    #pantalla-cargando {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #3F374E;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease-in-out;
+        display: none;
+        /* ✅ NO se muestra inicialmente */
+    }
+
+    .pantalla-cargando-visible {
+        display: flex !important;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .pantalla-cargando-oculta {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #fff;
+        border-top: 5px solid #733BDE;
+        border-radius: 50%;
+        animation: girar 1s linear infinite;
+    }
+
+    @keyframes girar {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .container-logo {
+        width: 76px;
+        height: 76px;
+        background-color: #221140;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        /* position: absolute; */
+        /* top: 50%;
+        left: 50%; */
+        transform: translateY(-50%, -50%);
+        transition: top 0.8s ease-in-out, transform 0.8s ease-in-out;
+        z-index: 9999;
+        margin-bottom: 5px;
+    }
+
+    .animate__animated.animate__slideInUp {
+        --animate-duration: 1s;
+    }
+
+    .container-logo-fijo {
+        top: 78.25px;
+        transform: translateX(-50%);
+    }
+
+    #container-logo {
+        width: 100%;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        opacity: 0;
+        transition: top 0.8s ease, transform 0.8s ease, opacity 0.5s ease;
+        z-index: 10000;
+    }
+
+    #container-logo.fijo {
+        top: 92.2px;
+        transform: translateX(-50%);
+        opacity: 1;
+    }
+
+    #container-contenido {
+        background: #161618;
+        position: absolute;
+        top: 100vh;
+        /* comienza fuera de pantalla */
+        border-radius: 26px 26px 0 0;
+        padding: 40px 16px 75px 16px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        opacity: 0;
+        transition: top 0.8s ease, opacity 0.8s ease;
+        z-index: 9999;
+    }
+
+    #container-contenido.visible {
+        top: 231px;
+        opacity: 1;
+        height: 100%;
+    }
+
+    input:-webkit-autofill {
+        background-color: #3F374E !important;
+        -webkit-box-shadow: 0 0 0 1000px #3F374E inset !important;
+        -webkit-text-fill-color: white !important;
+        caret-color: white !important;
+        border-radius: 5px !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+
+    input:-internal-autofill-selected {
+        background-color: #3F374E !important;
+        color: white !important;
+    }
+
+    /* Contenedor del campo con label flotante */
+    .campo {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Label flotante generado dinámicamente a partir del placeholder */
+    .label-flotante {
+        position: absolute;
+        left: 4px;
+        /* se alinea con tu padding de inputs */
+        top: -23px;
+        /* que “flote” sobre el borde superior */
+        font-size: 16px;
+        line-height: 1;
+        padding: 0 6px;
+        border-radius: 4px;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity .15s ease, transform .15s ease;
+        pointer-events: none;
+
+        /* Fondo para “cortar” el borde del input; usa tu color de fondo */
+        background: #161618;
+        color: #FFFFFF80;
+        /* similar a tu “texto-transparente” */
+    }
+
+    /* Cuando el input tiene valor o foco, mostramos el label */
+    .campo.activo .label-flotante {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+{% block content %}
+<form method="POST" style="height: 100%;" class="d-flex flex-column justify-content-between">
+    {% csrf_token %}
+    <div class="conainer-main">
+
+
+        <div>
+            <a href="{% url 'home' %}" style="text-decoration: none; padding: 13px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 4.00006L4.00006 20M4 4L20 20" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+
+        <p class="M-titulo" style="margin-top: 23px;">¿De dónde sos?</p>
+
+        <p class="M-body" style="margin-top: 5px;">Solo tu ciudad y provincia. Es para que otros sepan por dónde jugás.
+        </p>
+
+        <div class="d-flex flex-row align-items-center" style="gap: 10px; margin-top: 11px;">
+            <p class="M-body-s texto-transparente">4/4</p>
+            <div class="barra-indicadora" style="width: 100%; background: #2C2A44; border-radius: 9px; height: 8px;">
+                <div style="width: 100%; background: #733BDE; border-radius: 9px; height: 8px;"></div>
+            </div>
+        </div>
+
+        <div class="container-2 d-flex flex-column align-items-center justify-content-center"
+            style="margin-top: 50px; gap: 40px;">
+
+            <!-- Provincia -->
+            <div class="campo">
+                <select name="provincia" id="provincia" class="input-text" data-placeholder="Provincia"></select>
+            </div>
+
+            <!-- Ciudad -->
+            <div class="campo">
+                <select name="ciudad" id="ciudad" class="input-text" data-placeholder="Ciudad"></select>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container-botones w-100 d-flex justify-content-end align-items-end"
+        style="padding-top: 100px; padding-bottom: 25px; gap: 2%;">
+        <button type="button" class="btn-secundario" style="color: #4F9639;" id="btnAnterior">Anterior</button>
+        <button class="btn-primario btn-disabled" style="color: #FFF;" id="btnSiguiente">Completar</button>
+    </div>
+
+    <div id="pantalla-cargando" class="pantalla-cargando-oculta">
+
+        <div id="container-logo">
+            <div class="container-logo">
+                <img src="/static/svg/ticas-logo.svg" alt="" id="ticas-logo">
+            </div>
+            <p class="lead M-subtitulos" style="text-align: center;">Bienvenido a Ticas, {{ jugador.primer_nombre }}</p>
+
+        </div>
+
+        <div id="container-contenido">
+        </div>
+
+    </div>
+
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const provinciaInput = document.getElementById('provincia');
+        const ciudadInput = document.getElementById('ciudad');
+        const botonSiguiente = document.getElementById('btnSiguiente');
+        const form = document.querySelector('form');
+
+        // Valores actuales del form (si el usuario vuelve a esta pantalla)
+        const provGuardada = "{{ form.provincia.value|default_if_none:''|escapejs }}";
+        const ciudadGuardada = "{{ form.ciudad.value|default_if_none:''|escapejs }}";
+
+        // 👇 Agregá estas dos constantes que faltan
+        const botonAnterior = document.getElementById('btnAnterior');
+        const pantallaCargando = document.getElementById('pantalla-cargando');
+
+        // 👇 Agregá este listener para navegar al paso 3
+        if (botonAnterior) {
+            botonAnterior.addEventListener('click', () => {
+                window.location.href = "{% url 'crear_perfil_3' %}";
+            });
+        }
+
+
+        // === 1) Cargar JSON y poblar selects ===
+        const DATA_URL = "{% static 'data/ar_provincias_localidades.json' %}";
+        let DATA = {};
+        try {
+            const res = await fetch(DATA_URL, { cache: 'no-store' });
+            DATA = await res.json();
+        } catch (e) {
+            console.error("No se pudo cargar ar_provincias_localidades.json", e);
+        }
+
+        // Helpers
+        const ordenar = (arr) => arr.slice().sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+
+        function renderProvincias() {
+            const provincias = ordenar(Object.keys(DATA || {}));
+            provinciaInput.innerHTML =
+                `<option value="" hidden>Seleccioná provincia</option>` +
+                provincias.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        function renderCiudades(prov) {
+            const ciudades = ordenar(DATA[prov] || []);
+            ciudadInput.innerHTML =
+                `<option value="" hidden>Seleccioná ciudad</option>` +
+                ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        renderProvincias();
+
+        if (provGuardada && DATA[provGuardada]) {
+            provinciaInput.value = provGuardada;
+            renderCiudades(provGuardada);
+            if (ciudadGuardada) ciudadInput.value = ciudadGuardada;
+        } else {
+            // si no hay provincia previa, inicializamos ciudades vacío
+            ciudadInput.innerHTML = `<option value="" hidden>Seleccioná provincia primero</option>`;
+        }
+
+        provinciaInput.addEventListener('change', () => {
+            const prov = provinciaInput.value;
+            if (prov) {
+                renderCiudades(prov);
+                ciudadInput.value = '';
+            } else {
+                ciudadInput.innerHTML = `<option value="" hidden>Seleccioná provincia primero</option>`;
+                ciudadInput.value = '';
+            }
+            syncCampoState(provinciaInput);
+            syncCampoState(ciudadInput);
+            validarCampos();
+        });
+
+        ciudadInput.addEventListener('change', () => {
+            syncCampoState(ciudadInput);
+            validarCampos();
+        });
+
+        // === 2) Validación + estilos "con-valor" ===
+        function validarCampos() {
+            const ok = (provinciaInput.value || '').trim() !== '' && (ciudadInput.value || '').trim() !== '';
+            botonSiguiente.disabled = !ok;
+            botonSiguiente.classList.toggle('btn-disabled', !ok);
+            return ok;
+        }
+        validarCampos();
+
+        function syncCampoState(el) {
+            const campo = el.closest('.campo');
+            if (!campo) return;
+            const tieneValor = (el.value || '').trim() !== '';
+            campo.classList.toggle('activo', tieneValor);  // para label flotante
+            el.classList.toggle('con-valor', tieneValor);  // tu color de fondo
+        }
+
+        // Crear labels flotantes para inputs y selects con data-placeholder
+        document.querySelectorAll('.campo > .input-text').forEach((el) => {
+            if (!el.parentElement.querySelector('.label-flotante')) {
+                const label = document.createElement('label');
+                label.className = 'label-flotante';
+                label.textContent = el.getAttribute('data-placeholder') || el.getAttribute('placeholder') || '';
+                label.setAttribute('for', el.id || '');
+                el.parentElement.prepend(label);
+            }
+            syncCampoState(el);
+            el.addEventListener('input', () => syncCampoState(el));
+            el.addEventListener('change', () => syncCampoState(el));
+        });
+
+        form.addEventListener('submit', (e) => {
+            if (!validarCampos()) {
+                e.preventDefault();
+                return;
+            }
+
+            e.preventDefault();
+
+            pantallaCargando.classList.remove('pantalla-cargando-oculta');
+            pantallaCargando.classList.add('pantalla-cargando-visible', 'animate__slideInUp', 'animate__animated');
+
+            const logoContainer = document.getElementById('container-logo');
+            const contenidoContainer = document.getElementById('container-contenido');
+
+            setTimeout(() => {
+                logoContainer.classList.add('animate__fadeIn', 'animate__animated');
+            }, 1000);
+
+            setTimeout(() => {
+                logoContainer.offsetHeight;
+                logoContainer.classList.add('fijo');
+                contenidoContainer.classList.add('visible');
+            }, 4000);
+
+            setTimeout(() => {
+                form.submit();
+            }, 5000);
+        });
+
+        // Crear labels flotantes desde el placeholder (como ya lo tenías)
+        document.querySelectorAll('.campo > .input-text').forEach((input) => {
+            if (!input.parentElement.querySelector('.label-flotante')) {
+                const label = document.createElement('label');
+                label.className = 'label-flotante';
+                label.textContent = input.getAttribute('placeholder') || '';
+                label.setAttribute('for', input.id || '');
+                input.parentElement.prepend(label);
+            }
+        });
+
+        // 👉 Sólo valor, nada de foco
+        function syncCampoState(input) {
+            const campo = input.closest('.campo');
+            if (!campo) return;
+            const tieneValor = (input.value || '').trim() !== '';
+            campo.classList.toggle('activo', tieneValor);   // ← ya no depende del foco
+            input.classList.toggle('con-valor', tieneValor);
+        }
+
+        // Eventos: input + cambio programático (por si autocompletado)
+        document.querySelectorAll('.campo > .input-text').forEach((input) => {
+            // Estado inicial
+            syncCampoState(input);
+
+            input.addEventListener('input', () => syncCampoState(input));
+            input.addEventListener('change', () => syncCampoState(input));
+            // (podés mantener focus/blur si querés estilos de foco, pero NO llamamos a sync por foco)
+        });
+
+        // Rechequeo por autofill del navegador
+        setTimeout(() => {
+            document.querySelectorAll('.campo > .input-text').forEach(syncCampoState);
+        }, 150);
+
+        // Fecha (flatpickr): mantenemos tu lógica de con-valor SOLO por valor
+        const inputFechaVisible = document.getElementsByClassName("input-fecha-custom")[1];
+        if (inputFechaVisible) {
+            const marcarFecha = () => {
+                const tiene = (inputFechaVisible.value || '').trim() !== '';
+                inputFechaVisible.classList.toggle('con-valor', tiene);
+            };
+            inputFechaVisible.addEventListener('input', marcarFecha);
+            inputFechaVisible.addEventListener('change', marcarFecha);
+            setTimeout(marcarFecha, 150);
+        }
+
+
+    });
+</script>
+
+
+{% endblock %}

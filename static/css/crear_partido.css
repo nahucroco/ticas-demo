@@ -1,0 +1,352 @@
+.pantalla-crear {
+    position: absolute;
+    top: 60px;
+    /* left: 0;
+    right: 0; */
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+  #select-tipocancha + .select2 .select2-search__field {
+    pointer-events: auto !important;
+    caret-color: inherit !important;
+  }
+  #select-tipocancha.no-typing + .select2 .select2-search__field {
+    pointer-events: none !important;
+    caret-color: transparent !important;
+  }
+
+  /* --- Contenedores Select2 --- */
+  #s2-cancha, #s2-tipo { position: relative; overflow: visible; }
+  .select2-container { width: 100% !important; }       /* que no quede angosto */
+  .select2-dropdown { z-index: 9999; }                 /* por si hay overlays */
+
+  .custom-icons svg { transition: transform 0.3s ease; }
+  .custom-icons svg.rotar { transform: rotate(180deg); }
+  #custom-icon-tipocancha svg { transition: transform 0.3s ease; }
+  #custom-icon-tipocancha svg.rotar { transform: rotate(180deg); }
+
+  input:-webkit-autofill {
+    background-color: #3F374E !important;
+    -webkit-box-shadow: 0 0 0 1000px #3F374E inset !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: white !important;
+    border-radius: 5px !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  input:-internal-autofill-selected {
+    background-color: #3F374E !important;
+    color: white !important;
+  }
+
+  .campo { position: relative; width: 100%; }
+  .label-flotante {
+    position: absolute; left: 4px; top: -23px; font-size: 16px; line-height: 1;
+    padding: 0 6px; border-radius: 4px; opacity: 0; transform: translateY(4px);
+    transition: opacity .15s ease, transform .15s ease; pointer-events: none;
+    background: #161618; color: #FFFFFF80;
+  }
+  .campo.activo .label-flotante { opacity: 1; transform: translateY(0); }
+  .input-select.con-valor { background-color: #3F374E; }
+
+/* visible por defecto */
+#ubicacion-cancha::placeholder{
+  opacity: .6;           /* o el valor que quieras */
+  transition: opacity .15s ease;
+}
+
+/* al hacer foco: oculto */
+#ubicacion-cancha:focus::placeholder{
+  opacity: 0;
+}
+
+/* si el input tiene texto, también oculto */
+#ubicacion-cancha:not(:placeholder-shown)::placeholder{
+  opacity: 0;
+}
+.main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 0;
+    box-sizing: border-box
+}
+
+.footer-boton {
+    padding: 16px;
+    flex-shrink: 0;
+    background-color: transparent;
+    display: flex;
+    justify-content: flex-end
+}
+
+.container-titulo {
+    margin: 0 16px
+}
+
+.container-progress {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 27px;
+    margin-bottom: 20px
+}
+
+.circle-container {
+    position: relative;
+    width: 100px;
+    height: 100px
+}
+
+.circle-center,
+.circle-progress {
+    position: absolute;
+    border-radius: 50%
+}
+
+.circle-progress {
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background: conic-gradient(#8b42f4 0 24.83%, #3d3750 24.83% 74.5%, #161618 74.5% 100%);
+    transform: rotate(225deg)
+}
+
+.circle-center {
+    top: 50%;
+    left: 50%;
+    width: 70px;
+    height: 70px;
+    background: #161618;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: CalSans, sans-serif
+}
+
+.select2-container,
+.select2-container .selection {
+    background-color: #373639;
+    border-radius: 5px !important
+}
+
+.container-selects {
+    display: flex;
+    flex-direction: column;
+ 
+}
+
+.container-selects .container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px
+}
+
+.container-selects .container .icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.container-selects .container .select-container {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.select-unico {
+    width: 100%
+}
+
+.select2-container {
+   /*  width: 100% !important; */
+    flex-grow: 1 !important;
+    max-width: 100% !important
+}
+
+.select2-container--default .select2-selection--multiple {
+    background-color: #373639 !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 13px 40px 13px 10px !important;
+    align-items: center !important;
+    height: 46px !important;
+    line-height: normal !important;
+    width: 100% !important;
+    overflow: hidden !important
+}
+
+.select2-container .select2-search--inline .select2-search__field {
+    font-family: Outfit !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    height: 20px !important;
+    line-height: normal !important;
+    margin-top: 0 !important;
+    color: #fff !important
+}
+
+.select2-search .select2-search--inline {
+    height: 20px !important;
+    align-items: center !important
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    border: none !important;
+    background-color: transparent !important;
+    margin-top: 0 !important;
+    padding-left: 0 !important
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    padding: 0 !important
+}
+
+.select2-dropdown {
+    background: #535368 !important;
+    border: none !important;
+    border-radius: 5px !important
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #3f374e !important
+}
+
+.select2-container--default .select2-results__option--selected{
+    background-color: #535368 !important;
+}
+
+.select2-results__option {
+    font-family: Outfit !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    padding: 10px !important
+}
+
+.custom-icons {
+    position: relative;
+    top: 0;
+    right: 10px;
+    transform: none;
+    margin-left: -45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 5;
+    gap: 10px
+}
+
+.select2-results__option:first-child.select2-results__option--highlighted {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px
+}
+
+.select2-results__option:last-child.select2-results__option--highlighted {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px
+}
+
+.select2-selection__choice__remove {
+    display: none !important
+}
+
+.select-con-valor .select2-selection {
+    background-color: #3f374e !important;
+    color: #fff;
+    font-weight: 500
+}
+
+.select-sin-valor .select2-selection {
+    background-color: #373639;
+    color: rgba(255, 255, 255, .5)
+}
+
+.input-ubicacion {
+    width: 100%;
+    background-color: #373639;
+    border: none;
+    height: 46px;
+    border-radius: 5px;
+    padding-left: 15px;
+    color: #fff
+}
+
+.input-ubicacion:focus {
+    outline: 0;
+    border: none
+}
+
+.input-con-valor {
+    background-color: #3f374e !important;
+    color: #fff !important
+}
+
+.input-sin-valor {
+    background-color: #373639 !important;
+    color: rgba(255, 255, 255, .5) !important
+}
+
+.btn-primario {
+    align-self: flex-end;
+    display: inline-flex;
+    padding: 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 20px;
+    background: #4f9639;
+    width: 160px;
+    border: none;
+    margin-bottom: 0
+}
+
+.btn-primario:disabled {
+    background: #5e605e;
+    box-shadow: none
+}
+
+.sin-estilos body {
+  visibility: hidden;
+}
+
+
+
+    .container-placeholder{
+        padding: 5px 50px;
+    }
+
+.cancha-opacity,
+.formato-opacity,
+.ubicacion-opacity {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out; /* suaviza el cambio */
+}
+
+/* fondo por defecto + transición */
+.select2 .select2-selection {
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+/* cuando el select tiene valor */
+.select2.select2-has-value .select2-selection {
+  background-color: #8b42f4;         /* opcional */
+
+}
+
+  /* fondo cuando hay letras */
+  .input-ubicacion.filled { background:#3F374E; color:#fff; }
+  /* oculto placeholder cuando está “filled” (opcional) */
+  .input-ubicacion.filled::placeholder { color: transparent; }
+  
+.select2-has-value .select2-selection {
+  background: #3F374E !important; /* igual al input */
+  color: #fff !important;
+}

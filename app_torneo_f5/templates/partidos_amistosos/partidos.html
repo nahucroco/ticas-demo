@@ -1,0 +1,280 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/partido.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+{% block content %}
+
+
+<div class="titulos-info">
+  <div>
+    <h1>Partidos</h1>
+  </div>
+  <div class="tab-selector">
+    <button class="tab active" data-tab="amistosos">
+      <p class="M-body">Amistosos</p>
+    </button>
+    <button class="tab" data-tab="torneos">
+      <p class="M-body">Torneos</p>
+    </button>
+  </div>
+</div>
+
+<!-- Partidos amistosos -->
+<div class="contenido-tab active" id="amistosos">
+  {% if partidos %}
+  {% for partido in partidos %}
+  <a href="{% url 'detalle_partido' 'amistoso' partido.id %}" class="card-link">
+    <div class="card-partido">
+      <div class="card-partido-contenido">
+
+        <div class="container-1">
+          <div class="container-equipo equipo-1 {{ partido.color_equipo_local }}"></div>
+          <div class="info-central">
+            <p class="fecha">
+              {{ partido.dia|date:"d/M" }} - {{ partido.hora_inicio|time:"H:i" }}
+            </p>
+            <p class="vs">VS</p>
+          </div>
+          <div class="container-equipo equipo-1 {{ partido.color_equipo_visitante }}"></div>
+        </div>
+
+        <div class="container-2">
+          <p class="equipo-nombre izq">
+            {{ partido.equipo_local.nombre|default:"Equipo 1" }}
+          </p>
+          <p class="equipo-nombre der">
+            {{ partido.equipo_visitante.nombre|default:"Equipo 2" }}
+          </p>
+        </div>
+
+      </div>
+
+      <div class="badge-cancha">
+        <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+        <p class="M-body">{{ partido.cancha }}</p>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+  {% else %}
+  <div class="error-torneos" id="error-partido">
+    <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+      <path
+        d="M5.1665 30.9999C5.1665 21.2576 5.1665 16.3864 8.19307 13.3598C11.2196 10.3333 16.0908 10.3333 25.8332 10.3333H36.1665C45.9089 10.3333 50.78 10.3333 53.8066 13.3598C56.8332 16.3864 56.8332 21.2576 56.8332 30.9999V36.1666C56.8332 45.9089 56.8332 50.7801 53.8066 53.8067C50.78 56.8332 45.9089 56.8333 36.1665 56.8333H25.8332C16.0908 56.8333 11.2196 56.8332 8.19307 53.8067C5.1665 50.7801 5.1665 45.9089 5.1665 36.1666V30.9999Z"
+        stroke="#733BDE" stroke-width="3.875" />
+      <path d="M18.0835 10.3333V6.45825" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" />
+      <path d="M43.9165 10.3333V6.45825" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" />
+      <path d="M6.4585 23.25H55.5418" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" />
+      <path
+        d="M46.5002 43.9167C46.5002 45.3434 45.3436 46.5 43.9168 46.5C42.4901 46.5 41.3335 45.3434 41.3335 43.9167C41.3335 42.4899 42.4901 41.3333 43.9168 41.3333C45.3436 41.3333 46.5002 42.4899 46.5002 43.9167Z"
+        fill="#733BDE" />
+      <path
+        d="M46.5002 33.5833C46.5002 35.0101 45.3436 36.1667 43.9168 36.1667C42.4901 36.1667 41.3335 35.0101 41.3335 33.5833C41.3335 32.1566 42.4901 31 43.9168 31C45.3436 31 46.5002 32.1566 46.5002 33.5833Z"
+        fill="#733BDE" />
+      <path
+        d="M33.5832 43.9167C33.5832 45.3434 32.4266 46.5 30.9998 46.5C29.5731 46.5 28.4165 45.3434 28.4165 43.9167C28.4165 42.4899 29.5731 41.3333 30.9998 41.3333C32.4266 41.3333 33.5832 42.4899 33.5832 43.9167Z"
+        fill="#733BDE" />
+      <path
+        d="M33.5832 33.5833C33.5832 35.0101 32.4266 36.1667 30.9998 36.1667C29.5731 36.1667 28.4165 35.0101 28.4165 33.5833C28.4165 32.1566 29.5731 31 30.9998 31C32.4266 31 33.5832 32.1566 33.5832 33.5833Z"
+        fill="#733BDE" />
+      <path
+        d="M20.6667 43.9167C20.6667 45.3434 19.5101 46.5 18.0833 46.5C16.6566 46.5 15.5 45.3434 15.5 43.9167C15.5 42.4899 16.6566 41.3333 18.0833 41.3333C19.5101 41.3333 20.6667 42.4899 20.6667 43.9167Z"
+        fill="#733BDE" />
+      <path
+        d="M20.6667 33.5833C20.6667 35.0101 19.5101 36.1667 18.0833 36.1667C16.6566 36.1667 15.5 35.0101 15.5 33.5833C15.5 32.1566 16.6566 31 18.0833 31C19.5101 31 20.6667 32.1566 20.6667 33.5833Z"
+        fill="#733BDE" />
+    </svg>
+    <p class="M-body texto-transparente">No tenés ningún partido por jugar...</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Partidos de torneo -->
+<div class="contenido-tab" id="torneos">
+  {% if partidos_torneo %}
+  {% for partido in partidos_torneo %}
+  <a href="{% url 'propuesta_partido' partido.id %}" class="card-link">
+    <div class="card-partido">
+      <div class="card-partido-contenido">
+
+        <div class="container-1">
+          {% if partido.equipo_1.escudo %}
+          <img src="{{ partido.equipo_1.escudo.url }}" alt="" class="escudo">
+          {% else %}
+          <img src="{% static 'images/escudo-generico.png' %}" width="76" alt="Escudo equipo 1">
+          {% endif %}
+          <div class="info-central">
+            <p class="fecha">
+              {% if partido.dia and partido.hora_inicio %}
+              {{ partido.dia|date:"d/M" }} - {{ partido.hora_inicio|time:"H:i" }}
+              {% elif partido.dia %}
+              {{ partido.dia|date:"d/M" }} - A definir
+              {% elif partido.hora_inicio %}
+              A definir - {{ partido.hora_inicio|time:"H:i" }}
+              {% else %}
+              A definir
+              {% endif %}
+            </p>
+
+            <p class="vs">VS</p>
+          </div>
+          {% if partido.equipo_2.escudo %}
+          <img src="{{ partido.equipo_2.escudo.url }}" alt="" class="escudo">
+          {% else %}
+          <img src="{% static 'images/escudo-generico.png' %}" width="76" alt="Escudo equipo 1">
+          {% endif %}
+        </div>
+
+        <div class="container-2">
+          <p class="equipo-nombre izq">
+            {{ partido.equipo_1.nombre|default:"Equipo 1" }}
+          </p>
+          <p class="equipo-nombre der">
+            {{ partido.equipo_2.nombre|default:"Equipo 2" }}
+          </p>
+        </div>
+
+      </div>
+
+      {% if partido.cancha and partido.cancha.nombre %}
+      <div class="badge-cancha">
+        <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+        <p class="M-body">{{ partido.cancha.nombre }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </a>
+  {% endfor %}
+  {% else %}
+  <div class="error-torneos">
+    <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+      <path
+        d="M31.0019 41.3334C16.122 41.3334 13.486 26.5038 13.019 14.7418C12.8891 11.47 12.8242 9.83413 14.0531 8.32056C15.282 6.80701 16.7529 6.55883 19.6946 6.06249C22.5985 5.57256 26.3943 5.16675 31.0019 5.16675C35.6093 5.16675 39.4053 5.57256 42.3089 6.06249C45.2508 6.55883 46.7215 6.80701 47.9504 8.32056C49.1796 9.83413 49.1145 11.47 48.9845 14.7418C48.5177 26.5038 45.8817 41.3334 31.0019 41.3334Z"
+        stroke="#733BDE" stroke-width="3.875" />
+      <path
+        d="M49.0835 12.9167L51.534 13.7336C54.0918 14.5862 55.3706 15.0125 56.1019 16.0273C56.8335 17.0421 56.8335 18.3901 56.8332 21.0861V21.2735C56.8332 23.4971 56.8332 24.6089 56.298 25.5185C55.7627 26.4281 54.7909 26.968 52.8472 28.0478L45.2085 32.2917"
+        stroke="#733BDE" stroke-width="3.875" />
+      <path
+        d="M12.9164 12.9167L10.4657 13.7336C7.90809 14.5862 6.62927 15.0125 5.89785 16.0273C5.1664 17.0421 5.16643 18.3901 5.16651 21.0861V21.2735C5.16658 23.4971 5.16661 24.6089 5.70185 25.5185C6.23706 26.4281 7.20897 26.968 9.15272 28.0478L16.7913 32.2917"
+        stroke="#733BDE" stroke-width="3.875" />
+      <path d="M31 43.9167V49.0834" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" />
+      <path
+        d="M40.0418 56.8333H21.9585L22.8348 52.4517C23.0763 51.2443 24.1366 50.375 25.368 50.375H36.6323C37.8638 50.375 38.924 51.2443 39.1656 52.4517L40.0418 56.8333Z"
+        fill="#733BDE" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M46.5 56.8333H15.5H46.5Z" fill="#733BDE" />
+      <path d="M46.5 56.8333H15.5" stroke="#733BDE" stroke-width="3.875" stroke-linecap="round" />
+    </svg>
+    <p class="M-body texto-transparente">No tenés ningún torneo por jugar...</p>
+  </div>
+  {% endif %}
+</div>
+
+
+<!-- Botón Buscar -->
+
+<div style="padding: 0 16px; width: 100%; margin: 20px 0;">
+  <a href="{% url 'adelantos' %}" id="boton-secundario-largo" class="btn-secundario w-100">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+      <path
+        d="M11.5 21.5C16.7467 21.5 21 17.2467 21 12C21 6.75329 16.7467 2.5 11.5 2.5C6.25329 2.5 2 6.75329 2 12C2 17.2467 6.25329 21.5 11.5 21.5Z"
+        stroke="#4F9639" stroke-width="1.5" />
+      <path d="M18.5 19L22 22.5" stroke="#4F9639" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <p class="M-boton" id="contenido-btn">
+      Buscar partidos públicos
+    </p>
+  </a>
+</div>
+
+
+<!-- Botón Fijo -->
+<div class="boton-fijo">
+  <button href="{% url 'crear_partido' %}" class="btn-primario" id="btnCrearPartido">
+    <p class="M-boton">Crear partido</p>
+  </button>
+</div>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.contenido-tab');
+    const botonBuscar = document.getElementById('contenido-btn');
+    const botonFijo = document.querySelector('.boton-fijo');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const selectedId = tab.dataset.tab;
+
+        // Alternar pestañas activas
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Mostrar u ocultar botones con transición
+        if (selectedId === 'amistosos') {
+          // Mostrar botones de forma más suave
+          requestAnimationFrame(() => {
+            /* botonBuscar.classList.remove('boton-oculto'); */
+            botonBuscar.innerHTML = "Buscar partidos públicos";
+            botonFijo.classList.remove('boton-oculto');
+          });
+        } else {
+          /* botonBuscar.classList.add('boton-oculto'); */
+          botonBuscar.innerHTML = "Buscar torneos públicos";
+          botonFijo.classList.add('boton-oculto');
+        }
+
+        // Mostrar contenido con transición
+        tabContents.forEach(content => {
+          if (content.id === selectedId) {
+            content.classList.add('active');
+
+          } else {
+            content.classList.remove('active');
+          }
+        });
+      });
+    });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const boton = document.getElementById("btnCrearPartido");
+    const cardPartido = document.querySelector(".card-partido");
+    const errorPartido = document.getElementById("error-partido");
+
+    let visible = false;
+
+    boton.addEventListener("click", function () {
+      visible = !visible;
+
+      cardPartido.style.display = visible ? "flex" : "none";
+      torneos.style.display = visible ? "none" : "absolute";
+      errorPartido.style.display = visible ? "none" : "flex";
+
+    });
+  });
+
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const boton = document.getElementById("btnCrearPartido");
+    boton.addEventListener("click", function () {
+      window.location.href = "{% url 'crear_partido' %}";
+    });
+  });
+</script>
+
+{% endblock %}

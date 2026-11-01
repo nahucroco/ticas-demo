@@ -1,0 +1,36 @@
+{# mis_equipos/_lista_jugadores.html #}
+{% load static %}
+{% if jugadores %}
+<div class="lista-jugadores">
+  {% for jugador in jugadores %}
+  <div class="jugador-card">
+    <img src="{{ jugador.foto.url }}" alt="">
+    <div class="d-flex w-100 flex-column">
+      <div>{{ jugador.nombre }}</div>
+      <div class="d-flex flex-row justify-content-between">
+        <p class="texto-transparente" style="font-size: 12px;">
+          {{ jugador.provincia|cut:" "|first|upper }}{{ jugador.provincia|cut:" "|slice:"1:"|first|upper }}
+          {{ jugador.ciudad }}
+        </p>
+        <p class="texto-transparente" style="font-size: 12px;">
+          #{{ jugador.id|stringformat:"04d" }}
+        </p>
+      </div>
+    </div>
+
+    {% if jugador.id in invitados_ids %}
+    <a href="#" class="d-flex align-items-center btn-agregar-invitado" data-jugador-id="{{ jugador.id }}">
+      <img src="{% static 'svg/x.svg' %}" alt="" style="width: 24px; height: 24px;">
+    </a>
+    {% else %}
+    <a href="#" class="d-flex align-items-center btn-agregar-invitado" data-jugador-id="{{ jugador.id }}">
+      <img src="{% static 'svg/+.svg' %}" alt="" style="width: 24px; height: 24px;">
+    </a>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+</div>
+{% else %}
+<p>No se encontraron jugadores con ese nombre.</p>
+{% endif %}

@@ -1,0 +1,500 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalletorneo.css' %}">
+
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="container-logo">
+  <img src="{% static 'svg/ticas-logo.svg' %}" alt="">
+</div>
+{% if jugador.nombre %}
+<p class="lead M-subtitulos" style="text-align: center;">Bienvenido a Ticas, {{ jugador.primer_nombre }}</p>
+{% else %}
+<p class="lead M-subtitulos" style="text-align: center;">Bienvenido a Ticas</p>
+{% endif %}
+<!-- Contenido -->
+<div class="container-contenido">
+  <!-- Registrá tu partido -->
+  {% if ultimo_partido_sin_estadisticas %}
+  <div class="container-1 d-flex flex-column">
+    <div class="d-flex flex-row justify-content-between">
+      <p class="M-subtitulos">Registrá tu partido</p>
+      <div class="d-flex flex-row container-expira-en">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path opacity="0.5"
+            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+            fill="white" />
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V11.6893L15.0303 13.9697C15.3232 14.2626 15.3232 14.7374 15.0303 15.0303C14.7374 15.3232 14.2626 15.3232 13.9697 15.0303L11.4697 12.5303C11.329 12.3897 11.25 12.1989 11.25 12V8C11.25 7.58579 11.5858 7.25 12 7.25Z"
+            fill="white" />
+        </svg>
+        <div id="expira-en" vencimiento="{{ ahora_iso }}">
+          <p class="M-body" id="expira-text">Expira en 00 hs</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!-- Registro de partido amistoso -->
+      <div class="partido-card">
+        <div class="container-resultado">
+          <div class="container-equipos">
+            <div class="equipo">
+              <div class="container-1">
+                <img src="{% static home_escudos.ultimo.local %}" alt="Escudo local último" width="76"
+                  style="border-radius: 5px;">
+                {% if equipo_jugador == ultimo_partido_sin_estadisticas.equipo_local %}
+                <p class="M-body nombre-equipo equipo-usuario">Equipo 1</p>
+                {% else %}
+                <p class="M-body nombre-equipo">Equipo 1</p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="equipo">
+              <div class="container-1">
+                <img src="{% static home_escudos.ultimo.visitante %}" alt="Escudo visitante último" width="76"
+                  style="border-radius: 5px;">
+                {% if equipo_jugador == ultimo_partido_sin_estadisticas.equipo_visitante %}
+                <p class="M-body nombre-equipo equipo-usuario">Equipo 2</p>
+                {% else %}
+                <p class="M-body nombre-equipo goles-jugador">Equipo 2</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="container-fechahora">
+            <img src="{% static 'svg/vector-1.svg' %}" alt="" class="vector">
+            <div>
+              <p class="M-body">{{ ultimo_partido_sin_estadisticas.dia|date:"d/m" }}</p>
+              <p class="M-body">-</p>
+              <p class="M-body">{{ ultimo_partido_sin_estadisticas.hora_inicio|time:"H:i" }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="badge-cancha">
+          <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+          <p class="M-body">{{ ultimo_partido_sin_estadisticas.cancha }}</p>
+        </div>
+        {% url "estadisticas_paso1" "amistoso" ultimo_partido_sin_estadisticas.id as url_estadisticas %}
+        <button class="btn-registrar" onclick="window.location.href='{{ url_estadisticas }}'">
+          Registrar
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Completá tu perfil -->
+  {% if jugador.paso_perfil != 4 %}
+  <div class="container-4 d-flex flex-column">
+    <div class="d-flex flex-column justify-content-between" style="gap: 10px;">
+      <p class="M-subtitulos">Completá tu perfil</p>
+      <div class="d-flex flex-row align-items-center" style="gap: 20px;">
+        <p class="M-body">Tu perfil está casi listo, completa los datos que faltan antes de volver a la cancha. ¡No te
+          cuelgues!</p>
+        {% if jugador.paso_perfil == 0 %}
+        <div class="container-progress">
+          <div class="circle-container">
+            <div class="circle-progress primer_paso" id="progressCircle"></div>
+            <div class="M-titulo circle-center" id="circleLabel">1/4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="{% url 'crear_perfil_1' %}">
+      <button class="btn-primario" style="color: #FFF; width: 100%;">Ir a perfil</button>
+    </a>
+    {% elif jugador.paso_perfil == 1 %}
+    <div class="container-progress">
+      <div class="circle-container">
+        <div class="circle-progress segundo_paso" id="progressCircle"></div>
+        <div class="M-titulo circle-center" id="circleLabel">2/4</div>
+      </div>
+    </div>
+  </div>
+</div>
+<a href="{% url 'crear_perfil_2' %}">
+  <button class="btn-primario" style="color: #FFF; width: 100%;">Ir a perfil</button>
+</a>
+{% elif jugador.paso_perfil == 2 %}
+<div class="container-progress">
+  <div class="circle-container">
+    <div class="circle-progress tercer_paso" id="progressCircle"></div>
+    <div class="M-titulo circle-center" id="circleLabel">3/4</div>
+  </div>
+</div>
+</div>
+</div>
+<a href="{% url 'crear_perfil_3' %}">
+  <button class="btn-primario" style="color: #FFF; width: 100%;">Ir a perfil</button>
+</a>
+{% elif jugador.paso_perfil == 3 %}
+<div class="container-progress">
+  <div class="circle-container">
+    <div class="circle-progress cuarto_paso" id="progressCircle"></div>
+    <div class="M-titulo circle-center" id="circleLabel">4/4</div>
+  </div>
+</div>
+</div>
+</div>
+<a href="{% url 'crear_perfil_4' %}">
+  <button class="btn-primario" style="color: #FFF; width: 100%;">Ir a perfil</button>
+</a>
+{% endif %}
+</div>
+{% endif %}
+<!-- Tu próximo partido -->
+<div class="container-2 d-flex flex-column">
+  <div>
+    <p class="M-subtitulos">Tu próximo partido:</p>
+  </div>
+  <div class="d-flex justify-content-center">
+    {% if proximo_partido_tipo == "amistoso" %}
+    <a href="{% url 'detalle_partido' 'amistoso' proximo_partido.id %}" class="card-link">
+      <div class="card-partido">
+        <div class="card-partido-contenido">
+
+          <div class="container-1">
+            <img src="{% static home_escudos.proximo.local %}" alt="Escudo local próximo" width="76"
+              style="border-radius: 5px;">
+            <div class="info-central">
+              <p class="fecha">
+                {{ proximo_partido.dia|date:"d/M" }} - {{ proximo_partido.hora_inicio|time:"H:i" }}
+              </p>
+              <p class="vs">VS</p>
+            </div>
+            <img src="{% static home_escudos.proximo.visitante %}" alt="Escudo visitante próximo" width="76"
+              style="border-radius: 5px;">
+          </div>
+
+          <div class="container-2">
+            <p class="equipo-nombre izq">
+              {{ proximo_partido.equipo_local.nombre|default:"Equipo 1" }}
+            </p>
+            <p class="equipo-nombre der">
+              {{ proximo_partido.equipo_visitante.nombre|default:"Equipo 2" }}
+            </p>
+          </div>
+
+        </div>
+
+        <div class="badge-cancha">
+          <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+          <p class="M-body">{{ proximo_partido.cancha }}</p>
+        </div>
+      </div>
+    </a>
+    {% elif proximo_partido_tipo == "torneo" %}
+    <a href="{% if not proximo_partido.dia or not proximo_partido.hora_inicio %}
+            {% url 'detalle_propuesta' proximo_partido.id %}
+         {% else %}
+            {% url 'detalle_partido' 'torneo' proximo_partido.id %}
+         {% endif %}" style="text-decoration: none; display: flex; justify-content: center;">
+
+      <div class="card-partido">
+        <div class="card-partido-contenido">
+          <div class="container-1">
+
+            <!-- ESCUDO LOCAL -->
+            {% if proximo_partido.equipo_local and proximo_partido.equipo_local.equipo.escudo %}
+            <img src="{{ proximo_partido.equipo_local.equipo.escudo.url }}" width="76">
+            {% else %}
+            <img src="{% static 'images/escudo-generico.png' %}" width="76">
+            {% endif %}
+
+            <div class="info-central">
+              <p class="fecha">
+                {% if proximo_partido.dia and proximo_partido.hora_inicio %}
+                {{ proximo_partido.dia|date:"d/M" }} - {{ proximo_partido.hora_inicio|time:"H:i" }}
+                {% else %}
+                A definir
+                {% endif %}
+              </p>
+
+              {% if not proximo_partido.jugado %}
+              <p class="vs">VS</p>
+              {% else %}
+              <div class="resultado">
+                <p class="goles izq">{{ proximo_partido.goles_equipo_local }}</p>
+                <p class="vs">-</p>
+                <p class="goles der">{{ proximo_partido.goles_equipo_visitante }}</p>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- ESCUDO VISITANTE -->
+            {% if proximo_partido.equipo_visitante and proximo_partido.equipo_visitante.equipo.escudo %}
+            <img src="{{ proximo_partido.equipo_visitante.equipo.escudo.url }}" width="76">
+            {% else %}
+            <img src="{% static 'images/escudo-generico.png' %}" width="76">
+            {% endif %}
+
+          </div>
+
+          <div class="container-2">
+            <p class="equipo-nombre izq M-body">
+              {{ proximo_partido.equipo_local.equipo.nombre|default:"Equipo 1" }}
+            </p>
+            <p class="equipo-nombre der M-body">
+              {{ proximo_partido.equipo_visitante.equipo.nombre|default:"Equipo 2" }}
+            </p>
+          </div>
+
+        </div>
+
+        {% if proximo_partido.cancha %}
+        <div class="badge-cancha">
+          <img src="{% static 'svg/cancha-icon.svg' %}">
+          <p class="M-body">{{ proximo_partido.cancha.nombre }}</p>
+        </div>
+        {% endif %}
+
+      </div>
+    </a>
+    {% else %}
+    <div class="d-flex flex-column align-items-center w-100" style="gap: 30px; margin-top: 20px;">
+      <p class="M-body texto-transparente">No tenés ningún partido por jugar...</p>
+      <div class="d-flex justify-content-end w-100">
+        <button href="{% url 'crear_partido' %}" class="btn-primario" id="btnCrearPartido">
+          <p class="M-boton">Crear partido</p>
+        </button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Torneo actual -->
+{% if torneo_actual %}
+<div class="container-3 d-flex flex-column">
+  <div class="container-titulo" style="margin-bottom: 10px;">
+    <p class="M-subtitulos">Torneo actual</p>
+  </div>
+  <div class="container-torneo-actual">
+    <div class="container-1 d-flex flex-row justify-content-start align-items-center w-100">
+      <div>
+        {% if torneo_actual.imagen %}
+        <img src="{{ torneo_actual.imagen.url }}" alt="Escudo" class="escudo" width="76">
+        {% else %}
+        <img src="{% static 'images/copas-default/copa-default.png' %}" alt="" width="76">
+        {% endif %}
+      </div>
+      <div>
+        <p class="M-subtitulos">{{ torneo_actual.nombre }}</p>
+        <p class="M-body">Fecha {{ torneo_actual.fecha_actual }}
+          <span class="texto-transparente">({{torneo_actual.total_fechas }})</span>
+        </p>
+      </div>
+    </div>
+    <div class="container-2">
+      <div id="tabla">
+        <table class="table table-striped">
+          <thead>
+            <tr class="table-header">
+              <th class="M-body-s">Pos</th>
+              <th class="M-body-s club-col">Club</th>
+              <th class="M-body-s">PJ</th>
+              <th class="M-body-s">PG</th>
+              <th class="M-body-s">PE</th>
+              <th class="M-body-s">PP</th>
+              <th class="M-body-s">DG</th>
+              <th class="M-body-s">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if participacion_equipo %}
+            <tr class="mi-equipo">
+              <td>{{ participacion_equipo.posicion }}</td>
+              <td class="club-col">
+                <img src="{{ equipo_jugador.escudo.url }}" alt="">
+                <p style="text-transform: uppercase;">{{ equipo_jugador.nombre_corto }}</p>
+              </td>
+              <td>{{ participacion_equipo.pj }}</td>
+              <td>{{ participacion_equipo.pg }}</td>
+              <td>{{ participacion_equipo.pe }}</td>
+              <td>{{ participacion_equipo.pp }}</td>
+              {% if participacion_equipo.dif > 0 %}
+              <td>+{{ participacion_equipo.dif }}</td>
+              {% else %}
+              <td>{{ participacion_equipo.dif }}</td>
+              {% endif %}
+              <td>{{ participacion_equipo.puntos }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="8">No hay estadísticas de tu equipo en este torneo.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <a href="{% url 'detalle_torneo' torneo_actual.id %}" class="container-3 btn-secundario"
+      style="text-decoration: none; margin-right: 16px;">
+      <p class="M-boton texto-verde">
+        Ir a torneo
+      </p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+        <path d="M9.5 5.5L15.5 12.5L9.5 19.5" stroke="#4F9639" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Completa tu perfil -->
+{% if jugador.paso_perfil == 4 %}
+{% if not jugador.fortalezas or not jugador.debilidades %}
+<div class="container-4 d-flex flex-column">
+  <p class="M-subtitulos">Completá tu perfil</p>
+  <div class="d-flex flex-row align-items-center" style="gap: 20px;">
+    <p class="M-body">Sumá tus fortalezas y debilidades al perfil.</p>
+    <div class="d-flex flex-row" style="gap: 5px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="63" height="63" viewBox="0 0 63 63" fill="none">
+        <path
+          d="M55.0598 31.9861L53.1198 31.6506L55.0598 31.9861ZM53.2078 42.6955L51.2678 42.36L53.2078 42.6955ZM18.2116 53.7523L16.2502 53.9219L18.2116 53.7523ZM16.0797 29.0966L18.0411 28.927L16.0797 29.0966ZM36.7367 13.7062L38.6796 14.0246V14.0245L36.7367 13.7062ZM34.9972 24.3232L36.9401 24.6415V24.6415L34.9972 24.3232ZM17.5826 25.4034L16.2974 23.912L16.2974 23.912L17.5826 25.4034ZM21.3593 22.1489L22.6445 23.6404H22.6445L21.3593 22.1489ZM27.6099 12.5573L25.7042 12.063V12.063L27.6099 12.5573ZM28.8586 7.74346L30.7643 8.2378V8.23779L28.8586 7.74346ZM33.2524 5.41893L32.6503 7.29333L32.6503 7.29333L33.2524 5.41893ZM33.633 5.54118L34.2351 3.66677L34.2351 3.66677L33.633 5.54118ZM25.8876 16.9644L27.6241 17.892L25.8876 16.9644ZM36.4998 8.52475L34.5941 9.01909V9.01909L36.4998 8.52475ZM30.6448 5.59753L29.7901 3.82396V3.82396L30.6448 5.59753ZM10.4254 56.3606L8.46401 56.5302H8.46401L10.4254 56.3606ZM7.875 26.8648L9.83643 26.6952C9.74561 25.6448 8.84344 24.8524 7.79012 24.8979C6.7368 24.9433 5.90625 25.8105 5.90625 26.8648H7.875ZM55.0598 31.9861L53.1198 31.6506L51.2678 42.36L53.2078 42.6955L55.1477 43.031L56.9997 32.3216L55.0598 31.9861ZM34.768 57.75V55.7812H22.5654V57.75V59.7187H34.768V57.75ZM18.2116 53.7523L20.1731 53.5827L18.0411 28.927L16.0797 29.0966L14.1183 29.2662L16.2502 53.9219L18.2116 53.7523ZM53.2078 42.6955L51.2678 42.36C49.9374 50.0528 43.0009 55.7812 34.768 55.7812V57.75V59.7187C44.812 59.7187 53.4734 52.7127 55.1477 43.031L53.2078 42.6955ZM36.7367 13.7062L34.7939 13.3879L33.0544 24.0049L34.9972 24.3232L36.9401 24.6415L38.6796 14.0246L36.7367 13.7062ZM17.5826 25.4034L18.8678 26.8948L22.6445 23.6404L21.3593 22.1489L20.0741 20.6575L16.2974 23.912L17.5826 25.4034ZM27.6099 12.5573L29.5156 13.0517L30.7643 8.2378L28.8586 7.74346L26.9529 7.24912L25.7042 12.063L27.6099 12.5573ZM33.2524 5.41893L32.6503 7.29333L33.0308 7.41558L33.633 5.54118L34.2351 3.66677L33.8546 3.54452L33.2524 5.41893ZM25.8876 16.9644L27.6241 17.892C28.443 16.3589 29.0789 14.7352 29.5156 13.0517L27.6099 12.5573L25.7042 12.063C25.3463 13.4428 24.8246 14.7759 24.1511 16.0368L25.8876 16.9644ZM33.633 5.54118L33.0308 7.41558C33.8352 7.67398 34.4063 8.29523 34.5941 9.01909L36.4998 8.52475L38.4055 8.03041C37.8662 5.95138 36.2748 4.32201 34.2351 3.66677L33.633 5.54118ZM28.8586 7.74346L30.7643 8.23779C30.8562 7.8834 31.1122 7.55771 31.4994 7.37111L30.6448 5.59753L29.7901 3.82396C28.3937 4.49687 27.3447 5.73895 26.9529 7.24912L28.8586 7.74346ZM30.6448 5.59753L31.4994 7.37111C31.8531 7.20066 32.2695 7.17101 32.6503 7.29333L33.2524 5.41893L33.8546 3.54453C32.5166 3.11468 31.0569 3.21352 29.7901 3.82396L30.6448 5.59753ZM37.1534 26.8648V28.8335H50.7538V26.8648V24.896H37.1534V26.8648ZM10.4254 56.3606L12.3869 56.191L9.83643 26.6952L7.875 26.8648L5.91357 27.0344L8.46401 56.5302L10.4254 56.3606ZM7.875 56.4709H9.84375V26.8648H7.875H5.90625V56.4709H7.875ZM10.4254 56.3606L8.46401 56.5302C8.42939 56.1298 8.74507 55.7812 9.1526 55.7812V57.75V59.7187C11.0583 59.7187 12.5507 58.0857 12.3869 56.191L10.4254 56.3606ZM36.7367 13.7062L38.6796 14.0245C39.0065 12.0292 38.9131 9.98752 38.4055 8.03041L36.4998 8.52475L34.5941 9.01909C34.9641 10.4455 35.0322 11.9336 34.7939 13.3879L36.7367 13.7062ZM22.5654 57.75V55.7812C21.3214 55.7812 20.2808 54.8283 20.1731 53.5827L18.2116 53.7523L16.2502 53.9219C16.5336 57.1994 19.2746 59.7187 22.5654 59.7187V57.75ZM21.3593 22.1489L22.6445 23.6404C24.4291 22.1025 26.3528 20.272 27.6241 17.892L25.8876 16.9644L24.1511 16.0368C23.2419 17.7389 21.7941 19.1754 20.0741 20.6575L21.3593 22.1489ZM55.0598 31.9861L56.9997 32.3216C57.67 28.4458 54.6894 24.896 50.7538 24.896V26.8648V28.8335C52.2413 28.8335 53.3747 30.1767 53.1198 31.6506L55.0598 31.9861ZM9.1526 57.75V55.7812C9.53642 55.7812 9.84375 56.0921 9.84375 56.4709H7.875H5.90625C5.90625 58.2625 7.35759 59.7187 9.1526 59.7187V57.75ZM34.9972 24.3232L33.0544 24.0049C32.6403 26.5324 34.5885 28.8335 37.1534 28.8335V26.8648V24.896C37.0225 24.896 36.9178 24.7774 36.9401 24.6415L34.9972 24.3232ZM16.0797 29.0966L18.0411 28.927C17.9744 28.1553 18.2825 27.3992 18.8678 26.8948L17.5826 25.4034L16.2974 23.912C14.7531 25.2428 13.9427 27.2351 14.1183 29.2662L16.0797 29.0966Z"
+          fill="#26BA37" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="63" height="63" viewBox="0 0 63 63" fill="none">
+        <path
+          d="M55.0598 31.0139L53.1198 31.3494L55.0598 31.0139ZM53.2078 20.3045L51.2678 20.64L53.2078 20.3045ZM18.2116 9.24769L16.2502 9.07809L18.2116 9.24769ZM16.0797 33.9034L18.0411 34.073L16.0797 33.9034ZM36.7367 49.2938L38.6796 48.9754V48.9755L36.7367 49.2938ZM34.9972 38.6768L36.9401 38.3585V38.3585L34.9972 38.6768ZM17.5826 37.5966L16.2974 39.088L16.2974 39.088L17.5826 37.5966ZM21.3593 40.8511L22.6445 39.3596H22.6445L21.3593 40.8511ZM27.6099 50.4427L25.7042 50.937V50.937L27.6099 50.4427ZM28.8586 55.2565L30.7643 54.7622V54.7622L28.8586 55.2565ZM33.2524 57.5811L32.6503 55.7067L32.6503 55.7067L33.2524 57.5811ZM33.633 57.4588L34.2351 59.3332L34.2351 59.3332L33.633 57.4588ZM25.8876 46.0356L27.6241 45.108L25.8876 46.0356ZM36.4998 54.4752L34.5941 53.9809V53.9809L36.4998 54.4752ZM30.6448 57.4025L29.7901 59.176V59.176L30.6448 57.4025ZM10.4254 6.63936L8.46401 6.46976H8.46401L10.4254 6.63936ZM7.875 36.1352L9.83643 36.3048C9.74561 37.3552 8.84344 38.1476 7.79012 38.1021C6.7368 38.0567 5.90625 37.1895 5.90625 36.1352H7.875ZM55.0598 31.0139L53.1198 31.3494L51.2678 20.64L53.2078 20.3045L55.1477 19.969L56.9997 30.6784L55.0598 31.0139ZM34.768 5.25V7.21875H22.5654V5.25V3.28125H34.768V5.25ZM18.2116 9.24769L20.1731 9.41729L18.0411 34.073L16.0797 33.9034L14.1183 33.7338L16.2502 9.07809L18.2116 9.24769ZM53.2078 20.3045L51.2678 20.64C49.9374 12.9472 43.0009 7.21875 34.768 7.21875V5.25V3.28125C44.812 3.28125 53.4734 10.2873 55.1477 19.969L53.2078 20.3045ZM36.7367 49.2938L34.7939 49.6121L33.0544 38.9951L34.9972 38.6768L36.9401 38.3585L38.6796 48.9754L36.7367 49.2938ZM17.5826 37.5966L18.8678 36.1052L22.6445 39.3596L21.3593 40.8511L20.0741 42.3425L16.2974 39.088L17.5826 37.5966ZM27.6099 50.4427L29.5156 49.9483L30.7643 54.7622L28.8586 55.2565L26.9529 55.7509L25.7042 50.937L27.6099 50.4427ZM33.2524 57.5811L32.6503 55.7067L33.0308 55.5844L33.633 57.4588L34.2351 59.3332L33.8546 59.4555L33.2524 57.5811ZM25.8876 46.0356L27.6241 45.108C28.443 46.6411 29.0789 48.2648 29.5156 49.9483L27.6099 50.4427L25.7042 50.937C25.3463 49.5572 24.8246 48.2241 24.1511 46.9632L25.8876 46.0356ZM33.633 57.4588L33.0308 55.5844C33.8352 55.326 34.4063 54.7048 34.5941 53.9809L36.4998 54.4752L38.4055 54.9696C37.8662 57.0486 36.2748 58.678 34.2351 59.3332L33.633 57.4588ZM28.8586 55.2565L30.7643 54.7622C30.8562 55.1166 31.1122 55.4423 31.4994 55.6289L30.6448 57.4025L29.7901 59.176C28.3937 58.5031 27.3447 57.261 26.9529 55.7509L28.8586 55.2565ZM30.6448 57.4025L31.4994 55.6289C31.8531 55.7993 32.2695 55.829 32.6503 55.7067L33.2524 57.5811L33.8546 59.4555C32.5166 59.8853 31.0569 59.7865 29.7901 59.176L30.6448 57.4025ZM37.1534 36.1352V34.1665H50.7538V36.1352V38.104H37.1534V36.1352ZM10.4254 6.63936L12.3869 6.80896L9.83643 36.3048L7.875 36.1352L5.91357 35.9656L8.46401 6.46976L10.4254 6.63936ZM7.875 6.52906H9.84375V36.1352H7.875H5.90625V6.52906H7.875ZM10.4254 6.63936L8.46401 6.46976C8.42939 6.8702 8.74507 7.21875 9.1526 7.21875V5.25V3.28125C11.0583 3.28125 12.5507 4.91426 12.3869 6.80896L10.4254 6.63936ZM36.7367 49.2938L38.6796 48.9755C39.0065 50.9708 38.9131 53.0125 38.4055 54.9696L36.4998 54.4752L34.5941 53.9809C34.9641 52.5545 35.0322 51.0664 34.7939 49.6121L36.7367 49.2938ZM22.5654 5.25V7.21875C21.3214 7.21875 20.2808 8.17169 20.1731 9.41729L18.2116 9.24769L16.2502 9.07809C16.5336 5.80061 19.2746 3.28125 22.5654 3.28125V5.25ZM21.3593 40.8511L22.6445 39.3596C24.4291 40.8975 26.3528 42.728 27.6241 45.108L25.8876 46.0356L24.1511 46.9632C23.2419 45.2611 21.7941 43.8246 20.0741 42.3425L21.3593 40.8511ZM55.0598 31.0139L56.9997 30.6784C57.67 34.5542 54.6894 38.104 50.7538 38.104V36.1352V34.1665C52.2413 34.1665 53.3747 32.8233 53.1198 31.3494L55.0598 31.0139ZM9.1526 5.25V7.21875C9.53642 7.21875 9.84375 6.90786 9.84375 6.52906H7.875H5.90625C5.90625 4.73745 7.35759 3.28125 9.1526 3.28125V5.25ZM34.9972 38.6768L33.0544 38.9951C32.6403 36.4676 34.5885 34.1665 37.1534 34.1665V36.1352V38.104C37.0225 38.104 36.9178 38.2226 36.9401 38.3585L34.9972 38.6768ZM16.0797 33.9034L18.0411 34.073C17.9744 34.8447 18.2825 35.6008 18.8678 36.1052L17.5826 37.5966L16.2974 39.088C14.7531 37.7572 13.9427 35.7649 14.1183 33.7338L16.0797 33.9034Z"
+          fill="#E32C2C" />
+      </svg>
+    </div>
+  </div>
+  <a href="{% url 'perfil' jugador.id %}" class="btn-primario"
+    style="width: 100%; color: #FFF; margin-top: 10px; display: inline-block; text-align: center; text-decoration: none;">
+    Ir a perfil
+  </a>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- Adelantos -->
+<div class="container-5 d-flex flex-column" style="gap: 10px;">
+  <p class="M-subtitulos">Lo próximo en Ticas</p>
+  <p>Ticas está preparando muchas funciones nuevas para completar tu experiencia, entrá y mirá el adelanto de lo que se
+    viene.</p>
+  <div class="w-100 d-flex justify-content-end">
+    <a href="{% url 'adelantos' %}" class="btn-secundario" style="text-decoration: none;">
+      <p class="M-boton">Adelantos</p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+        <path d="M9 5.5L15 12.5L9 19.5" stroke="#4F9639" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </a>
+  </div>
+</div>
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const boton = document.getElementById("btnCrearPartido");
+    boton.addEventListener("click", function () {
+      window.location.href = "{% url 'crear_partido' %}";
+    });
+  });
+</script>
+
+<script>
+  (function () {
+    const box = document.getElementById('expira-en');
+    const out = document.getElementById('expira-text');
+    if (!box || !out) return;
+
+    const raw = (box.getAttribute('vencimiento') || '').trim();
+    if (!raw) { out.textContent = '—'; return; }
+
+    // Mapa de meses ES (abreviaturas y variantes comunes)
+    const MONTHS = {
+      'ene': 0, 'enero': 0,
+      'feb': 1, 'febrero': 1,
+      'mar': 2, 'marzo': 2,
+      'abr': 3, 'abril': 3,
+      'may': 4, 'mayo': 4,
+      'jun': 5, 'junio': 5,
+      'jul': 6, 'julio': 6,
+      'ago': 7, 'agosto': 7,
+      'sep': 8, 'set': 8, 'sept': 8, 'septiembre': 8,
+      'oct': 9, 'octubre': 9,
+      'nov': 10, 'noviembre': 10,
+      'dic': 11, 'diciembre': 11,
+    };
+
+    function normalize(txt) {
+      return txt
+        .toLowerCase()
+        .replace(/\./g, '')                 // saca puntos: "Ago." -> "Ago"
+        .normalize('NFD').replace(/\p{Diacritic}/gu, '') // por si acaso
+        .trim();
+    }
+
+    // Parse "28 Ago. 2025"
+    function parseEsShortDate(str) {
+      // Separa por espacios, tolera múltiples espacios
+      const parts = normalize(str).split(/\s+/);
+      // Formatos esperados: ["28","ago","2025"] o ["28","ago.","2025"] (ya sin punto)
+      if (parts.length < 3) return null;
+
+      // día puede venir con coma: "28," -> 28
+      const day = parseInt(parts[0].replace(/[^\d]/g, ''), 10);
+      const monKey = parts[1]; // "ago"
+      const year = parseInt(parts[2], 10);
+
+      if (!Number.isFinite(day) || !Number.isFinite(year)) return null;
+      const mon = MONTHS[monKey];
+      if (mon == null) return null;
+
+      // 00:00 local de esa fecha
+      return new Date(year, mon, day, 0, 0, 0, 0);
+    }
+
+    const target = parseEsShortDate(raw);
+    if (!target || isNaN(target.getTime())) {
+      out.textContent = '—';
+      return;
+    }
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    function renderCountdown() {
+      const now = new Date();
+      const ms = target.getTime() - now.getTime();
+
+      if (ms <= 0) {
+        out.textContent = "Vencido";
+        box.setAttribute("data-status", "expired");
+        return true; // terminado
+      }
+
+      // convertir a horas completas
+      const horas = Math.ceil(ms / (1000 * 60 * 60));
+      out.textContent = `Expira en ${horas} hs`;
+
+      return false;
+    }
+
+    // Primera pinta y luego interval
+    if (!renderCountdown()) {
+      const timer = setInterval(() => {
+        if (renderCountdown()) clearInterval(timer);
+      }, 1000);
+    }
+  })();
+</script>
+
+{% endblock %}

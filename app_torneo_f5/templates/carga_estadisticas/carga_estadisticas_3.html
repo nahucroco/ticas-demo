@@ -1,0 +1,545 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    /* Overlay */
+    #pantalla-cargando {
+        position: fixed;
+        inset: 0;
+        background-color: #221140;
+        z-index: 9999;
+        display: none;
+        /* oculto por defecto */
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        transition: opacity .5s ease;
+    }
+
+    #pantalla-cargando.visible {
+        display: flex;
+        opacity: 1;
+    }
+
+    /* Logo centrado que luego sube */
+    #container-logo {
+        width: 100%;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transition: top .8s ease, transform .8s ease, opacity .5s ease;
+        z-index: 10000;
+    }
+
+    #container-logo.fijo {
+        top: 78px;
+        transform: translateX(-50%);
+        opacity: 1;
+    }
+
+    .container-logo {
+        width: 76px;
+        height: 76px;
+        background-color: #221140;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+    }
+
+    /* Contenido que sube desde abajo */
+    #container-contenido {
+        background: #221140;
+        position: absolute;
+        left: 0;
+        width: 100%;
+        top: 100vh;
+        /* arranca fuera de pantalla */
+        border-radius: 26px 26px 0 0;
+        padding: 40px 16px 75px 16px;
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transition: top .8s ease, opacity .8s ease;
+    }
+
+    #container-contenido.visible {
+        opacity: 1;
+    }
+
+    /* Spinner opcional */
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border: 5px solid #fff;
+        border-top: 5px solid #733BDE;
+        border-radius: 50%;
+        animation: girar 1s linear infinite;
+    }
+
+    @keyframes girar {
+        from {
+            transform: rotate(0)
+        }
+
+        to {
+            transform: rotate(360deg)
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="cargar_estadisticas_3">
+
+        <div class="header">
+            <div class="container-1">
+                {% if tipo == 'amistoso' %}
+                <p class="M-subtitulos texto-transparente">Partido amistoso</p>
+                {% else %}
+                <p class="M-subtitulos texto-transparente">{{ partido.torneo.nombre }}</p>
+                {% endif %}
+                <p class="M-subtitulos texto-transparente">{{ partido.dia|date:"d/M" }}</p>
+            </div>
+            <div class="container-2">
+                <div class="container-icons">
+                    <div class="icon-container-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <hr class="linea-1">
+                    <div class="icon-container-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 22H2" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M21 22V14.5C21 13.6716 20.3284 13 19.5 13H16.5C15.6716 13 15 13.6716 15 14.5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M15 22V5C15 3.58579 15 2.87868 14.5607 2.43934C14.1213 2 13.4142 2 12 2C10.5858 2 9.87868 2 9.43934 2.43934C9 2.87868 9 3.58579 9 5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M9 22V9.5C9 8.67157 8.32843 8 7.5 8H4.5C3.67157 8 3 8.67157 3 9.5V22"
+                                stroke="white" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <hr class="linea-2">
+                    <div class="icon-container-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="18.5" cy="4.5" r="2.5" stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M9 17L7.99923 18.2009C7.262 19.0856 6.89338 19.5279 6.38945 19.764C5.88552 20 5.30973 20 4.15813 20H3"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M13.6503 21.9999C13.6503 22.4141 13.9861 22.7499 14.4003 22.7499C14.8145 22.7499 15.1503 22.4141 15.1503 21.9999H13.6503ZM12.5649 16.2457L13.0178 15.6479L13.0178 15.6479L12.5649 16.2457ZM13.7493 17.261L14.3365 16.7945L14.3365 16.7945L13.7493 17.261ZM14.3062 18.3817L15.0327 18.1954L15.0327 18.1954L14.3062 18.3817ZM13.5045 11.555C13.811 11.2763 13.8336 10.802 13.555 10.4955C13.2763 10.189 12.802 10.1664 12.4955 10.445L13.5045 11.555ZM10.8523 13.1644L11.5555 13.4252L11.5555 13.4252L10.8523 13.1644ZM10.922 14.72L10.2449 15.0426H10.2449L10.922 14.72ZM14.4003 19.9389H13.6503V21.9999H14.4003H15.1503V19.9389H14.4003ZM12.5649 16.2457L12.112 16.8436C12.7756 17.3463 12.9992 17.5226 13.162 17.7276L13.7493 17.261L14.3365 16.7945C14.0282 16.4065 13.6192 16.1035 13.0178 15.6479L12.5649 16.2457ZM14.4003 19.9389H15.1503C15.1503 19.1844 15.1558 18.6754 15.0327 18.1954L14.3062 18.3817L13.5797 18.5681C13.6448 18.8216 13.6503 19.1063 13.6503 19.9389H14.4003ZM13.7493 17.261L13.162 17.7276C13.3588 17.9753 13.5011 18.2617 13.5797 18.5681L14.3062 18.3817L15.0327 18.1954C14.9017 17.6847 14.6645 17.2073 14.3365 16.7945L13.7493 17.261ZM13 11L12.4955 10.445C12.0759 10.8265 11.5507 11.2813 11.1415 11.6686C10.9321 11.8668 10.7317 12.0669 10.5681 12.2554C10.4196 12.4266 10.2415 12.6544 10.1491 12.9037L10.8523 13.1644L11.5555 13.4252C11.5478 13.4461 11.5696 13.39 11.7011 13.2385C11.8175 13.1044 11.9771 12.9431 12.1726 12.758C12.5731 12.3789 13.0371 11.9799 13.5045 11.555L13 11ZM12.5649 16.2457L13.0178 15.6479C12.5303 15.2786 12.2 15.0277 11.9623 14.8161C11.7288 14.6083 11.6414 14.4864 11.5991 14.3975L10.922 14.72L10.2449 15.0426C10.412 15.3935 10.6684 15.6725 10.965 15.9366C11.2574 16.1969 11.6439 16.4889 12.112 16.8436L12.5649 16.2457ZM10.8523 13.1644L10.1491 12.9037C9.89078 13.6003 9.92532 14.3719 10.2449 15.0426L10.922 14.72L11.5991 14.3975C11.4538 14.0926 11.4381 13.7419 11.5555 13.4252L10.8523 13.1644Z"
+                                fill="white" />
+                            <path
+                                d="M5.43568 8.82067L5.06517 8.16858L5.06517 8.16858L5.43568 8.82067ZM3.62949 8.98431C3.26935 9.18893 3.14328 9.64677 3.34791 10.0069C3.55253 10.367 4.01037 10.4931 4.37051 10.2885L3.62949 8.98431ZM13.4066 7.35719L13.1211 8.05073V8.05073L13.4066 7.35719ZM10.4467 6.64289L10.3924 5.89487L10.4467 6.64289ZM21 12.75C21.4142 12.75 21.75 12.4142 21.75 12C21.75 11.5858 21.4142 11.25 21 11.25V12.75ZM15.7681 9.53622L15.0973 9.87163V9.87163L15.7681 9.53622ZM5.43568 8.82067L5.06517 8.16858L3.62949 8.98431L4 9.6364L4.37051 10.2885L5.80619 9.47277L5.43568 8.82067ZM13.4066 7.35719L13.6921 6.66365C12.3481 6.1104 11.6111 5.80624 10.3924 5.89487L10.4467 6.64289L10.5011 7.39092C11.3248 7.33103 11.7575 7.48943 13.1211 8.05073L13.4066 7.35719ZM5.43568 8.82067L5.80619 9.47277C8.30813 8.05121 9.35849 7.47401 10.5011 7.39092L10.4467 6.64289L10.3924 5.89487C8.83282 6.00827 7.4432 6.81743 5.06517 8.16858L5.43568 8.82067ZM19.7546 12V12.75H21V12V11.25H19.7546V12ZM15.7681 9.53622L15.0973 9.87163C15.9793 11.6357 17.7823 12.75 19.7546 12.75V12V11.25C18.3505 11.25 17.0669 10.4567 16.4389 9.20082L15.7681 9.53622ZM15.7681 9.53622L16.4389 9.20082C15.8611 8.0451 14.8765 7.15119 13.6921 6.66365L13.4066 7.35719L13.1211 8.05073C13.9811 8.40473 14.6864 9.04993 15.0973 9.87163L15.7681 9.53622Z"
+                                fill="white" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="container-textos">
+                    <p class="M-body-s text-container-1">Equipo</p>
+                    <p class="M-body-s text-container-2">Rendimiento</p>
+                    <p class="M-body-s text-container-3">Participacion</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-main">
+            <p class="M-subtitulos">Tus números en el partido</p>
+
+            <div class="lista-jugadores">
+                <div class="estadisticas-container">
+                    <div class="estadistica-item">
+                        <span class="icono">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none">
+                                <path
+                                    d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                                    stroke="white" stroke-width="1.5" />
+                                <path d="M2 12H5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M19 12H22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M12 22V19" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M12 5V2" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M10 12H12H14" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M12 14V12V10" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <span class="label M-body">Goles</span>
+                        <div class="contador">
+                            <button type="button" id="btn-menos-goles" onclick="cambiarValor('goles', -1)">−</button>
+                            <input type="text" id="goles" name="goles" value="0" readonly>
+                            <button type="button" onclick="cambiarValor('goles', 1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="estadistica-item">
+                        <span class="icono">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="20" viewBox="0 0 22 20"
+                                fill="none">
+                                <path
+                                    d="M10 15L12 17C12.197 17.197 12.4308 17.3532 12.6882 17.4598C12.9456 17.5665 13.2214 17.6213 13.5 17.6213C13.7786 17.6213 14.0544 17.5665 14.3118 17.4598C14.5692 17.3532 14.803 17.197 15 17C15.197 16.803 15.3532 16.5692 15.4598 16.3118C15.5665 16.0544 15.6213 15.7786 15.6213 15.5C15.6213 15.2214 15.5665 14.9456 15.4598 14.6882C15.3532 14.4308 15.197 14.197 15 14"
+                                    stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M13.0002 12L15.5002 14.5C15.8981 14.8978 16.4376 15.1213 17.0002 15.1213C17.5628 15.1213 18.1024 14.8978 18.5002 14.5C18.8981 14.1022 19.1215 13.5626 19.1215 13C19.1215 12.4374 18.8981 11.8978 18.5002 11.5L14.6202 7.62002C14.0577 7.05821 13.2952 6.74265 12.5002 6.74265C11.7052 6.74265 10.9427 7.05821 10.3802 7.62002L9.50023 8.50002C9.1024 8.89784 8.56284 9.12134 8.00023 9.12134C7.43762 9.12134 6.89805 8.89784 6.50023 8.50002C6.1024 8.10219 5.87891 7.56262 5.87891 7.00002C5.87891 6.43741 6.1024 5.89784 6.50023 5.50002L9.31023 2.69002C10.2225 1.78016 11.4121 1.20057 12.6909 1.04299C13.9696 0.885409 15.2644 1.15885 16.3702 1.82002L16.8402 2.10002C17.266 2.357 17.7723 2.44613 18.2602 2.35002L20.0002 2.00002"
+                                    stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M20 1L21 12H19M2 1L1 12L7.5 18.5C7.89782 18.8978 8.43739 19.1213 9 19.1213C9.56261 19.1213 10.1022 18.8978 10.5 18.5C10.8978 18.1022 11.1213 17.5626 11.1213 17C11.1213 16.4374 10.8978 15.8978 10.5 15.5M2 2H10"
+                                    stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <span class="label M-body">Asistencias</span>
+                        <div class="contador">
+                            <button type="button" id="btn-menos-asistencias"
+                                onclick="cambiarValor('asistencias', -1)">−</button>
+                            <input type="text" id="asistencias" name="asistencias" value="0" readonly>
+                            <button type="button" onclick="cambiarValor('asistencias', 1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="estadistica-item">
+                        <span class="icono">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none">
+                                <g clip-path="url(#clip0_1019_3180)">
+                                    <path
+                                        d="M2.66135 12.8222C2.65067 12.8052 2.64161 12.7871 2.63256 12.7691C2.29594 12.1484 2.25065 11.4001 2.50782 10.7182C2.68292 10.2527 2.97706 9.85804 3.35472 9.57127C3.27183 9.4788 3.18559 9.3828 3.10423 9.29276L3.06766 9.2525L3.03919 9.20715C2.79302 8.80964 2.66664 8.35838 2.66935 7.89156L2.66172 7.87941L2.67836 7.68833C2.69945 7.4414 2.75542 7.19967 2.84577 6.97135L2.86825 6.91546C3.10225 6.3531 3.51911 5.90399 4.04206 5.64003C4.0318 5.57873 4.02549 5.51834 4.02051 5.45825C3.91732 4.29587 4.65424 3.19311 5.77324 2.8338C6.14121 2.71681 6.51706 2.6897 6.88722 2.75423C7.07184 2.78395 7.25864 2.84054 7.44346 2.92094L7.51622 2.81204C7.81982 2.39113 8.23786 2.07337 8.70101 1.91017L8.72287 1.89645L8.79682 1.87937C9.59568 1.63412 10.4287 1.78852 11.0855 2.30418L11.1135 2.32723L14.0206 5.26397L14.0392 4.95543L14.0623 4.88443C14.6307 3.15709 16.0821 2.53603 17.2688 2.68739C18.4598 2.83833 19.7155 3.82244 19.8368 5.67904C19.8969 6.59299 19.8622 7.54839 19.8292 8.47226C19.8011 9.25647 19.772 10.0661 19.8026 10.827C19.823 11.3234 19.8633 11.8174 19.9246 12.3016C19.9439 12.3053 19.9618 12.3087 19.9795 12.3134C20.7118 12.4802 22.3248 14.3013 22.4388 14.4487C23.3622 15.6606 22.8256 16.4242 22.196 17.1028C21.2233 18.1538 20.1508 19.1624 19.1128 20.1381C18.1322 21.0596 17.1179 22.0137 16.202 22.9895L16.1513 23.0382C16.0956 23.0845 16.0377 23.1253 15.9778 23.1629C15.4604 23.4878 14.7641 23.5242 14.2127 23.2393C13.7578 23.0021 12.3845 21.568 12.1415 21.2476C11.9383 20.9778 11.6927 20.5866 11.6808 20.0929C9.58211 18.9889 7.55237 17.8291 5.73344 16.0719C5.65098 15.9928 5.55248 15.8988 5.44159 15.7923C4.24386 14.6487 3.04263 13.478 2.66969 12.8372L2.66054 12.8227L2.66135 12.8222ZM5.55597 13.457L6.28211 14.191C6.28211 14.191 8.3468 16.1958 8.59792 16.3836C8.82671 16.5538 9.06813 16.7082 9.31905 16.8453L9.91605 17.1705L12.9151 18.9138L18.4844 13.435C18.3066 12.7202 18.2248 11.9858 18.1854 11.2541C18.0877 9.44934 18.377 7.41061 18.2095 5.6586C18.1938 5.49688 18.1905 5.28668 18.1347 5.13659C17.6626 3.86489 15.7948 4.06548 15.6061 5.52175C15.5432 6.00603 15.6867 7.90515 15.508 8.16182C15.0793 8.78092 14.5077 8.12938 14.2022 7.75784L13.4178 6.97233L12.9107 6.42708L11.11 4.61441L10.2189 3.71297C10.1843 3.67037 10.1461 3.63113 10.1041 3.59655C9.85919 3.39353 9.49114 3.31978 9.19755 3.43297C8.66183 3.6406 8.50683 4.3306 8.80034 4.78193L10.4426 6.44117L11.2098 7.21719L11.2106 7.21668L11.3807 7.38873C11.5074 7.51689 11.5057 7.72456 11.3781 7.85211L11.1022 8.12469C10.9737 8.25275 10.766 8.25104 10.638 8.12259L10.1873 7.66722L7.30415 4.75262C7.2497 4.68746 7.19394 4.63102 7.13688 4.5833C6.7514 4.25519 6.32538 4.28331 6.02824 4.49695C6.00527 4.5125 5.9825 4.53019 5.96075 4.54949C5.94446 4.5631 5.92949 4.57701 5.91421 4.59225C5.90824 4.59712 5.90197 4.60332 5.89702 4.60982C5.87932 4.62657 5.86263 4.64495 5.84777 4.66444C5.82199 4.6953 5.79773 4.7286 5.77713 4.76411C5.76662 4.77974 5.75875 4.79597 5.75007 4.81271C5.61678 5.05896 5.5938 5.37481 5.75447 5.68827L5.75914 5.69211L5.76066 5.69454L6.22996 6.16872L6.96848 6.9153L7.57407 7.52745L8.37819 8.33896L8.38073 8.34301L9.98219 9.9624C10.1097 10.09 10.108 10.2977 9.98039 10.4253L9.70445 10.6979C9.57549 10.8251 9.36833 10.8242 9.24027 10.6957L8.48448 9.93066L6.14653 7.56793L6.138 7.55974L6.13596 7.5565C6.07531 7.48507 6.00585 7.41578 5.93255 7.35117L5.92686 7.3457C5.70045 7.14691 5.42588 6.99189 5.14545 6.99296C5.11099 6.99202 5.07724 6.99401 5.04289 6.99864C4.99203 7.00574 4.93915 7.01861 4.88689 7.03787C4.86947 7.04429 4.85256 7.05152 4.83565 7.05875C4.82866 7.06201 4.82087 7.06578 4.81307 7.06954C4.8077 7.07178 4.80234 7.07402 4.79748 7.07707C4.79049 7.08033 4.78351 7.08359 4.77703 7.08765C4.76224 7.09468 4.74716 7.10302 4.73339 7.11166C4.67326 7.14715 4.61933 7.18892 4.57057 7.23533C4.52646 7.27657 4.48835 7.32195 4.45571 7.37066C4.44691 7.38183 4.43863 7.39381 4.43136 7.4074C4.4161 7.43166 4.40186 7.45753 4.38894 7.4837C4.37552 7.50907 4.3631 7.53605 4.35333 7.56364C4.33216 7.61983 4.31647 7.67935 4.30686 7.73957C4.30366 7.75965 4.30096 7.78053 4.29908 7.80091C4.29738 7.81439 4.2965 7.82737 4.29612 7.84115C4.29493 7.85544 4.29506 7.87004 4.29519 7.88463C4.29512 7.8971 4.29555 7.91037 4.29598 7.92365C4.29641 7.93692 4.29735 7.95101 4.29829 7.9651C4.30004 7.97867 4.30098 7.99276 4.30273 8.00634C4.30561 8.02711 4.3093 8.04737 4.31299 8.06763C4.31484 8.07776 4.31668 8.0879 4.31985 8.09833C4.32864 8.13571 4.34007 8.17369 4.35392 8.21015C4.35831 8.22433 4.50087 8.40465 4.50087 8.40465L5.05974 8.96936L5.26417 9.17631L5.42372 9.33693L5.81634 9.73394L5.81837 9.73718L5.8202 9.73829L5.82121 9.73991L5.82223 9.74153L6.48255 10.4085L7.20686 11.1414L8.49136 12.4394C8.50892 12.4566 8.52325 12.4758 8.53596 12.496C8.61578 12.6232 8.60051 12.7931 8.48925 12.9036L8.21332 13.1761C8.08435 13.3034 7.87719 13.3025 7.74994 13.1735L7.55972 12.9802L6.58497 11.9958C6.58497 11.9958 5.40832 10.7996 5.39877 10.7897C5.3938 10.7872 5.38832 10.7839 5.38335 10.7814L5.38233 10.7797C5.10057 10.6258 4.79099 10.6452 4.53553 10.7706C4.53179 10.7718 4.52804 10.773 4.5248 10.7751C4.11811 10.9401 3.8468 11.3927 4.01879 11.8446C4.0247 11.8612 4.03112 11.8787 4.03916 11.8951C4.04588 11.9112 4.05443 11.9284 4.06379 11.9451C4.06531 11.9475 4.06552 11.9496 4.06704 11.9521L4.06857 11.9545L4.15042 12.0363L4.87656 12.7704L5.55597 13.457ZM19.6521 13.9391C19.4466 13.8401 19.1224 14.3541 18.962 14.4853L20.6978 16.306C20.7921 16.1147 21.3474 15.7943 21.2841 15.5891C21.2057 15.3312 19.8897 14.2619 19.6521 13.9391ZM13.2442 20.071L15.0177 21.8781L19.9571 17.0306L18.1836 15.2235L13.2442 20.071Z"
+                                        fill="white" />
+                                    <path
+                                        d="M14.8783 10.251L15.0663 10.437C15.2702 10.6387 15.3049 10.9343 15.1437 11.0973L12.175 14.0983C12.0139 14.2613 11.7179 14.2298 11.514 14.0281L11.3259 13.8421C11.122 13.6404 11.0873 13.3448 11.2485 13.1818L14.2172 10.1807C14.3784 10.0178 14.6743 10.0493 14.8783 10.251Z"
+                                        fill="white" />
+                                    <path
+                                        d="M16.6169 11.5546L16.8077 11.7434C17.0148 11.9482 17.052 12.2463 16.8908 12.4093L12.6297 16.7168C12.4686 16.8798 12.1701 16.8458 11.963 16.641L11.7721 16.4522C11.5651 16.2474 11.5279 15.9493 11.6891 15.7863L15.9502 11.4788C16.1113 11.3159 16.4098 11.3498 16.6169 11.5546Z"
+                                        fill="white" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1019_3180">
+                                        <rect width="24" height="24" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </span>
+                        <span class="label M-body">Atajadas</span>
+                        <div class="contador">
+                            <button type="button" id="btn-menos-atajadas"
+                                onclick="cambiarValor('atajadas', -1)">−</button>
+                            <input type="text" id="atajadas" name="atajadas" value="0" readonly>
+                            <button type="button" onclick="cambiarValor('atajadas', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="boton-fijo-inferior d-flex justify-content-between">
+        <a href="{% url 'estadisticas_paso2' tipo=tipo partido_id=partido.id %}" id="btn-anterior" class="btn-secundario" style="text-decoration: none;">
+            <p class="M-boton">Anterior</p>
+        </a>
+        <button class="btn-primario">
+            <p class="M-boton">Siguiente</p>
+        </button>
+    </div>
+
+    <div id="pantalla-cargando" class="pantalla-cargando"><!-- sin animate__... acá -->
+        <div id="lottie-cargando" style="width: 202px; height: 202px;"></div>
+        <p class="lead"></p>
+    </div>
+    <input type="hidden" name="ultima_frase" id="ultima_frase">
+
+</form>
+
+<script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+<script>
+    // Evita que el navegador reinyecte un valor viejo del hidden (BFCache / autofill)
+    function resetHidden() {
+        var h = document.getElementById('ultima_frase');
+        if (h) h.value = '';
+    }
+    document.addEventListener('DOMContentLoaded', resetHidden);
+    window.addEventListener('pageshow', function (e) {
+        // pageshow con persisted=true indica que vino del cache de historial
+        resetHidden();
+    });
+</script>
+
+<script>
+    (function () {
+        const form = document.querySelector('form');
+        const overlay = document.getElementById('pantalla-cargando');
+        const lottieContainer = document.getElementById('lottie-cargando');
+
+        // Lottie (no autoplay)
+        const lottieAnim = lottie.loadAnimation({
+            container: lottieContainer,
+            renderer: 'svg',
+            loop: true,
+            autoplay: false,
+            path: "{% static 'animaciones/estadisticas.json' %}"
+        });
+
+        // ===== Frases =====
+        const grupo1 = [
+            "Calculando tu progreso…",
+            "Cargando tu rendimiento…",
+            "Midiendo tu desempeño…",
+            "Viendo cómo te moviste hoy…"
+        ];
+        const grupo2 = [
+            "Conectando pases y estadísticas…",
+            "Esto ya huele a MVP…",
+            "Traduciendo tu esfuerzo en números…"
+        ];
+        const grupo3 = ["Ya casi estamos…", "Ya lo tenemos…"];
+        const grupos = [grupo1, grupo2, grupo3];
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+        const leadEl = overlay.querySelector('.lead');
+
+        // Alturas enteras
+        const FONT_PX = 30;
+        const LH_PX = 38;       // alto de línea fijo
+        const FIXED_H = LH_PX * 2; // 2 líneas = 76px
+        Object.assign(leadEl.style, {
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'block',
+            color: '#fff',
+            fontSize: FONT_PX + 'px',
+            lineHeight: LH_PX + 'px',
+            width: '100%',
+            padding: '0 16px',
+            textAlign: 'center',
+            whiteSpace: 'normal',
+            height: FIXED_H + 'px',
+        });
+
+        // Pista/paneles
+        const track = document.createElement('span');
+        Object.assign(track.style, { position: 'relative', display: 'block', height: '100%', overflow: 'hidden' });
+        const paneA = document.createElement('span');
+        const paneB = document.createElement('span');
+        [paneA, paneB].forEach(p => {
+            Object.assign(p.style, {
+                position: 'absolute', inset: '0',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transform: 'translate3d(0,0,0)', willChange: 'transform, opacity', backfaceVisibility: 'hidden',
+            });
+        });
+        leadEl.textContent = '';
+        leadEl.appendChild(track);
+        track.appendChild(paneA);
+        track.appendChild(paneB);
+
+        // Estado
+        let current = paneA, next = paneB;
+        let started = false;
+        let lastShownText = "";
+        const STEP_MS = 4000;
+        const DUR = 150;
+        const EASE = 'ease-in-out';
+
+        // Primera frase (fade-in)
+        function first(text) {
+            lastShownText = text;
+            current.textContent = text;
+
+            current.style.transition = 'none';
+            current.style.transform = 'translate3d(0,0,0)';
+            current.style.opacity = '0';
+
+            next.style.transition = 'none';
+            next.style.transform = 'translate3d(0,100%,0)';
+            next.style.opacity = '1';
+
+            requestAnimationFrame(() => {
+                current.style.transition = `opacity ${DUR}ms ${EASE}`;
+                current.style.opacity = '1';
+            });
+        }
+
+        // Swap (slide up)
+        function swapTo(text) {
+            next.textContent = text;
+
+            current.style.transition = 'none';
+            next.style.transition = 'none';
+
+            current.style.transform = 'translate3d(0,0,0)';
+            current.style.opacity = '1';
+
+            next.style.transform = 'translate3d(0,100%,0)';
+            next.style.opacity = '0.001';
+
+            void leadEl.offsetHeight;
+
+            const trans = `transform ${DUR}ms ${EASE}, opacity ${DUR}ms ${EASE}`;
+            current.style.transition = trans;
+            next.style.transition = trans;
+
+            current.style.transform = 'translate3d(0,-100%,0)';
+            current.style.opacity = '0.999';
+            next.style.transform = 'translate3d(0,0,0)';
+            next.style.opacity = '1';
+
+            const prevCurrent = current;
+            const end = () => {
+                if (prevCurrent !== current) return;
+                const tmp = current; current = next; next = tmp;
+                next.style.transition = 'none';
+                next.style.transform = 'translate3d(0,100%,0)';
+                next.style.opacity = '1';
+                lastShownText = current.textContent; // <- guarda la última mostrada
+            };
+            const onEnd = () => { prevCurrent.removeEventListener('transitionend', onEnd); end(); };
+            prevCurrent.addEventListener('transitionend', onEnd, { once: true });
+            setTimeout(end, DUR + 40); // fallback
+        }
+
+        // Muestra exactamente 3 frases y se detiene (la 3ª queda fija)
+        function startPhraseCycle() {
+            if (started) return;
+            started = true;
+            let gi = 0;
+
+            first(pick(grupos[gi++ % grupos.length]));
+
+            // preparar posiciones
+            current.style.transition = 'none';
+            next.style.transition = 'none';
+            current.style.transform = 'translate3d(0,0,0)';
+            next.style.transform = 'translate3d(0,100%,0)';
+            void leadEl.offsetHeight;
+
+            // 2 swaps más: total 3 frases
+            let swaps = 0;
+            setTimeout(function tick() {
+                if (swaps >= 2) return;          // 1ª + 2 swaps = 3
+                swapTo(pick(grupos[gi++ % grupos.length]));
+                swaps++;
+                setTimeout(tick, STEP_MS);
+            }, STEP_MS);
+        }
+
+        // Mostrar overlay y correr todo
+        function runOverlayAnimation(thenSubmit) {
+            overlay.classList.add('visible');
+            overlay.classList.remove('animate__animated', 'animate__slideInUp');
+            void overlay.offsetWidth;
+            overlay.classList.add('animate__animated', 'animate__slideInUp');
+
+            const PHRASE_DELAY_MS = 1250;   // frases 1250ms DESPUÉS del inicio del video
+            const SUBMIT_AFTER_MS = 14000;  // tiempo total antes de enviar
+            let lottieBootstrapped = false;
+            let submitted = false;
+
+            const doSubmit = () => {
+                if (submitted) return;
+                submitted = true;
+                // carga la última frase en el hidden
+                const hidden = document.getElementById('ultima_frase');
+                if (hidden) hidden.value = lastShownText;
+                // NO animamos salida del texto: la 3ª queda visible hasta navegar
+                thenSubmit();
+            };
+
+            const startLottieThenPhrases = () => {
+                if (lottieBootstrapped) return;
+                lottieBootstrapped = true;
+
+                lottieAnim.goToAndStop(0, true);
+                requestAnimationFrame(() => {
+                    lottieAnim.play();
+                    setTimeout(() => startPhraseCycle(), PHRASE_DELAY_MS);
+                });
+
+                // programar el submit (la 3ª frase ya quedará fija)
+                setTimeout(doSubmit, SUBMIT_AFTER_MS);
+            };
+
+            if (lottieAnim.isLoaded) {
+                startLottieThenPhrases();
+            } else {
+                const onDomLoaded = () => { lottieAnim.removeEventListener('DOMLoaded', onDomLoaded); startLottieThenPhrases(); };
+                const onDataReady = () => { lottieAnim.removeEventListener('data_ready', onDataReady); startLottieThenPhrases(); };
+                lottieAnim.addEventListener('DOMLoaded', onDomLoaded);
+                lottieAnim.addEventListener('data_ready', onDataReady);
+                setTimeout(startLottieThenPhrases, 1500); // fallback
+            }
+        }
+
+        // Submit
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = form.querySelector('button[type="submit"], .btn-primario');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+            runOverlayAnimation(() => form.submit());
+        });
+    })();
+</script>
+
+<script>
+    function cambiarValor(campo, cambio) {
+        const input = document.getElementById(campo);
+        const valorActual = parseInt(input.value) || 0;
+        const nuevoValor = Math.max(0, valorActual + cambio);
+        input.value = nuevoValor;
+
+        actualizarBotones(campo, nuevoValor);
+    }
+
+    function actualizarBotones(campo, valor) {
+        const botonMenos = document.querySelector(`#btn-menos-${campo}`);
+        if (valor <= 0) {
+            botonMenos.disabled = true;
+            botonMenos.style.opacity = 0.5;
+            botonMenos.style.cursor = 'default';
+        } else {
+            botonMenos.disabled = false;
+            botonMenos.style.opacity = 1;
+            botonMenos.style.cursor = 'pointer';
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        ['goles', 'asistencias', 'atajadas'].forEach(campo => {
+            actualizarBotones(campo, parseInt(document.getElementById(campo).value));
+        });
+    });
+</script>
+
+
+{% endblock %}

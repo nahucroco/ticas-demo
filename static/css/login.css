@@ -1,0 +1,496 @@
+@font-face {
+  font-family: 'Outfit';
+  src: url('/static/fonts/Outfit-Regular.woff2') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CalSans';
+  src: url('/static/fonts/CalSans-Regular.woff2') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+button:focus,
+input[type="checkbox"]:focus,
+.custom-checkbox label:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+*:focus {
+  outline: none;
+}
+
+
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+:root {
+  --color-primario: #4F9639;
+  --color-secundario: #3F374E;
+  --color-fondo: #161618;
+  --color-texto: #FFFFFF;
+  --color-error: #FF0C0C;
+
+  font-family: 'Outfit', sans-serif;
+}
+
+img {
+  width: 150px;
+  height: 150px;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /*     min-height: 100vh; */
+  padding: 20px;
+}
+
+.login-container {
+  padding: 40px 16px;
+  text-align: center;
+
+}
+
+.form-control {
+  background-color: #2a2a2a;
+  border: none;
+  color: white;
+  height: 50px;
+  padding: 15px;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.form-control::placeholder {
+  color: #aaa;
+  opacity: 0.5;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+}
+
+.btn-login {
+  background-color: var(--color-primario);
+  color: white;
+  border: none;
+  width: 160px;
+  height: 51px;
+  padding: 12px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-family: 'CalSans', sans-serif;
+}
+
+.btn-login:hover {
+  background-color: #3b7a2c;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background-color: white;
+  color: #202124;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: 'CalSans', sans-serif;
+  text-decoration: none;
+  transition: box-shadow 0.2s ease-in-out;
+  border: none;
+  box-shadow: 0px 4px 0px 0px #5A5B59;
+}
+
+.social-container {
+  width: 100%;
+  margin-bottom: 64px;
+  margin-top: 16px;
+
+}
+
+.google-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+
+.google-btn img {
+  width: 20px;
+}
+
+.register-link {
+  margin-top: 20px;
+  color: var(--color-primario);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.alert-danger {
+  background-color: var(--color-error);
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.form-check {
+  text-align: right;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  flex-direction: row-reverse;
+
+}
+
+.custom-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.custom-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--color-texto);
+}
+
+.custom-checkbox .box {
+  width: 24px;
+  height: 24px;
+  border: 2px solid white;
+  border-radius: 6px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.custom-checkbox .checkmark {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.custom-checkbox input[type="checkbox"]:checked+label .box {
+  background-color: white;
+}
+
+.custom-checkbox input[type="checkbox"]:checked+label .checkmark {
+  opacity: 1;
+}
+
+.button-container {
+  display: flex;
+  justify-content: right;
+
+}
+
+.custom-checkbox input[type="checkbox"]:focus+label .box {
+  outline: none;
+  box-shadow: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0;
+  color: var(--color-texto);
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-secundario);
+
+}
+
+.label-user,
+.label-password {
+  text-align: left;
+  margin-top: 5px
+}
+
+.label {
+  margin-left: 10px;
+  margin-bottom: 5px;
+
+}
+
+.alert-dangerx p {
+  color: var(--color-error);
+  font-size: 16px;
+  margin: 0;
+  opacity: 0;
+}
+
+
+.input-con-valor {
+  background: #3F374E !important;
+}
+
+.input-sin-valor {
+  background: #373639;
+}
+
+
+.login-form-container {
+  margin-bottom: 16px;
+}
+
+.form-control {
+  width: 100%;
+  height: 50px;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: #373639;
+  color: #fff;
+  box-sizing: border-box
+}
+
+.btn-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 20px;
+  background: #4F9639;
+  color: #fff;
+  width: 160px;
+  height: 51px
+}
+
+.divider {
+  margin: 25px 0;
+  opacity: .85
+}
+
+img.logo {
+  display: block;
+  margin: 0 auto 0px;
+  margin-bottom: 14px;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error {
+  color: var(--Error, #FF0C0C) !important;
+  opacity: 1 !important;
+  height: 20px;
+  font-family: Outfit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.label-username-form {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.label-user {
+  color: var(--Texto, #FFF);
+  font-family: Outfit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 5px 10px;
+  opacity: 0.5;
+}
+
+.label-user-group,
+.label-passwor-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.label-user-user,
+.label-user-pass {
+  margin: 5px 10px;
+}
+
+.label-username-form {
+  width: 40vh;
+}
+
+.label-user-user,
+.label-user-pass {
+  opacity: 0.5;
+}
+
+.label-username-form {
+  margin-top: 25px;
+}
+
+p {
+  margin: 0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  /* ocupa todo el ancho del padre */
+}
+
+.divider span {
+  white-space: nowrap;
+  color: white;
+  /* texto */
+  margin: 0 10px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  /* se expande */
+  border-top: 1px solid var(--Secundario, #3F374E);
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  /* separa del divider */
+  width: 100%;
+  height: 51px;
+}
+
+.btn-secundario-registro {
+  display: flex;
+  justify-content: center;
+  /* centra el texto */
+  align-items: center;
+  /* centra verticalmente */
+  width: 100%;
+  /* ✅ ocupa todo el ancho */
+  padding: 12px 30px;
+  /* espacio interno */
+  border: none;
+  border-radius: 20px;
+  background: #11250A;
+  /* verde oscuro */
+  color: var(--Primario, #4F9639);
+  font-family: 'CalSans';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-secundario-registro:hover {
+  background: #173514;
+  /* un poco más claro al pasar el mouse */
+}
+
+/* Fade suave */
+/* Fade suave en los labels */
+.label-fade {
+  transition: opacity .25s ease;
+}
+
+/* Disparador para detectar autofill en Chrome */
+@keyframes onAutoFillStart {
+  from {}
+
+  to {}
+}
+
+.form-control:-webkit-autofill {
+  animation-name: onAutoFillStart;
+  animation-duration: .01s;
+  animation-iteration-count: 1;
+}
+
+
+/* Texto de error */
+.opacity {
+  opacity: 0 !important;
+}
+
+.form-control:focus {
+  background: #3F374E;
+  /* también cuando está en foco */
+}
+
+/* cuando el input TIENE datos */
+.form-control.input-con-valor {
+  background: #3F374E !important;
+}
+
+/* opcional: mantener el mismo color si además está en foco */
+.form-control.input-con-valor:focus {
+  background: #3F374E !important;
+}
+
+/* NO mostrar color cuando está vacío (placeholder visible) */
+
+
+/* Cuando TIENE datos (no se muestra el placeholder) */
+.form-control:not(:placeholder-shown),
+.form-control:-webkit-autofill {
+  /* cubre autofill de Chrome/Edge */
+  background: #3F374E;
+}
+
+
+.olvide-pass-container {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.olvide-pass {
+  color: #716CFF;
+  font-family: Outfit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}

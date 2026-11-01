@@ -1,0 +1,470 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body {
+        overflow-y: scroll;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari, Edge */
+    }
+
+    .container-volver {
+        width: 100%;
+        padding: 25px 16px;
+    }
+
+    .container-volver a {
+        padding: 15px 13px;
+    }
+
+    .pantalla-crear {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        top: 0% !important;
+    }
+
+    .main {
+        width: 100% !important;
+        max-width: 450px !important;
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
+    .main::-webkit-scrollbar {
+        display: none;
+    }
+
+    .circle-progress {
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        background: conic-gradient(#8b42f4 0 74.5%, #3d3750 24.83% 74.5%, #161618 74.5% 100%) !important;
+        transform: rotate(225deg)
+    }
+
+    .footer-boton {
+        width: 100%;
+        max-width: 450px !important;
+    }
+
+    .input-precio-wrapper {
+        border-radius: 5px !important;
+    }
+
+    .container-selects {
+        gap: 30px !important;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_3.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+    rel="stylesheet" />
+
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+{% block content %}
+<div class="main">
+    <div class="container-volver">
+        <a href="{{ url_volver }}" class="icono-volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+    </div>
+    <form style="display:none;">{% csrf_token %}</form>
+
+
+    <div class="container-titulo">
+        <p class="M-subtitulos">Propuesta partido torneo</p>
+    </div>
+
+    <div class="container-progress d-flex flex-column">
+        <div class="circle-container">
+            <div class="circle-progress" id="progressCircle"></div>
+            <div class="M-titulo circle-center" id="circleLabel">2/2</div>
+        </div>
+        <p class="M-titulo">Cancha</p>
+    </div>
+
+    <div class="container-selects">
+
+        <p class="M-boton" style="width: 100%; padding: 0 16px; margin-top: 19px;">Opción 1</p>
+        <div class="container">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 18" fill="none">
+                    <path
+                        d="M8.5715 8.99986C8.5715 9.90917 8.93272 10.7812 9.5757 11.4242C10.2187 12.0672 11.0908 12.4284 12.0001 12.4284C12.9094 12.4284 13.7815 12.0672 14.4244 11.4242C15.0674 10.7812 15.4286 9.90917 15.4286 8.99986C15.4286 8.09055 15.0674 7.21848 14.4244 6.57549C13.7815 5.93251 12.9094 5.57129 12.0001 5.57129C11.0908 5.57129 10.2187 5.93251 9.5757 6.57549C8.93272 7.21848 8.5715 8.09055 8.5715 8.99986ZM1.71436 5.57129H5.14293V12.4284H1.71436V5.57129ZM18.8572 5.57129H22.2858V12.4284H18.8572V5.57129Z"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                        d="M12.0001 1V17M1.71436 3.28571C1.71436 2.67951 1.95517 2.09812 2.38383 1.66947C2.81248 1.24082 3.39386 1 4.00007 1H20.0001C20.6063 1 21.1877 1.24082 21.6163 1.66947C22.045 2.09812 22.2858 2.67951 22.2858 3.28571V14.7143C22.2858 15.3205 22.045 15.9019 21.6163 16.3305C21.1877 16.7592 20.6063 17 20.0001 17H4.00007C3.39386 17 2.81248 16.7592 2.38383 16.3305C1.95517 15.9019 1.71436 15.3205 1.71436 14.7143V3.28571Z"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="select-container">
+
+                <select id="select-cancha-1" class="select-unico" multiple>
+                    <option></option>
+                    {% for cancha in canchas %}
+                    <option value="{{ cancha.id }}">{{ cancha.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="custom-icons">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="2" height="24" viewBox="0 0 2 24" fill="none">
+                        <path d="M1 0L0.999999 24" stroke="#733BDE" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 9L12 15L5 9" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M4 10.1433C4 5.64588 7.58172 2 12 2C16.4183 2 20 5.64588 20 10.1433C20 14.6055 17.4467 19.8124 13.4629 21.6744C12.5343 22.1085 11.4657 22.1085 10.5371 21.6744C6.55332 19.8124 4 14.6055 4 10.1433Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+                        stroke="white" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="select-container">
+                <input type="text" id="ubicacion-cancha-1" class="input-ubicacion" placeholder="Ubicación de la cancha"
+                    readonly>
+            </div>
+        </div>
+        <div class="container">
+            <div class="icon-container">
+                <span class="icono-precio"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                        <path d="M12 17V17.5V18" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M12 6V6.5V7" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path
+                            d="M15 9.5C15 8.11929 13.6569 7 12 7C10.3431 7 9 8.11929 9 9.5C9 10.8807 10.3431 12 12 12C13.6569 12 15 13.1193 15 14.5C15 15.8807 13.6569 17 12 17C10.3431 17 9 15.8807 9 14.5"
+                            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg></span>
+            </div>
+            <div class="select-container">
+                <div class="input-precio-wrapper input-sin-valor">
+                    <input type="text" id="precio-1" class="input-precio" placeholder="Precio total de cancha (ARS)">
+                </div>
+            </div>
+        </div>
+
+        <p class="M-boton" style="width: 100%; padding: 0 16px; margin-top: 19px;">Opción 2</p>
+        <div class="container">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 18" fill="none">
+                    <path
+                        d="M8.5715 8.99986C8.5715 9.90917 8.93272 10.7812 9.5757 11.4242C10.2187 12.0672 11.0908 12.4284 12.0001 12.4284C12.9094 12.4284 13.7815 12.0672 14.4244 11.4242C15.0674 10.7812 15.4286 9.90917 15.4286 8.99986C15.4286 8.09055 15.0674 7.21848 14.4244 6.57549C13.7815 5.93251 12.9094 5.57129 12.0001 5.57129C11.0908 5.57129 10.2187 5.93251 9.5757 6.57549C8.93272 7.21848 8.5715 8.09055 8.5715 8.99986ZM1.71436 5.57129H5.14293V12.4284H1.71436V5.57129ZM18.8572 5.57129H22.2858V12.4284H18.8572V5.57129Z"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                        d="M12.0001 1V17M1.71436 3.28571C1.71436 2.67951 1.95517 2.09812 2.38383 1.66947C2.81248 1.24082 3.39386 1 4.00007 1H20.0001C20.6063 1 21.1877 1.24082 21.6163 1.66947C22.045 2.09812 22.2858 2.67951 22.2858 3.28571V14.7143C22.2858 15.3205 22.045 15.9019 21.6163 16.3305C21.1877 16.7592 20.6063 17 20.0001 17H4.00007C3.39386 17 2.81248 16.7592 2.38383 16.3305C1.95517 15.9019 1.71436 15.3205 1.71436 14.7143V3.28571Z"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="select-container">
+
+                <select id="select-cancha-2" class="select-unico" multiple>
+                    <option></option>
+                    {% for cancha in canchas %}
+                    <option value="{{ cancha.id }}">{{ cancha.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="custom-icons">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="2" height="24" viewBox="0 0 2 24" fill="none">
+                        <path d="M1 0L0.999999 24" stroke="#733BDE" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 9L12 15L5 9" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M4 10.1433C4 5.64588 7.58172 2 12 2C16.4183 2 20 5.64588 20 10.1433C20 14.6055 17.4467 19.8124 13.4629 21.6744C12.5343 22.1085 11.4657 22.1085 10.5371 21.6744C6.55332 19.8124 4 14.6055 4 10.1433Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+                        stroke="white" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="select-container">
+                <input type="text" id="ubicacion-cancha-2" class="input-ubicacion" placeholder="Ubicación de la cancha"
+                    readonly>
+            </div>
+        </div>
+        <div class="container">
+            <div class="icon-container">
+                <span class="icono-precio"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                        <path d="M12 17V17.5V18" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M12 6V6.5V7" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path
+                            d="M15 9.5C15 8.11929 13.6569 7 12 7C10.3431 7 9 8.11929 9 9.5C9 10.8807 10.3431 12 12 12C13.6569 12 15 13.1193 15 14.5C15 15.8807 13.6569 17 12 17C10.3431 17 9 15.8807 9 14.5"
+                            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg></span>
+            </div>
+            <div class="select-container">
+                <div class="input-precio-wrapper input-sin-valor">
+                    <input type="text" id="precio-2" class="input-precio" placeholder="Precio total de cancha (ARS)">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="footer-boton">
+    <button type="button" class="btn-secundario" onclick="window.history.back();">
+        <p class="M-boton">Volver</p>
+    </button>
+    <button type="button" class="btn-primario" id="btnProponer" data-partido-id="{{ partido.id }}">
+        <p class="M-boton">Proponer</p>
+    </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        localStorage.removeItem('crearPartido_selectCancha');
+        localStorage.removeItem('crearPartido_ubicacionCancha');
+    });
+</script>
+
+<script id="canchas-data" type="application/json">
+    {{ canchas_json|safe }}
+</script>
+
+<script>
+    function actualizarEstiloSelect(selectId, inputId = null) {
+        const select = $(selectId);
+        const container = select.next('.select2-container');
+        const valor = select.val();
+
+        if (valor && valor.length > 0) {
+            container.addClass('select-con-valor').removeClass('select-sin-valor');
+        } else {
+            container.addClass('select-sin-valor').removeClass('select-con-valor');
+        }
+
+        if (inputId) {
+            const input = $(inputId);
+            const tieneTexto = input.val().trim() !== "";
+
+            if (tieneTexto) {
+                input.addClass('input-con-valor').removeClass('input-sin-valor');
+            } else {
+                input.addClass('input-sin-valor').removeClass('input-con-valor');
+            }
+        }
+    }
+</script>
+
+<script>
+    function guardarEnLocalStorageYValidar() {
+        const datos = {};
+        let completos = true;
+
+        for (let i = 1; i <= 2; i++) {
+            const canchaSelect = document.getElementById(`select-cancha-${i}`);
+            const ubicacionInput = document.getElementById(`ubicacion-cancha-${i}`);
+            const precioInput = document.getElementById(`precio-${i}`);
+
+            const canchaVal = $(canchaSelect).val();
+            const ubicacionVal = ubicacionInput?.value.trim();
+            const precioVal = precioInput?.value.trim();
+
+            datos[`cancha_${i}`] = canchaVal;
+            datos[`ubicacion_${i}`] = ubicacionVal;
+            datos[`precio_${i}`] = precioVal;
+
+            const canchaOK = canchaVal && canchaVal.length > 0;
+            const ubicacionOK = ubicacionVal && ubicacionVal !== '';
+            const precioOK = precioVal && precioVal !== '';
+
+            if (!(canchaOK && ubicacionOK && precioOK)) {
+                completos = false;
+            }
+        }
+
+        localStorage.setItem("crearPartido_datosOpciones", JSON.stringify(datos));
+        const boton = document.getElementById("btnProponer");
+        boton.disabled = !completos;
+        boton.classList.toggle("btn-deshabilitado", !completos);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const boton = document.getElementById("btnProponer");
+        boton.disabled = true;
+
+        for (let i = 1; i <= 2; i++) {
+            $(`#select-cancha-${i}`).on('change', guardarEnLocalStorageYValidar);
+            $(`#ubicacion-cancha-${i}`).on('input', guardarEnLocalStorageYValidar);
+            $(`#precio-${i}`).on('input', guardarEnLocalStorageYValidar);
+        }
+
+        const datos = JSON.parse(localStorage.getItem("crearPartido_datosOpciones") || "{}");
+        for (let i = 1; i <= 2; i++) {
+            const cancha = datos[`cancha_${i}`];
+            const ubicacion = datos[`ubicacion_${i}`];
+            const precio = datos[`precio_${i}`];
+
+            if (cancha) $(`#select-cancha-${i}`).val(cancha).trigger('change');
+            if (ubicacion) document.getElementById(`ubicacion-cancha-${i}`).value = ubicacion;
+            if (precio) document.getElementById(`precio-${i}`).value = precio;
+        }
+
+        setTimeout(guardarEnLocalStorageYValidar, 1500);
+    });
+</script>
+
+<script>
+    const canchaInfo = JSON.parse(document.getElementById('canchas-data').textContent);
+
+    for (let i = 1; i <= 2; i++) {
+        $(`#select-cancha-${i}`).select2({
+            tags: true,
+            placeholder: 'Cancha',
+            maximumSelectionLength: 1,
+            language: { noResults: () => "Sin resultados. Escribí para agregar." }
+        });
+
+        actualizarEstiloSelect(`#select-cancha-${i}`, `#ubicacion-cancha-${i}`);
+
+        $(`#select-cancha-${i}`).on('change', function () {
+            const selectedVal = $(this).val();
+            const cancha = canchaInfo[selectedVal];
+            const ubicacionInput = $(`#ubicacion-cancha-${i}`);
+
+            if (!cancha) {
+                ubicacionInput.val('').prop('readonly', false);
+            } else {
+                ubicacionInput.val(cancha.direccion).prop('readonly', true);
+            }
+
+            actualizarEstiloSelect(`#select-cancha-${i}`, `#ubicacion-cancha-${i}`);
+            guardarEnLocalStorageYValidar();
+        });
+
+        $(`#ubicacion-cancha-${i}`).on('input', () => {
+            actualizarEstiloSelect(`#select-cancha-${i}`, `#ubicacion-cancha-${i}`);
+        });
+
+        const inputPrecio = document.getElementById(`precio-${i}`);
+        const wrapper = inputPrecio?.closest(".input-precio-wrapper");
+
+        inputPrecio?.addEventListener("input", () => {
+            let valor = inputPrecio.value.replace(/\D/g, '');
+            if (valor.length === 0) {
+                inputPrecio.value = "";
+                wrapper?.classList.remove("input-con-valor");
+                wrapper?.classList.add("input-sin-valor");
+            } else {
+                inputPrecio.value = parseInt(valor, 10).toLocaleString('es-AR');
+                wrapper?.classList.add("input-con-valor");
+                wrapper?.classList.remove("input-sin-valor");
+            }
+        });
+    }
+</script>
+
+
+
+<script>
+    window.addEventListener('load', () => {
+        document.documentElement.classList.remove('sin-estilos');
+    });
+</script>
+
+<script>
+    document.getElementById("btnProponer").addEventListener("click", async () => {
+        const datosPaso1 = {
+            fecha1: localStorage.getItem("partido_fecha1"),
+            hora1: localStorage.getItem("partido_hora1"),
+            fecha2: localStorage.getItem("partido_fecha2"),
+            hora2: localStorage.getItem("partido_hora2"),
+            fecha3: localStorage.getItem("partido_fecha3"),
+            hora3: localStorage.getItem("partido_hora3"),
+        };
+
+        const datosPaso2 = JSON.parse(localStorage.getItem("crearPartido_datosOpciones") || "{}");
+
+        const partidoId = document.getElementById("btnProponer").dataset.partidoId;
+
+        const payload = {
+            ...datosPaso1,
+            cancha1: datosPaso2.cancha_1?.[0] || null,
+            ubicacion1: datosPaso2.ubicacion_1,
+            precio1: datosPaso2.precio_1?.replace(/\D/g, '') || null,
+            cancha2: datosPaso2.cancha_2?.[0] || null,
+            ubicacion2: datosPaso2.ubicacion_2,
+            precio2: datosPaso2.precio_2?.replace(/\D/g, '') || null,
+            partido_id: partidoId,
+        };
+
+        try {
+            const res = await fetch("{% url 'crear_propuesta' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const resultado = await res.json();
+
+            if (resultado.success) {
+                alert("¡Propuesta creada con éxito!");
+                window.location.href = "{% url 'detalle_propuesta' partido.id %}";
+            } else {
+                alert("Error al crear la propuesta.");
+            }
+        } catch (error) {
+            console.error("Error en la solicitud:", error);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+
+{% endblock %}

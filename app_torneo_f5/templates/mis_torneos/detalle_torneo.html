@@ -1,0 +1,1290 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+  .container-3 {
+    gap: 10px;
+  }
+
+  .contenedor-toggle .toggle-selector {
+    width: 224px;
+  }
+
+  /* contenedores del carrusel */
+  .toggle-fechas,
+  #toggle-fechas,
+  #toggle-fechas-tabla {
+    display: flex;
+    gap: 16px;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* ⭐ Hace que el primero y el último puedan centrarse */
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 50%;
+  }
+
+  /* cada “pill”/etiqueta */
+  .tag-fechas,
+  .tag-fechas-tabla {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    /* ⭐ Se alinea al centro del viewport del carrusel */
+  }
+
+  /* --- Estado deshabilitado de los botones del carrusel --- */
+  .btn-carrusel:disabled {
+    opacity: 0.3;
+    /* se ve apagado */
+    cursor: not-allowed;
+    /* cursor bloqueado */
+    pointer-events: none;
+    /* impide clic en SVG interno */
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-carrusel svg {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalletorneo.css' %}">
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+
+{% endblock %}
+{% block title %}Ticas - {{ torneo.nombre }}{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <!-- Overlay alert-->
+
+    <div id="swa-overlay" class="swa-overlay swa--hidden" role="presentation" aria-hidden="true">
+      <div id="swa-dialog" class="swa swa--info" role="dialog"
+           aria-modal="true" aria-labelledby="swa-title" aria-describedby="swa-desc" data-swa-root tabindex="-1">
+        <div class="swa__content">
+          <h2 id="swa-title" class="swa__title M-Subtitulos"></h2>
+          <p  id="swa-desc"   class="swa__message M-body"></p>
+        </div>
+        <div id="swa-actions" class="swa__actions">
+          <button id="swa-btn-cancel"  class="swa__btn swa__btn--cancel"  type="button" data-swa-action="cancel">
+            <span class="swa__btn-text">Cancelar</span>
+          </button>
+          <button id="swa-btn-confirm" class="swa__btn swa__btn--confirm" type="button" data-swa-action="confirm">
+            <span class="swa__btn-text">Aceptar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay alert-->
+
+<!-- Torneo header -->
+<div class="container-header">
+  {% if torneo.foto %}
+  <img src="{{ torneo.foto.url }}" alt="Imagen del torneo" class="img-fluid">
+  {% else %}
+  <img src="{% static 'images/copas-default/copa-default.png' %}" alt="Imagen del torneo" class="img-fluid">
+  {% endif %}
+  <p class="M-titulo">{{ torneo.nombre }}</p>
+</div>
+
+<!-- Torneo info -->
+<div class="container-info">
+  <div class="container-2">
+    <div class="d-flex align-items-center flex-column">
+      <p class="M-body texto-transparente">Etapa</p>
+      <div class="d-flex">
+        {% if fases_detalle %}
+        <p class="M-subtitulos">{{ etapa_activa_label }}</p>
+        {% else %}
+        <p class="M-subtitulos">A definir</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="d-flex align-items-center flex-column">
+      <p class="M-body texto-transparente">Duración partidos</p>
+      <p class="M-subtitulos">{{ torneo.duracion_partido }} minutos</p>
+    </div>
+  </div>
+  <div class="container-3 d-flex align-items-center flex-row">
+    <p class="M-subtitulos">{{ torneo.tipo_cancha }}</p>
+    <div class="d-flex align-items-center flex-row" style="gap: 10px;">
+      <p class="M-body formato-torneo-violeta">{{ torneo.descripcion_corta }}</p>
+      <p class="M-body"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+            stroke="white" stroke-width="1.5" />
+          <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white" stroke-width="1.5"
+            stroke-linecap="round" />
+          <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white" stroke-width="1.5"
+            stroke-linecap="round" />
+          <path
+            d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+            stroke="white" stroke-width="1.5" />
+          <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="white"
+            stroke-width="1.5" stroke-linecap="round" />
+          <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="white"
+            stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <span id="cantidadEquiposValor">{{ cantidad_equipos }}</span>
+      </p>
+    </div>
+  </div>
+  <a class="container-4" href="{% url 'descripcion_torneo' torneo.id %}">
+    <p class="M-subtitulos">Descripción</p>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+      <path d="M9 5.5L15 12.5L9 19.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </svg>
+  </a>
+</div>
+
+<!-- Línea divisora -->
+<div class="container-divisor">
+  <div class="divisor"></div>
+</div>
+
+{% if torneo_empezado %}
+<!-- Selector de tablas -->
+<div class="contenedor-toggle">
+  <div class="toggle-selector">
+    <div class="slider" id="slider"></div>
+    <span class="tag activo M-body" onclick="mostrarEstadisticas('partidos')">Partidos</span>
+    <span class="tag M-body" onclick="mostrarEstadisticas('tabla')">Tabla</span>
+    <span class="tag M-body" onclick="mostrarEstadisticas('rankings')">Rankings</span>
+  </div>
+</div>
+
+<!-- Tabla de posiciones -->
+<div id="tabla" style="padding: 0 0 62px 0;">
+
+  <!-- Selector (igual al de fechas) -->
+  <div class="contenedor-toggle contenedor-toggle-fechas">
+    <button class="btn-carrusel" id="btn-izquierda-tablas" type="button" onclick="moverCarruselTablas(-1)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path
+          d="M19.5025 20.835L2.99281 13.4725C1.66906 12.8822 1.66906 11.1178 2.99281 10.5275L19.5025 3.16496C20.9984 2.49789 22.5499 3.97914 21.809 5.36689L18.657 11.2706C18.4118 11.7298 18.4118 12.2702 18.657 12.7294L21.809 18.6331C22.5499 20.0209 20.9984 21.5021 19.5025 20.835Z"
+          stroke="white" stroke-width="1.5" />
+      </svg>
+    </button>
+
+    <div class="toggle-selector toggle-fechas" id="toggle-fechas-tabla">
+
+      {% if partidos_grupo_por_fecha %}
+      <span class="tag M-body tag-fechas-tabla
+          {% if not partidos_plata_por_ronda and not partidos_oro_por_ronda %}activo{% endif %}" data-tabla="zonas"
+        style="padding: 8px 29px;">
+        Zonas
+      </span>
+      {% endif %}
+
+      {% if partidos_oro_por_ronda %}
+      <span class="tag M-body tag-fechas-tabla
+          {% if not partidos_plata_por_ronda %}activo{% endif %}" data-tabla="oro" style="padding: 8px 29px;">
+        Copa Oro
+      </span>
+      {% endif %}
+
+      {% if partidos_plata_por_ronda %}
+      <span class="tag M-body tag-fechas-tabla activo" data-tabla="plata" style="padding: 8px 29px;">
+        Copa AniVersario
+      </span>
+      {% endif %}
+
+
+    </div>
+
+
+    <button class="btn-carrusel" id="btn-derecha-tablas" type="button" onclick="moverCarruselTablas(1)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path
+          d="M4.49746 20.835L21.0072 13.4725C22.3309 12.8822 22.3309 11.1178 21.0072 10.5275L4.49746 3.16496C3.00163 2.49789 1.45006 3.97914 2.19099 5.36689L5.34302 11.2706C5.58817 11.7298 5.58818 12.2702 5.34302 12.7294L2.19099 18.6331C1.45007 20.0209 3.00163 21.5021 4.49746 20.835Z"
+          stroke="white" stroke-width="1.5" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Contenido: ZONAS (se rellena por fetch) -->
+  <div id="tabla-zonas" style="display:none;" data-url="{% url 'api_tabla_posiciones' torneo.id %}"></div>
+
+
+  <!-- Contenido: FIXTURE COPA ORO -->
+  <div id="fixture-oro" style="display:none;">
+    {% if partidos_oro_por_ronda %}
+    <div class="fixture-track">
+
+      <!-- Etapas -->
+      <div class="container-etapas">
+        <div>
+          <p class="M-subtitulos texto-transparente">Cuartos</p>
+        </div>
+        <div>
+          <p class="M-subtitulos texto-transparente">Semifinal</p>
+        </div>
+        <div>
+          <p class="M-subtitulos texto-transparente">Final</p>
+        </div>
+      </div>
+
+      <div class="container-partidos">
+
+        {# Cuartos #}
+        <div class="columna-partidos" style="gap: 138px;">
+          {% for p in oro_cuartos %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% empty %}{% endfor %}
+        </div>
+
+        <!-- Conexiones -->
+        <div class="d-flex flex-column" style="gap: 233px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="238" viewBox="0 0 60 238" fill="none">
+            <path d="M0 236.5H33.9474V119M0 1.5H33.9474V119M60 119H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="238" viewBox="0 0 60 238" fill="none">
+            <path d="M0 236.5H33.9474V119M0 1.5H33.9474V119M60 119H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+        </div>
+
+        {# Semifinal #}
+        <div class="columna-partidos" style="gap: 372px;">
+          {% for p in oro_semis %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% endfor %}
+        </div>
+
+        <!-- Conexiones -->
+        <div class="d-flex flex-column">
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="471" viewBox="0 0 60 471" fill="none">
+            <path d="M0 469.5H33.9474V235.5M0 1.5H33.9474V235.5M60 235.5H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+        </div>
+
+        {# Final #}
+        <div class="columna-partidos">
+          {% for p in oro_final %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+    {% else %}
+    <p class="M-body" style="padding: 0 16px;">Sin fixture para Copa Oro.</p>
+    {% endif %}
+  </div>
+
+
+  <!-- Contenido: FIXTURE COPA PLATA -->
+  <div id="fixture-plata" style="display:none;">
+    {% if plata_cuartos or plata_semis or plata_final %}
+    <div class="fixture-track">
+
+      <!-- Etapas -->
+      <div class="container-etapas">
+        <div>
+          <p class="M-subtitulos texto-transparente">Cuartos</p>
+        </div>
+        <div>
+          <p class="M-subtitulos texto-transparente">Semifinal</p>
+        </div>
+        <div>
+          <p class="M-subtitulos texto-transparente">Final</p>
+        </div>
+      </div>
+
+      <div class="container-partidos">
+
+        {# ---------- CUARTOS ---------- #}
+        {% if plata_cuartos %}
+        <div class="columna-partidos" style="gap: 138px;">
+          {% for p in plata_cuartos %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Conector Cuartos -> Semis #}
+        {% if plata_cuartos and plata_semis %}
+        <div class="d-flex flex-column" style="gap: 233px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="238" viewBox="0 0 60 238" fill="none">
+            <path d="M0 236.5H33.9474V119M0 1.5H33.9474V119M60 119H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="238" viewBox="0 0 60 238" fill="none">
+            <path d="M0 236.5H33.9474V119M0 1.5H33.9474V119M60 119H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+        </div>
+        {% endif %}
+
+        {# ---------- SEMIFINAL ---------- #}
+        {% if plata_semis %}
+        <div class="columna-partidos" style="gap: 372px;">
+          {% for p in plata_semis %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Conector Semis -> Final #}
+        {% if plata_semis and plata_final %}
+        <div class="d-flex flex-column">
+          <svg xmlns="http://www.w3.org/2000/svg" width="60" height="471" viewBox="0 0 60 471" fill="none">
+            <path d="M0 469.5H33.9474V235.5M0 1.5H33.9474V235.5M60 235.5H33.9474" stroke="#9BA3AF" stroke-width="3" />
+          </svg>
+        </div>
+        {% endif %}
+
+        {# ---------- FINAL ---------- #}
+        {% if plata_final %}
+        <div class="columna-partidos">
+          {% for p in plata_final %}
+          {% include "mis_torneos/_fixture_item.html" with p=p %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+    {% else %}
+    <p class="M-body" style="padding: 0 16px;">Sin fixture para Copa Plata.</p>
+    {% endif %}
+  </div>
+
+
+</div>
+
+
+<!-- Rankings -->
+<div id="rankings" class="rankings">
+
+  <!-- Goles -->
+  <p class="M-subtitulos titulo-ranking">Goles</p>
+  <table class="table tabla-rankings">
+    <thead>
+      <tr>
+        <th class="M-body-s">Pos</th>
+        <th class="M-body-s club-col">Jugador</th>
+        <th class="M-body-s">Tot</th>
+        <th class="M-body-s">Prom</th>
+        <th class="M-body-s">PJ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for j in goleadores %}
+      <tr>
+        <td class="M-body">{{ forloop.counter }}</td>
+        <td class="M-body club-col">
+          {% if j.jugador_id %}
+          <a href="{% url 'perfil' j.jugador_id %}">
+            {% if j.jugador.foto %}
+            <img src="{{ j.jugador.foto.url }}" alt="Foto de perfil" class="perfil-foto">
+            {% else %}
+            <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto">
+            {% endif %}
+          </a>
+          <a href="{% url 'perfil' j.jugador_id %}" style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">{{ j.jugador.nombre|default:"-" }}</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </a>
+          {% else %}
+          <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto" class="perfil-foto">
+          <div style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">-</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </div>
+          {% endif %}
+        </td>
+        <td class="M-body">{{ j.goles|default:0 }}</td>
+        <td class="M-body">{{ j.prom_goles|default:0|floatformat:2 }}</td>
+        <td class="M-body">{{ j.pj|default:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="M-body">Sin jugadores.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+  <!-- Asistidores -->
+  <p class="M-subtitulos titulo-ranking">Asistencias</p>
+  <table class="table tabla-rankings">
+    <thead>
+      <tr>
+        <th class="M-body-s">Pos</th>
+        <th class="M-body-s club-col">Jugador</th>
+        <th class="M-body-s">Tot</th>
+        <th class="M-body-s">Prom</th>
+        <th class="M-body-s">PJ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for j in asistidores %}
+      <tr>
+        <td class="M-body">{{ forloop.counter }}</td>
+        <td class="M-body club-col">
+          {% if j.jugador_id %}
+          <a href="{% url 'perfil' j.jugador_id %}">
+            {% if j.jugador.foto %}
+            <img src="{{ j.jugador.foto.url }}" alt="Foto de perfil" class="perfil-foto">
+            {% else %}
+            <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto">
+            {% endif %}
+          </a>
+          <a href="{% url 'perfil' j.jugador_id %}" style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">{{ j.jugador.nombre|default:"-" }}</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </a>
+          {% else %}
+          <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto" class="perfil-foto">
+          <div style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">-</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </div>
+          {% endif %}
+        </td>
+        <td class="M-body">{{ j.asistencias|default:0 }}</td>
+        <td class="M-body">{{ j.prom_asistencias|default:0|floatformat:2 }}</td>
+        <td class="M-body">{{ j.pj|default:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="M-body">Sin jugadores.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+  <!-- Arqueros -->
+  <p class="M-subtitulos titulo-ranking">Atajadas</p>
+  <table class="table tabla-rankings">
+    <thead>
+      <tr>
+        <th class="M-body-s">Pos</th>
+        <th class="M-body-s club-col">Jugador</th>
+        <th class="M-body-s">Tot</th>
+        <th class="M-body-s">Prom</th>
+        <th class="M-body-s">PJ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for j in arqueros %}
+      <tr>
+        <td class="M-body">{{ forloop.counter }}</td>
+        <td class="M-body club-col">
+          {% if j.jugador_id %}
+          <a href="{% url 'perfil' j.jugador_id %}">
+            {% if j.jugador.foto %}
+            <img src="{{ j.jugador.foto.url }}" alt="Foto de perfil" class="perfil-foto">
+            {% else %}
+            <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto">
+            {% endif %}
+          </a>
+          <a href="{% url 'perfil' j.jugador_id %}" style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">{{ j.jugador.nombre|default:"-" }}</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </a>
+          {% else %}
+          <img src="{% static 'images/torneo-placeholder.png' %}" alt="Sin foto" class="perfil-foto">
+          <div style="text-decoration:none; justify-content:start; width:100%;">
+            <p class="M-boton">-</p>
+            <p class="M-body-s" style="text-align:start;">
+              {{ j.equipo_torneo.equipo.nombre|default:"-" }}
+            </p>
+          </div>
+          {% endif %}
+        </td>
+        <td class="M-body">{{ j.atajadas|default:0 }}</td>
+        <td class="M-body">{{ j.prom_atajadas|default:0|floatformat:2 }}</td>
+        <td class="M-body">{{ j.pj|default:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="M-body">Sin jugadores.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Historial de partidos -->
+<div id="partidos">
+  <!-- Selector de fechas -->
+  <div class="contenedor-toggle contenedor-toggle-fechas">
+    <button class="btn-carrusel" id="btn-izquierda-fechas" onclick="moverCarruselFechas(-1)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path
+          d="M19.5025 20.835L2.99281 13.4725C1.66906 12.8822 1.66906 11.1178 2.99281 10.5275L19.5025 3.16496C20.9984 2.49789 22.5499 3.97914 21.809 5.36689L18.657 11.2706C18.4118 11.7298 18.4118 12.2702 18.657 12.7294L21.809 18.6331C22.5499 20.0209 20.9984 21.5021 19.5025 20.835Z"
+          stroke="white" stroke-width="1.5" />
+      </svg>
+    </button>
+    <div class="toggle-selector toggle-fechas" id="toggle-fechas">
+      {% for item in selector_etapas %}
+      {% if item.tipo == 'grupo' %}
+      <span class="tag M-body tag-fechas {% if forloop.first %}activo{% endif %}" data-tipo="grupo"
+        data-numero="{{ item.numero }}">
+        {{ item.nombre }}
+      </span>
+      {% elif item.tipo == 'copa' %}
+      <span class="tag M-body tag-fechas" data-tipo="copa" data-numero="{{ item.numero }}" {#=ronda #}
+        data-ronda="{{ item.ronda }}" data-copa="{{ item.copa }}"> {# COPAORO | COPAPLATA #}
+        {{ item.nombre }}
+      </span>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+
+
+
+    <button class="btn-carrusel" id="btn-derecha-fechas" onclick="moverCarruselFechas(1)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path
+          d="M4.49746 20.835L21.0072 13.4725C22.3309 12.8822 22.3309 11.1178 21.0072 10.5275L4.49746 3.16496C3.00163 2.49789 1.45006 3.97914 2.19099 5.36689L5.34302 11.2706C5.58817 11.7298 5.58818 12.2702 5.34302 12.7294L2.19099 18.6331C1.45007 20.0209 3.00163 21.5021 4.49746 20.835Z"
+          stroke="white" stroke-width="1.5" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="container-partidos">
+
+    {# ============================ #}
+    {# FASES DE GRUPOS / LIGA #}
+    {# ============================ #}
+    {% for ronda, partidos in partidos_grupo_por_fecha.items %}
+    {% for partido in partidos %}
+    <div class="fila-partido" data-fecha="{{ ronda }}">
+      <a href="{{ partido.url_detalle }}" style="text-decoration:none;">
+        <div class="card-partido">
+          <div class="card-partido-contenido">
+            <div class="container-1">
+              {% if partido.equipo_1.escudo %}
+              <img src="{{ partido.equipo_1.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76" alt="Escudo equipo 1">
+              {% endif %}
+
+              <div class="info-central">
+                <p class="fecha">
+                  {% if not partido.dia or not partido.hora_inicio or not partido.cancha %}
+                  A definir
+                  {% else %}
+                  {{ partido.dia|date:"d/M" }} - {{ partido.hora_inicio|time:"H:i" }}
+                  {% endif %}
+                </p>
+
+                {% if not partido.jugado %}
+                <p class="vs">VS</p>
+                {% else %}
+                <div class="resultado">
+                  <p class="goles izq">{{ partido.goles_equipo_1 }}</p>
+                  <p class="vs">-</p>
+                  <p class="goles der">{{ partido.goles_equipo_2 }}</p>
+                </div>
+                {% endif %}
+              </div>
+
+              {% if partido.equipo_2.escudo %}
+              <img src="{{ partido.equipo_2.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76" alt="Escudo equipo 2">
+              {% endif %}
+            </div>
+
+            <div class="container-2">
+              <p class="equipo-nombre izq">{{ partido.equipo_1.nombre|default:"Equipo 1" }}</p>
+              <p class="equipo-nombre der">{{ partido.equipo_2.nombre|default:"Equipo 2" }}</p>
+            </div>
+          </div>
+
+          {% if partido.dia and partido.hora_inicio and partido.cancha %}
+          <div class="badge-cancha">
+            <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+            <p class="M-body">{{ partido.cancha.nombre }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+    {% endfor %}
+
+
+    {# ---- COPA ORO ---- #}
+    {% for ronda, partidos in partidos_oro_por_ronda.items %}
+    {% for partido in partidos %}
+    <div class="fila-partido" data-copa="COPAORO" data-ronda="{{ ronda }}">
+      <a href="{{ partido.url_detalle }}" style="text-decoration:none;">
+        <div class="card-partido">
+          <div class="card-partido-contenido">
+            <div class="container-1">
+              {% with e1=partido.equipo_1 e2=partido.equipo_2 %}
+              {% if e1 and e1.escudo %}
+              <img src="{{ e1.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76" alt="Escudo equipo 1">
+              {% endif %}
+
+              <div class="info-central">
+                <p class="fecha">
+                  {% if not partido.dia or not partido.hora_inicio or not partido.cancha %}
+                  A definir
+                  {% else %}
+                  {{ partido.dia|date:"d/M" }} - {{ partido.hora_inicio|time:"H:i" }}
+                  {% endif %}
+                </p>
+
+                {% if not partido.jugado %}
+                <p class="vs">VS</p>
+                {% else %}
+                <div class="resultado">
+                  <p class="goles izq">{{ partido.goles_equipo_1 }}</p>
+                  <p class="vs">-</p>
+                  <p class="goles der">{{ partido.goles_equipo_2 }}</p>
+                </div>
+                {% endif %}
+              </div>
+
+              {% if e2 and e2.escudo %}
+              <img src="{{ e2.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76" alt="Escudo equipo 2">
+              {% endif %}
+              {% endwith %}
+            </div>
+
+            <div class="container-2">
+              <p class="equipo-nombre izq">{{ partido.equipo_1.nombre|default:"A confirmar" }}</p>
+              <p class="equipo-nombre der">{{ partido.equipo_2.nombre|default:"A confirmar" }}</p>
+            </div>
+          </div>
+
+          {% if partido.dia and partido.hora_inicio and partido.cancha %}
+          <div class="badge-cancha">
+            <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+            <p class="M-body">{{ partido.cancha.nombre }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+    {% endfor %}
+
+    {# ---- COPA PLATA ---- #}
+    {% for ronda, partidos in partidos_plata_por_ronda.items %}
+    {% for partido in partidos %}
+    <div class="fila-partido" data-copa="COPAPLATA" data-ronda="{{ ronda }}">
+      {# el mismo card de arriba #}
+      <a href="{{ partido.url_detalle }}" style="text-decoration:none;">
+        <div class="card-partido">
+          <div class="card-partido-contenido">
+            <div class="container-1">
+              {% with e1=partido.equipo_1 e2=partido.equipo_2 %}
+              {% if e1 and e1.escudo %}
+              <img src="{{ e1.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76" alt="Escudo equipo 1">
+              {% endif %}
+
+              <div class="info-central">
+                <p class="fecha">
+                  {% if not partido.dia or not partido.hora_inicio or not partido.cancha %}
+                  A definir
+                  {% else %}
+                  {{ partido.dia|date:"d/M" }} - {{ partido.hora_inicio|time:"H:i" }}
+                  {% endif %}
+                </p>
+
+                {% if not partido.jugado %}
+                <p class="vs">VS</p>
+                {% else %}
+                <div class="resultado">
+                  <p class="goles izq">{{ partido.goles_equipo_1 }}</p>
+                  <p class="vs">-</p>
+                  <p class="goles der">{{ partido.goles_equipo_2 }}</p>
+                </div>
+                {% endif %}
+              </div>
+
+              {% if e2 and e2.escudo %}
+              <img src="{{ e2.escudo.url }}" alt="" class="escudo">
+              {% else %}
+              <img src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76" alt="Escudo equipo 2">
+              {% endif %}
+              {% endwith %}
+            </div>
+
+            <div class="container-2">
+              <p class="equipo-nombre izq">{{ partido.equipo_1.nombre|default:"A confirmar" }}</p>
+              <p class="equipo-nombre der">{{ partido.equipo_2.nombre|default:"A confirmar" }}</p>
+            </div>
+          </div>
+
+          {% if partido.dia and partido.hora_inicio and partido.cancha %}
+          <div class="badge-cancha">
+            <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+            <p class="M-body">{{ partido.cancha.nombre }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+    {% endfor %}
+
+
+  </div>
+</div>
+
+
+{% else %}
+<p></p>
+{% endif %}
+
+
+
+<script>
+
+  // ====================================
+  // FUNCIONES DE VISTAS (partidos / tabla / rankings)
+  // ====================================
+
+  const TORNEO_ID = "{{ torneo.id }}"; // Django lo reemplaza
+const LS_MAIN_TAB = `torneo:${TORNEO_ID}:mainTab`;
+
+function mostrarEstadisticas(tipo) {
+  // ✅ guardar selección
+  localStorage.setItem(LS_MAIN_TAB, tipo);
+
+  const partidos = document.getElementById('partidos');
+  const tabla = document.getElementById('tabla');
+  const rankings = document.getElementById('rankings');
+  const tags = document.querySelectorAll('.toggle-selector .tag');
+  const slider = document.getElementById('slider');
+
+  if (tipo === 'partidos') {
+    partidos.style.display = 'block';
+    tabla.style.display = 'none';
+    rankings.style.display = 'none';
+    slider.style.transform = 'translateX(-8.5%) scaleX(0.85)';
+    tags[0].style.color = 'white';
+    tags[1].style.color = '#aaa';
+    tags[2].style.color = '#aaa';
+  } else if (tipo === 'tabla') {
+    partidos.style.display = 'none';
+    tabla.style.display = 'block';
+    rankings.style.display = 'none';
+    slider.style.transform = 'translateX(77%) scaleX(0.68)';
+    tags[0].style.color = '#aaa';
+    tags[1].style.color = 'white';
+    tags[2].style.color = '#aaa';
+  } else {
+    partidos.style.display = 'none';
+    tabla.style.display = 'none';
+    rankings.style.display = 'block';
+    slider.style.transform = 'translateX(162%) scaleX(0.90)';
+    tags[0].style.color = '#aaa';
+    tags[1].style.color = '#aaa';
+    tags[2].style.color = 'white';
+  }
+}
+
+  // ====================================
+  // CARRUSEL DE FECHAS (PARTIDOS)
+  // ====================================
+
+
+
+  // ====================================
+  // CARRUSEL DE ETAPAS (TABLA)
+  // ====================================
+
+  let indiceEtapas = 0;
+  function centrarElementoCarrusel(contenedor, elemento) {
+    if (!contenedor || !elemento) return;
+
+    const contRect = contenedor.getBoundingClientRect();
+    const elemRect = elemento.getBoundingClientRect();
+
+    const scrollActual = contenedor.scrollLeft;
+    const offsetElemento = elemento.offsetLeft;
+
+    const destino =
+      offsetElemento - (contenedor.clientWidth / 2) + (elemento.clientWidth / 2);
+
+    contenedor.scrollTo({
+      left: Math.max(0, destino),
+      behavior: 'smooth'
+    });
+  }
+  function moverCarruselEtapas(dir) {
+    const items = document.querySelectorAll('#toggle-etapas .tag-fechas-tabla');
+    const contenedor = document.getElementById('toggle-etapas');
+    const btnIzq = document.getElementById('btn-izquierda-etapas');
+    const btnDer = document.getElementById('btn-derecha-etapas');
+    if (!items.length) return;
+
+    indiceEtapas = Math.max(0, Math.min(indiceEtapas + dir, items.length - 1));
+    const tag = items[indiceEtapas];
+
+    centrarElementoCarrusel(contenedor, tag);
+
+    items.forEach(t => t.classList.remove('activo'));
+    tag.classList.add('activo');
+
+    btnIzq.disabled = indiceEtapas === 0;
+    btnDer.disabled = indiceEtapas === items.length - 1;
+  }
+
+  // ====================================
+  // ACTUALIZAR ESTADO DE BOTONES
+  // ====================================
+
+
+
+  function actualizarEstadoBotonesEtapas() {
+    const items = document.querySelectorAll('#toggle-etapas .tag-fechas-tabla');
+    const btnIzq = document.getElementById('btn-izquierda-etapas');
+    const btnDer = document.getElementById('btn-derecha-etapas');
+    if (!items.length || !btnIzq || !btnDer) return;
+
+    btnIzq.disabled = indiceEtapas === 0;
+    btnDer.disabled = indiceEtapas === items.length - 1;
+  }
+
+  // ====================================
+  // MOSTRAR PARTIDOS SEGÚN FECHA O ETAPA
+  // ====================================
+
+function _mostrarFechaPorTipo_sinFallback(tipo, numero, faseOrCopa) {
+  const filas = document.querySelectorAll(".fila-partido");
+  filas.forEach(f => (f.style.display = "none"));
+
+  let mostrados = 0;
+
+  if (tipo === "grupo") {
+    const numeroInt = parseInt(numero, 10);
+    document.querySelectorAll('.fila-partido[data-fecha]').forEach(fila => {
+      const fechaAttr = parseInt(fila.dataset.fecha, 10);
+      if (fechaAttr === numeroInt) {
+        fila.style.display = "block";
+        mostrados++;
+      }
+    });
+  } else if (tipo === "copa") {
+    const ronda = String(numero || "").toUpperCase();
+    const copa = String(faseOrCopa || "").toUpperCase();
+    document.querySelectorAll('.fila-partido[data-copa][data-ronda]').forEach(fila => {
+      const copaAttr = String(fila.dataset.copa || "").toUpperCase();
+      const rondaAttr = String(fila.dataset.ronda || "").toUpperCase();
+      if (copaAttr === copa && rondaAttr === ronda) {
+        fila.style.display = "block";
+        mostrados++;
+      }
+    });
+  }
+
+  return mostrados;
+}
+
+function aplicarFiltroPartidosConFallback(startIndex) {
+  const tags = Array.from(document.querySelectorAll(".tag-fechas"));
+  if (!tags.length) return;
+
+  // 1) probar desde startIndex hacia adelante
+  for (let i = startIndex; i < tags.length; i++) {
+    const t = tags[i];
+    const faseOrCopa = (t.dataset.tipo === "copa") ? t.dataset.copa : "";
+    const n = _mostrarFechaPorTipo_sinFallback(t.dataset.tipo, t.dataset.numero, faseOrCopa);
+
+    if (n > 0) {
+      tags.forEach(x => x.classList.remove("activo"));
+      t.classList.add("activo");
+
+      //indiceFechas = i; // sincroniza carrusel
+      centrarElementoCarrusel(document.getElementById("toggle-fechas"), t);
+      actualizarEstadoBotonesFechas();
+      guardarFiltroPartidos(t);
+      return;
+    }
+  }
+
+  // 2) si no hubo, probar desde 0 hasta startIndex-1
+  for (let i = 0; i < startIndex; i++) {
+    const t = tags[i];
+    const faseOrCopa = (t.dataset.tipo === "copa") ? t.dataset.copa : t.dataset.fase;
+    const n = _mostrarFechaPorTipo_sinFallback(t.dataset.tipo, t.dataset.numero, faseOrCopa);
+
+    if (n > 0) {
+      tags.forEach(x => x.classList.remove("activo"));
+      t.classList.add("activo");
+
+      //indiceFechas = i;
+      centrarElementoCarrusel(document.getElementById("toggle-fechas"), t);
+      actualizarEstadoBotonesFechas();
+      guardarFiltroPartidos(t);
+      return;
+    }
+  }
+
+  // 3) escenario rarísimo: no existe ningún partido para ningún filtro
+  // -> caemos al último (o al primero) y listo
+  const fallback = tags[tags.length - 1] || tags[0];
+  tags.forEach(x => x.classList.remove("activo"));
+  fallback.classList.add("activo");
+  //indiceFechas = tags.indexOf(fallback);
+  centrarElementoCarrusel(document.getElementById("toggle-fechas"), fallback);
+  actualizarEstadoBotonesFechas();
+  guardarFiltroPartidos(fallback);
+}
+</script>
+<script>
+  // ========= CARRUSEL PARTIDOS (FLECHAS SIN BUG) =========
+  function getTagsFechas() {
+    return Array.from(document.querySelectorAll('#toggle-fechas .tag-fechas'));
+  }
+
+  function getActiveIndexFechas() {
+    const tags = getTagsFechas();
+    const idx = tags.findIndex(t => t.classList.contains('activo'));
+    return idx >= 0 ? idx : 0;
+  }
+
+  function setDisabledFechasFromIndex(idx) {
+    const tags = getTagsFechas();
+    const btnIzq = document.getElementById('btn-izquierda-fechas');
+    const btnDer = document.getElementById('btn-derecha-fechas');
+    if (!btnIzq || !btnDer || !tags.length) return;
+
+    btnIzq.disabled = idx <= 0;
+    btnDer.disabled = idx >= tags.length - 1;
+  }
+
+  function actualizarEstadoBotonesFechas() {
+    setDisabledFechasFromIndex(getActiveIndexFechas());
+  }
+
+  function moverCarruselFechas(dir) {
+    const tags = getTagsFechas();
+    if (!tags.length) return;
+
+    const actual = getActiveIndexFechas();
+    const next = Math.max(0, Math.min(actual + dir, tags.length - 1));
+
+    aplicarFiltroPartidosConFallback(next);
+  }
+</script>
+<script>
+  // -------- CARRUSEL (Zonas / Oro / Plata) --------
+  let indiceTablas = 0;
+
+  function moverCarruselTablas(dir) {
+    const items = document.querySelectorAll('#toggle-fechas-tabla .tag-fechas-tabla');
+    const contenedor = document.getElementById('toggle-fechas-tabla');
+    const btnIzq = document.getElementById('btn-izquierda-tablas');
+    const btnDer = document.getElementById('btn-derecha-tablas');
+    if (!items.length) return;
+
+    indiceTablas = Math.max(0, Math.min(indiceTablas + dir, items.length - 1));
+    const tag = items[indiceTablas];
+
+    centrarElementoCarrusel(contenedor, tag);
+    items.forEach(t => t.classList.remove('activo'));
+    tag.classList.add('activo');
+    mostrarOpcionTabla(tag.dataset.tabla);
+
+    btnIzq.disabled = indiceTablas === 0;
+    btnDer.disabled = indiceTablas === items.length - 1;
+  }
+
+  function actualizarEstadoBotonesTablas() {
+    const items = document.querySelectorAll('#toggle-fechas-tabla .tag-fechas-tabla');
+    const btnIzq = document.getElementById('btn-izquierda-tablas');
+    const btnDer = document.getElementById('btn-derecha-tablas');
+    if (!items.length || !btnIzq || !btnDer) return;
+
+    btnIzq.disabled = indiceTablas === 0;
+    btnDer.disabled = indiceTablas === items.length - 1;
+  }
+
+    const LS_TABLA_TAB = `torneo:${TORNEO_ID}:tablaTab`;
+
+    function mostrarOpcionTabla(key) {
+      localStorage.setItem(LS_TABLA_TAB, key); // ✅ persist
+
+      const zonas = document.getElementById('tabla-zonas');
+      const oro = document.getElementById('fixture-oro');
+      const plata = document.getElementById('fixture-plata');
+
+      zonas.style.display = (key === 'zonas') ? 'block' : 'none';
+      oro.style.display = (key === 'oro') ? 'block' : 'none';
+      plata.style.display = (key === 'plata') ? 'flex' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = Array.from(document.querySelectorAll('#toggle-fechas-tabla .tag-fechas-tabla'));
+      if (!tabs.length) return;
+
+      // click => activar y centrar
+      tabs.forEach((tag, idx) => {
+        tag.addEventListener('click', () => {
+          indiceTablas = idx;
+          tabs.forEach(t => t.classList.remove('activo'));
+          tag.classList.add('activo');
+          mostrarOpcionTabla(tag.dataset.tabla);
+          centrarElementoCarrusel(document.getElementById('toggle-fechas-tabla'), tag);
+          actualizarEstadoBotonesTablas();
+        });
+      });
+
+      // ✅ restaurar (si existe) o usar el primero disponible
+      const saved = localStorage.getItem(LS_TABLA_TAB);
+      const elegido = (saved && tabs.find(t => t.dataset.tabla === saved)) ? tabs.find(t => t.dataset.tabla === saved) : tabs[0];
+
+      indiceTablas = Math.max(0, tabs.indexOf(elegido));
+      tabs.forEach(t => t.classList.remove('activo'));
+      elegido.classList.add('activo');
+      mostrarOpcionTabla(elegido.dataset.tabla);
+      centrarElementoCarrusel(document.getElementById('toggle-fechas-tabla'), elegido);
+      actualizarEstadoBotonesTablas();
+    });
+
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const tablaContainer = document.getElementById("tabla-zonas");
+    if (!tablaContainer) return;
+
+    // 1) URL segura desde Django
+    const url = tablaContainer.dataset.url;
+    if (!url) {
+      tablaContainer.innerHTML = `<p class="M-body">No se encontró la URL de la tabla.</p>`;
+      return;
+    }
+
+    // 2) Loader
+    tablaContainer.innerHTML = `
+      <div style="padding:16px;">
+        <p class="M-body">Cargando tabla de zonas…</p>
+      </div>
+    `;
+
+    try {
+      const res = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        console.error("Tabla Zonas: respuesta no OK", res.status, txt);
+        tablaContainer.innerHTML = `<p class="M-body">Error ${res.status} al cargar la tabla.</p>`;
+        return;
+      }
+
+      const json = await res.json();
+      const data = Array.isArray(json) ? json : (Array.isArray(json?.results) ? json.results : []);
+
+      if (!data.length) {
+        tablaContainer.innerHTML = `<p class="M-body">Sin equipos registrados.</p>`;
+        const spanCant = document.getElementById("cantidadEquiposValor");
+        if (spanCant) spanCant.textContent = '0';
+        return;
+      }
+
+      // 3) Cantidad de equipos (header)
+      const totalEquipos = data.reduce((acc, z) => acc + (z.posiciones?.length || 0), 0);
+      const spanCant = document.getElementById("cantidadEquiposValor");
+      if (spanCant) spanCant.textContent = String(totalEquipos);
+
+      // 4) Render HTML
+      let html = "";
+      data.forEach(tabla => {
+        html += `
+          <h3 class="M-subtitulos texto-transparente" style="padding:15px 16px 10px 16px;margin:0;">
+            Zona ${tabla.grupo ?? "-"}
+          </h3>
+          <table class="table table-striped tabla-pos">
+            <thead>
+              <tr class="table-header">
+                <th><p class="M-body-s">Pos</p></th>
+                <th><p class="M-body-s">Club</p></th>
+                <th><p class="M-body-s">PJ</p></th>
+                <th><p class="M-body-s">PG</p></th>
+                <th><p class="M-body-s">PE</p></th>
+                <th><p class="M-body-s">PP</p></th>
+                <th><p class="M-body-s">DG</p></th>
+                <th><p class="M-body-s">Pts</p></th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        (tabla.posiciones ?? []).forEach((p, idx) => {
+          const cuposOro = Number(tabla.cupos_avance || 0);
+          const escudo = (p.escudo && p.escudo !== "") ? p.escudo : "/static/images/escudo-equipo/equipo-a.png";
+          const color = (p.avance_info && p.avance_info.color) ? p.avance_info.color : "#E74C3C";
+          const dif = Number(p.dif || 0);
+          const difTxt = dif >= 0 ? `+${dif}` : `${dif}`;
+
+          html += `
+            <tr class="${idx < cuposOro ? 'avanza' : 'no-avanza'}" style="border-left: 6px solid ${color};">
+              <td>${p.pos ?? (idx + 1)}</td>
+              <td class="club-col">
+                <img src="${escudo}" alt="">
+                <p style="text-transform: uppercase;">${(p.equipo ?? "-")}</p>
+              </td>
+              <td>${p.pj ?? 0}</td>
+              <td>${p.pg ?? 0}</td>
+              <td>${p.pe ?? 0}</td>
+              <td>${p.pp ?? 0}</td>
+              <td>${difTxt}</td>
+              <td>${p.puntos ?? 0}</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table>`;
+      });
+
+      tablaContainer.innerHTML = html;
+    } catch (err) {
+      console.error("Error al cargar tabla Zonas:", err);
+      tablaContainer.innerHTML = `<p class="M-body">Error al cargar la tabla.</p>`;
+      const spanCant = document.getElementById("cantidadEquiposValor");
+      if (spanCant) spanCant.textContent = '-';
+    }
+  });
+</script>
+
+<script>
+  const LS_PARTIDOS_TAG = `torneo:${TORNEO_ID}:partidosTag`;
+
+function guardarFiltroPartidos(tag) {
+  const payload = {
+    tipo: tag.dataset.tipo,
+    numero: tag.dataset.numero,
+    copa: tag.dataset.copa || "",
+    fase: tag.dataset.fase || ""
+  };
+  localStorage.setItem(LS_PARTIDOS_TAG, JSON.stringify(payload));
+}
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Tab principal persistente
+  const savedMain = localStorage.getItem(LS_MAIN_TAB) || "tabla";
+  mostrarEstadisticas(savedMain);
+
+  // ✅ Partidos: restaurar el filtro guardado (si existe)
+  const tags = Array.from(document.querySelectorAll(".tag-fechas"));
+
+  // Ocultar todas las filas al iniciar
+  document.querySelectorAll(".fila-partido").forEach(f => (f.style.display = "none"));
+
+  if (tags.length) {
+    let startIdx = 0;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_PARTIDOS_TAG) || "null");
+      if (saved) {
+        const found = tags.findIndex(t => {
+          if (saved.tipo === "grupo") {
+            return t.dataset.tipo === "grupo" && String(t.dataset.numero) === String(saved.numero);
+          }
+          return t.dataset.tipo === "copa"
+            && String(t.dataset.copa || "").toUpperCase() === String(saved.copa || "").toUpperCase()
+            && String(t.dataset.numero || "").toUpperCase() === String(saved.numero || "").toUpperCase();
+        });
+        if (found >= 0) startIdx = found;
+      }
+    } catch (e) {}
+
+    aplicarFiltroPartidosConFallback(startIdx);
+  }
+
+  actualizarEstadoBotonesFechas();
+});
+</script>
+
+
+<script src="{% static 'js/modal.js' %}"></script>
+
+<script>
+  (function () {
+    const DEBUG = false; // 👈 activás/desactivás acá
+    const MODAL_KEY = 'ticas_aviso_jugador_torneo_v1';
+
+    function showJugadorInfoModal() {
+  swa.fire({
+    title: '¿Sos jugador de este torneo?',
+    text: 'Si participás en el torneo y no se muestran tus datos en tu perfil, comunicate con nosotros.',
+    confirmButtonText: 'Hablar por WhatsApp',
+    cancelButtonText: 'Cerrar',
+    showCancelButton: true,
+    allowOutsideClick: true,
+    icon: 'info'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const nombre = "{{ request.user.first_name|default:request.user.username }}";
+      const email = "{{ request.user.email|default:'' }}";
+      const torneo = "{{ torneo.nombre|default:'' }}";
+
+      const mensaje = `Hola, soy ${nombre} (${email}). Estoy en el torneo "${torneo}" y no encuentro mis datos enlazado en mi perfil.`;
+      const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+
+      window.open(url, '_blank');
+    }
+  });
+}
+
+    function whenSwaReady(cb, retries = 40) {
+      if (window.swa && typeof window.swa.fire === 'function') return cb();
+      if (retries <= 0) return;
+      setTimeout(() => whenSwaReady(cb, retries - 1), 100);
+    }
+
+    function init() {
+      const alreadyShown = localStorage.getItem(MODAL_KEY);
+
+      // Demo: este aviso es para jugadores reales que no encuentran sus datos; no se muestra.
+      if (false && (DEBUG || !alreadyShown)) {
+        whenSwaReady(() => {
+          showJugadorInfoModal();
+
+          if (!DEBUG) {
+            localStorage.setItem(MODAL_KEY, '1');
+          }
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+
+
+{% endblock %}

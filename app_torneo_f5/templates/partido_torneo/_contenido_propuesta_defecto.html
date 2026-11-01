@@ -1,0 +1,15 @@
+{% if es_encargado %}
+<div class="container-propuesta">
+    <p class="M-body">
+        Definí dónde y cuándo va a tener lugar este partido. Los jugadores de ambos equipos serán notificados de esto.
+    </p>
+    <a href="{% url 'configurar_partido_torneo' partido.id %}" class="btn-primario">
+        <p class="M-boton">Definir partido</p>
+    </a>
+</div>
+{% else %}
+<div class="container-propuesta" style="background:#5E605E;">
+    <p class="M-subtitulos">Esperando confirmación del organizador</p>
+    <p class="M-body" style="margin-top:10px;">El encargado del torneo definirá la cancha, fecha y hora del partido.</p>
+</div>
+{% endif %}

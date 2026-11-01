@@ -1,0 +1,284 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/equipos_usuario.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Equipos{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="main">
+  <div class="container-titulo">
+    <p class="M-titulo">Equipos</p>
+  </div>
+
+  {% if equipos %}
+  <div class="carrusel-contenedor">
+    <div class="carrusel" id="carrusel-equipos">
+      {% for equipo in equipos %}
+      <div class="slide" data-id="{{ equipo.id }}">
+        <div class="equipo-card">
+          <div class="escudo-wrapper">
+            {% if equipo.escudo %}
+            <img src="{{ equipo.escudo.url }}" alt="{{ equipo.nombre }}" class="escudo">
+            {% else %}
+            <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" alt="Escudo equipo 1" class="escudo">
+            {% endif %}
+          </div>
+          <h3 class="nombre-equipo M-subtitulos">{{ equipo.nombre }}</h3>
+          <p class="sigla-equipo M-subtitulos texto-transparente">{{ equipo.nombre_corto|upper }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="botones-inferiores">
+      <button class="btn-flecha-local" onclick="moverCarrusel(-1)"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M19.5025 21.335L2.99281 13.9725C1.66906 13.3822 1.66906 11.6178 2.99281 11.0275L19.5025 3.66496C20.9984 2.99789 22.5499 4.47914 21.809 5.86689L18.657 11.7706C18.4118 12.2298 18.4118 12.7702 18.657 13.2294L21.809 19.1331C22.5499 20.5209 20.9984 22.0021 19.5025 21.335Z"
+            stroke="white" stroke-width="1.5" />
+        </svg></button>
+      <a id="btn-ver-equipo-fijo" href="#" class="btn-ver-equipo btn-primario">
+        <p class="M-boton">Ver equipo</p>
+      </a>
+      <button class="btn-flecha-local" onclick="moverCarrusel(1)"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M4.49746 21.335L21.0072 13.9725C22.3309 13.3822 22.3309 11.6178 21.0072 11.0275L4.49746 3.66496C3.00163 2.99789 1.45006 4.47914 2.19099 5.86689L5.34302 11.7706C5.58817 12.2298 5.58818 12.7702 5.34302 13.2294L2.19099 19.1331C1.45007 20.5209 3.00163 22.0021 4.49746 21.335Z"
+            stroke="white" stroke-width="1.5" />
+        </svg></button>
+    </div>
+  </div>
+  {% else %}
+  <div class="W-100 d-flex flex-column justify-content-center align-items-center" style="gap: 10px;">
+    <svg width="180" height="95" viewBox="0 0 180 95" fill="none" xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink">
+      <rect x="0.93457" y="26.6528" width="49.6216" height="68.7068" transform="rotate(-7.79743 0.93457 26.6528)"
+        fill="url(#pattern0_2869_7307)" />
+      <rect x="55.812" width="64.086" height="64.086" fill="url(#pattern1_2869_7307)" />
+      <rect x="126.683" y="23.1809" width="53.5264" height="60.4448" transform="rotate(11.8639 126.683 23.1809)"
+        fill="url(#pattern2_2869_7307)" />
+      <defs>
+        <pattern id="pattern0_2869_7307" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlink:href="#image0_2869_7307" transform="matrix(0.00713719 0 0 0.00515464 -0.0103093 0)" />
+        </pattern>
+        <pattern id="pattern1_2869_7307" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlink:href="#image1_2869_7307" transform="scale(0.00568182)" />
+        </pattern>
+        <pattern id="pattern2_2869_7307" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlink:href="#image2_2869_7307" transform="scale(0.00680272 0.0060241)" />
+        </pattern>
+        <image id="image0_2869_7307" width="143" height="194" preserveAspectRatio="none"
+          xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAADCCAYAAABwpZEhAAAACXBIWXMAAAsSAAALEgHS3X78AAAFh0lEQVR4nO3c20HbQBBG4d90Qh2hq1AGZVFHKMV5IATZlrE02stcznnKU7zWfMgSXnQ6n8+i215fPv4fmLf359PMtXjtafYCPLaEQ/cDz4bAtB54rroHBUC3gWfRIyAAugw8/wLG/sCzM5B9Bx7tBwGgz8rjsUIAUHE8ADhWaTxHq46vLJ5Wg68MqCSe1gOvCqgcnl6DrgioFJ7eA64GqAyeUYOtBKgEntEDrQIoPZ5Zg6wAKDWe2QOc/fq9S4vHy+C8rKNHp2x7mL0OK+M+6FR4vMJZlglRmo+tCHCkOOvcUvgzT9RhZDgDhcYTFc6yyIhCfmy9vnycR8AZMdjIPwDhzjyjDvYSzozXjFAYPCN/QteGOPv1PeYez+jT+k+D87QWD7nFM+NaYMuwvK5rRu7wzLqA3DOgCGsckRs8M+86LEOJtt4eTcXj4Tb1yCCir/9ow/F4OOBSu4Pu5f1I4yF1x+Pp4H7V4yBXeZ/LmuLxeACv63lAq73/h3giHJAtjTqlZzle0uNjdvr960+aN3uvGReVmRDdK+QXo3uadTfi5Xa6Z2nPPJ6Gl/UslA6PJzTLMgJKhccrnGWZEKXAEwHNdRkQhcYTEc11kRGFxJMBzXUREYXBkxHMWpEQucdTBc1a3iG5xFMZzFpeEbnBA5hteYI0FQ9gjjcT01A8YOnfSExd8IDEV71AHcYDlLgdRZV+Swb1CzxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxkDjxFe335OB/9Pw7jabEIGlurmTU58wAoTi1n1exjC0D+az2jptc8APJbj9k0v2AGkL96zaTL3RaA/NRzFt1u1QE0v94zeHp7fz71+s8BNK/ex/7t/fn09PWPXi8CoPGNgCMtPrYAlKNRcKSrax4AxW4kHGnlghlAMRsNR7pztwWgWM2AI/1wqw6gGM2CIz34PQ+AfDcTjrThl4QA8tlsONLG3zADyFce4Eg7vp4AkI+8wJF2frcFoLl5giMZvhgF0Jy8wZGM36oDaGwe4UgHtmQAaExe4UgH9/MAqG+e4UgNNoMBqE/e4UiNdhICqG0R4EgNt6ECqE1R4EiN9zAD6FiR4EgdNsADyFY0OFKnv54A0L4iwpE6/ukNgLYVFY7U+RErAPq5yHCkAc/nAdB60eFIgx7uBKDLMsCRBj4ZDECfZYEjDX6sXHVAmeBIE55JWBVQNjjSpAdaVgOUEY408WmoVQBlhSNNfpRudkCZ4UgOnsOcFVB2OJIDPFI+QBXgSE7wSHkAVYEjOcIjxQdUCY7kDI8UF1A1OJJDPFI8QBXhSE7xSHEAVYUjOcYj+QdUGY7kHI/kF1B1OFIAPJI/QMD5LAQeyQ8g4HwXBo80HxBwLguFR5oHCDi3hcMjjQcEnPVC4pHGAQLO/U7n8/RtL4fysG/HWmQ4UuAzz1dRBxB13cvC45HiDSLaeu+VAo8UZyBR1rmlNHgk/4Pxvr69pcIj+R2Q13UdKR0eyd+gvK2nVSnxSH4G5mUdPUqLR5o/uNmv37vUeKR5A8wORyqARxo/yApwpCJ4pHEDrQJHKoRH6j/YSnCkYnikfgOuBkcqiEdqP+iKcKSieKR2A68KRyqMRzo++MpwpOJ4JDuA6nAk8EjaDwE4n4HnX1tBAOc78Cx6BAM4l4HnqntAgHMbeFa6hgKc9f4CvUlHSgGyNEAAAAAASUVORK5CYII=" />
+        <image id="image1_2869_7307" width="176" height="176" preserveAspectRatio="none"
+          xlink:href="data:image/png;base64,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" />
+        <image id="image2_2869_7307" width="147" height="166" preserveAspectRatio="none"
+          xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJMAAACmCAYAAADeUr0LAAAACXBIWXMAAAsSAAALEgHS3X78AAAEXUlEQVR4nO3c4VUbQQxGUW1OGqEO0hWUQVnUAaU4v5QsYBvs/UYjad4tIOxq3srGELbT6WSRnv+8x37BRb28PmzRX/NX9BdEX8QEGWKCDDFBhpggQ0yQISbIEBNkiAkyxAQZYoIMMUEmNCZ+yBtnxqzZTJD5PfsCbjXjVytmqLjFwzaTYjirhGSmudfoIHmZg0xITBVXdheRsx8eEyHdT/WyHnUGZV7mVnq/VNXQmNhKeUScxbCYlBe/8lZS3vvooIbExEbKa+TZbMr/NzfiQlfeSnsVZivbTGyjetRndngzjYyIrfRR9lnf9bM5tlA/+zO9N6zt6fEtZRhspfMyP8gpP7QkpMsyzyZlTKgpXUyZn7wsss4oVUxZh5RRxlmliSnjcLLLNrMUMWUbSiWZZjc9pkzDqCrLDKfGlGUIHWSY5ZQPLTPceGezPtgM30yENN6sGYdtJiKaI3JLDY+JiHKIiGpYTESU09DftFTHREQ1jIjqcEzE04MirkPfzRFSH4qznP4JOPogJsgQE2SICTLEBBliggwxQYaYIENMkCEmyBATZIgJMsQEGWKCDDFBhpggQ0yQISbIEBNkiAkyxAQZYoIMMUGGmCBDTJAhJsgQE2SICTLEBBliggwxQYaYIENMkCEmyBATZIgJMsQEGWKCDDFBhpggQ0yQISbIEBNkiAkyxAQZYoIMMUGGmCBDTJAhJsgQE2SICTLEBBliggwxQYaYIENMkCEmyBATZIgJMsQEGWKCDDFBhpggQ0yQISbIHIrp+c/7SXUhmEtxltvT45skiJfXh03x7yCWciHIYnJEVYf6lUUekxlBZTfq7cmQmBxR5TL6Pe7Q7+Z4g55HxFkM3Ux7bKk5Ih/osM+Z2FLxomcetpn22FJjzXpwp8TkiEpvVkgvrw/bdjqdpl/EjK/bzcy3EX6G/2LKckG4TaYz+xCTY0vVkO2czsZklqt4fJT1bC7G5LLVv7rM5/FtTGZ5n4SVVDiDH8XkKtxQN5VmflNMLvOq7aRSSGZ3xmRW70YrqTrbu2NybCmtyvM8HJNZ3Scpkw4zlMTkOgxkhsrbaE8akxlB3aLbrOQxuW6DUuo6m2ExuS4rXKXzPIbHZNb3SbzFCjMIicl1fiqvWeW+Q2MyW+MJdSvdq9mEmFznQXe+t2umxeS6vQSsGpJZgpjMehxAh3s4KkVMruqWqnrdaqliMqv1hFe61gjpYnLZD4pt9FXamMxyBpXxmrJIHZPLcIAZriG7EjG51f74RZWIXKm/tlttuEdUvNdSm2mv65aqGJErtZn2Kg/9kur3VHYz7VXfUtUjci1ichWj6hKSWbOYzOoE1Ski1y4mlzWqjhG5sm/Av5Px0DJek1LbzbQ3e0t1j8i13Ux7Mw9zlZDMFtlMe1FbaqWI3HIxuVFRrRiRW+Jl7pwRh75ySGYLb6a9o1tq9Yjcsptp70gMhPQfm+mTn24pIvqKmC64FhUhnUdMV3wOioiu+wvYQmqPugXXcwAAAABJRU5ErkJggg==" />
+      </defs>
+    </svg>
+    <p class="M-body texto-transparente" style="text-align: center;">No estás fichado en ningún equipo en este momento...</p>
+  </div>
+  {% endif %}
+
+
+  <!-- <script>
+    const carrusel = document.getElementById("carrusel-equipos");
+    let slides = document.querySelectorAll(".slide");
+    let index = 1;
+    let isAnimating = false;
+
+    const primerSlide = slides[0].cloneNode(true);
+    const ultimoSlide = slides[slides.length - 1].cloneNode(true);
+    carrusel.appendChild(primerSlide);
+    carrusel.insertBefore(ultimoSlide, slides[0]);
+
+    slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
+
+    function getSlideWidth() {
+      const slide = slides[0];
+      const styles = getComputedStyle(slide);
+      const margin = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
+      return slide.offsetWidth + margin;
+    }
+
+
+
+    function posicionar() {
+      const anchoSlide = getSlideWidth();
+      carrusel.style.transition = "none";
+      carrusel.style.transform = `translateX(calc(50% - ${(index + 0.5) * anchoSlide}px))`;
+    }
+
+    function aplicarActivo() {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("activo", i === index);
+      });
+    }
+
+    function actualizarLinkVerEquipo() {
+      const slideActual = slides[index];
+      const equipoId = slideActual.getAttribute("data-id");
+      const boton = document.getElementById("btn-ver-equipo-fijo");
+
+      if (equipoId) {
+        boton.href = `/equipos/${equipoId}/`;  // Usamos la ruta Django con el ID
+      }
+    }
+
+
+
+    function moverCarrusel(offset) {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      index += offset;
+      aplicarActivo();
+      actualizarLinkVerEquipo();
+      const anchoSlide = getSlideWidth();
+      carrusel.style.transition = "transform 0.4s ease-in-out";
+      carrusel.style.transform = `translateX(calc(50% - ${(index + 0.5) * anchoSlide}px))`;
+
+      carrusel.addEventListener("transitionend", function handler() {
+        carrusel.removeEventListener("transitionend", handler);
+        if (index === 0) {
+          index = totalSlides - 2;
+          posicionar();
+          aplicarActivo();
+          actualizarLinkVerEquipo();
+        } else if (index === totalSlides - 1) {
+          index = 1;
+          posicionar();
+          aplicarActivo();
+          actualizarLinkVerEquipo();
+        }
+        isAnimating = false;
+      });
+    }
+
+    window.moverCarrusel = moverCarrusel;
+
+    window.addEventListener("load", () => {
+      posicionar();
+      aplicarActivo();
+      actualizarLinkVerEquipo();
+    });
+
+    window.addEventListener("resize", () => {
+      posicionar();
+    });
+  </script> -->
+  <script>
+    (function () {
+      const carrusel = document.getElementById("carrusel-equipos");
+      let slides = Array.from(document.querySelectorAll(".slide"));
+      const flechas = Array.from(document.querySelectorAll(".btn-flecha-local"));
+      const botonVer = document.getElementById("btn-ver-equipo-fijo");
+
+      // Estado según cantidad de slides
+      const usaClones = slides.length > 1;
+      let index = usaClones ? 1 : 0;
+      let isAnimating = false;
+
+      // Si no hay equipos
+      if (slides.length === 0) {
+        flechas.forEach(b => b.style.visibility = "hidden");
+        if (botonVer) { botonVer.href = "#"; botonVer.classList.add("disabled"); }
+        return;
+      }
+
+      // Clonar solo si hay más de 1
+      if (usaClones) {
+        const primerSlide = slides[0].cloneNode(true);
+        const ultimoSlide = slides[slides.length - 1].cloneNode(true);
+        carrusel.appendChild(primerSlide);
+        carrusel.insertBefore(ultimoSlide, slides[0]);
+        slides = Array.from(document.querySelectorAll(".slide"));
+      } else {
+        // Un solo equipo: ocultar flechas
+        flechas.forEach(b => b.style.visibility = "hidden");
+      }
+
+      function getSlideWidth() {
+        const slide = slides[0];
+        const styles = getComputedStyle(slide);
+        const margin = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
+        return slide.offsetWidth + margin;
+      }
+
+      function posicionar() {
+        const anchoSlide = getSlideWidth();
+        carrusel.style.transition = "none";
+        // Con clones, el índice real empieza en 1; sin clones, en 0
+        const n = usaClones ? (index + 0.5) : 0.5;
+        carrusel.style.transform = `translateX(calc(50% - ${n * anchoSlide}px))`;
+      }
+
+      function aplicarActivo() {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("activo", i === index);
+        });
+      }
+
+      function actualizarLinkVerEquipo() {
+        const slideActual = slides[index];
+        const equipoId = slideActual?.getAttribute("data-id");
+        if (botonVer && equipoId) {
+          botonVer.href = `/equipos/${equipoId}/`;
+        }
+      }
+
+      function moverCarrusel(offset) {
+        // Con 1 solo slide, no hay nada que mover
+        if (!usaClones) return;
+        if (isAnimating) return;
+        isAnimating = true;
+
+        index += offset;
+        aplicarActivo();
+        actualizarLinkVerEquipo();
+
+        const anchoSlide = getSlideWidth();
+        carrusel.style.transition = "transform 0.4s ease-in-out";
+        carrusel.style.transform = `translateX(calc(50% - ${(index + 0.5) * anchoSlide}px))`;
+
+        carrusel.addEventListener("transitionend", function handler() {
+          carrusel.removeEventListener("transitionend", handler);
+          if (index === 0) {
+            index = slides.length - 2; // salto al último real
+            posicionar();
+            aplicarActivo();
+            actualizarLinkVerEquipo();
+          } else if (index === slides.length - 1) {
+            index = 1; // salto al primero real
+            posicionar();
+            aplicarActivo();
+            actualizarLinkVerEquipo();
+          }
+          isAnimating = false;
+        });
+      }
+
+      // Exponer moverCarrusel para los botones inline
+      window.moverCarrusel = moverCarrusel;
+
+      window.addEventListener("load", () => {
+        posicionar();
+        aplicarActivo();
+        actualizarLinkVerEquipo();
+      });
+
+      window.addEventListener("resize", () => {
+        posicionar();
+      });
+    })();
+  </script>
+
+  {% endblock %}

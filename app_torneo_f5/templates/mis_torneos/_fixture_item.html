@@ -1,0 +1,46 @@
+{% load static %}
+{% with e1=p.equipo_1 e2=p.equipo_2 %}
+<div class="partido-fixture">
+  <div class="equipo-fixture">
+    <div class="container-1">
+      {% if e1 %}
+      {% if e1.escudo %}
+      <img width="36px" src="{{ e1.escudo.url }}" alt="escudo {{ e1.nombre }}">
+      {% else %}
+      <img width="36px" src="{% static 'images/escudo-equipo/equipo-a.png' %}" alt="escudo">
+      {% endif %}
+      {% else %}
+      <div class="escudo-equipo">
+      </div>
+      {% endif %}
+      <div class="nombrecorto-equipo M-boton">
+        {% if e1 %}{{ e1.nombre_corto|default:e1.nombre }}{% else %}{% endif %}
+      </div>
+    </div>
+    <div class="container-2 {% if p.ganador == 1 %}win{% elif p.ganador == 0 %}draw{% endif %}">
+      <p class="M-boton">{% if p.jugado %}{{ p.goles_equipo_1|default_if_none:"0" }}{% else %}-{% endif %}</p>
+    </div>
+  </div>
+
+  <div class="equipo-fixture">
+    <div class="container-1">
+      {% if e2 %}
+      {% if e2.escudo %}
+      <img width="36px" src="{{ e2.escudo.url }}" alt="escudo {{ e2.nombre }}">
+      {% else %}
+      <img width="36px" src="{% static 'images/escudo-equipo/equipo-a.png' %}" alt="escudo">
+      {% endif %}
+      {% else %}
+      <div class="escudo-equipo">
+      </div>
+      {% endif %}
+      <div class="nombrecorto-equipo M-boton">
+        {% if e2 %}{{ e2.nombre_corto|default:e2.nombre }}{% else %}{% endif %}
+      </div>
+    </div>
+    <div class="container-2 {% if p.ganador == 2 %}win{% elif p.ganador == 0 %}draw{% endif %}">
+      <p class="M-boton">{% if p.jugado %}{{ p.goles_equipo_2|default_if_none:"0" }}{% else %}-{% endif %}</p>
+    </div>
+  </div>
+</div>
+{% endwith %}

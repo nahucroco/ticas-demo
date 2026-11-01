@@ -1,0 +1,441 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="sin-estilos">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Ticas{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'app_torneo_f5/css/estilos.css' %}">
+
+  {% if not debug %}
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KHMPG2W1D1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-KHMPG2W1D1'); // reemplazá por tu Measurement ID
+  </script>
+  <!-- /Google tag -->
+  {% endif %}
+
+  {% block head %}{% endblock %}
+</head>
+
+<style>
+  body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: 'Outfit', sans-serif;
+  }
+
+  footer {
+    color: var(--color-texto);
+  }
+
+  .custom-close-button {
+    background-color: transparent;
+    border: none;
+    padding: 13px;
+  }
+
+  li.active {
+    background-color: #733BDE;
+    width: 100%;
+    border-radius: 5px;
+    /* padding: 5px 10px; */
+  }
+
+  li.nav-item {
+    height: 34px !important;
+  }
+
+  .navbar-nav {
+    width: 100% !important;
+    gap: 5px !important;
+  }
+
+  .text-white {
+    padding: 0 !important;
+  }
+
+  .navbar-nav .nav-link {
+    justify-content: flex-start;
+  }
+
+  .nav-link {
+    display: flex !important;
+  }
+
+  /* Bloqueo en escritorio */
+/* ========== ADVERTENCIA DESKTOP ========== */
+
+.desktop-blocker {
+  display: none;
+}
+
+@media (min-width: 992px) {
+
+  /* Solo bloquea scroll cuando está activo */
+  html.desktop-locked,
+  body.desktop-locked {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .desktop-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(40px);
+    background: rgba(10, 10, 10, 0.75);
+    padding: 24px;
+    text-align: center;
+  }
+
+  .desktop-blocker .box {
+    max-width: 620px;
+    width: 100%;
+    border-radius: 16px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    padding: 28px 24px;
+  }
+
+  .desktop-blocker h1 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .desktop-blocker p {
+    color: rgba(255,255,255,.85);
+    margin-bottom: 10px;
+  }
+
+  .desktop-blocker .hint {
+    font-size: 14px;
+    opacity: .7;
+  }
+}
+
+@media (min-width: 992px) {
+  .desktop-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;           /* por encima de navbar/offcanvas */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(100px);
+    background: rgba(10, 10, 10, 0.75);
+    padding: 24px;
+    text-align: center;
+  }
+
+  .desktop-blocker .box {
+    max-width: 620px;
+    width: 100%;
+    border-radius: 16px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    padding: 28px 24px;
+  }
+
+  .desktop-blocker h1 {
+    font-size: 22px;
+    margin: 0 0 8px 0;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .desktop-blocker p {
+    margin: 0 0 12px 0;
+    color: rgba(255,255,255,.85);
+  }
+
+  .desktop-blocker .hint {
+    font-size: 14px;
+    opacity: .7;
+  }
+}
+
+</style>
+
+
+<body>
+  {% url 'home' as home_url %}
+  {% url 'torneos' as torneos_url %}
+  {% url 'busqueda' as busqueda_url %}
+  {% url 'partidos' as partidos_url %}
+  {% url 'equipos' as equipos_url %}
+  {% url 'mi_perfil' as perfil_url %}
+
+  {% if not ocultar_navbar %}
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-dark">
+    <div class="container-fluid">
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
+        aria-controls="offcanvasMenu">
+        <!-- <span class="navbar-toggler-icon"></span> -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M20 7H4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M20 12H4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M20 17H4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <!-- ADVERTENCIA DESKTOP -->
+<div class="desktop-blocker" id="desktopBlocker">
+  <div class="box">
+    <h1>Vista no optimizada para escritorio</h1>
+    <p>
+      Ticas está pensada principalmente para usarse desde el celular.
+      En computadora algunas vistas pueden no verse correctamente.
+    </p>
+    <p class="hint">
+      Recomendamos abrirla desde tu teléfono para la mejor experiencia.
+    </p>
+
+    <button class="btn btn-outline-light mt-3" id="desktopBlockerClose">
+      Continuar en escritorio
+    </button>
+  </div>
+</div>
+
+
+
+      <div>
+        {% block navbar_extra %}{% endblock %}
+      </div>
+
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- OFFCANVAS MENU -->
+  <div id="offcanvas-overlay" class="offcanvas-blur"></div>
+  <div class="offcanvas-content">
+    <div class="offcanvas-custom offcanvas offcanvas-start text-white" tabindex="-1" id="offcanvasMenu">
+      <div class="offcanvas-header">
+        <button type="button" class="custom-close-button" data-bs-dismiss="offcanvas" aria-label="Cerrar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 4.00006L4.00006 20M4 4L20 20" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          </svg></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav">
+          <li class="nav-item {% if request.path == home_url %}active{% endif %}">
+            <a href="{% url 'home' %}" class="d-flex flex-row align-items-center nav-link text-white" style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M22 22L2 22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M2 11L10.1259 4.49928C11.2216 3.62276 12.7784 3.62276 13.8741 4.49928L22 11" stroke="white"
+                  stroke-width="1.5" stroke-linecap="round" />
+                <path d="M15.5 5.5V3.5C15.5 3.22386 15.7239 3 16 3H18.5C18.7761 3 19 3.22386 19 3.5V8.5" stroke="white"
+                  stroke-width="1.5" stroke-linecap="round" />
+                <path d="M4 22V9.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M20 22V9.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path
+                  d="M15 22V17C15 15.5858 15 14.8787 14.5607 14.4393C14.1213 14 13.4142 14 12 14C10.5858 14 9.87868 14 9.43934 14.4393C9 14.8787 9 15.5858 9 17V22"
+                  stroke="white" stroke-width="1.5" />
+                <path
+                  d="M14 9.5C14 10.6046 13.1046 11.5 12 11.5C10.8954 11.5 10 10.6046 10 9.5C10 8.39543 10.8954 7.5 12 7.5C13.1046 7.5 14 8.39543 14 9.5Z"
+                  stroke="white" stroke-width="1.5" />
+              </svg>
+              <p class="M-boton">Inicio</p>
+            </a>
+          </li>
+          <li class="nav-item {% if request.path == torneos_url %}active{% endif %}">
+            <a href="{% url 'torneos' %}" class="d-flex flex-row align-items-center nav-link text-white"
+              style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12.0002 16C6.24021 16 5.21983 10.2595 5.03907 5.70647C4.98879 4.43998 4.96365 3.80673 5.43937 3.22083C5.91508 2.63494 6.48445 2.53887 7.62318 2.34674C8.74724 2.15709 10.2166 2 12.0002 2C13.7837 2 15.2531 2.15709 16.3771 2.34674C17.5159 2.53887 18.0852 2.63494 18.5609 3.22083C19.0367 3.80673 19.0115 4.43998 18.9612 5.70647C18.7805 10.2595 17.7601 16 12.0002 16Z"
+                  stroke="white" stroke-width="1.5" />
+                <path
+                  d="M19 5L19.9486 5.31621C20.9387 5.64623 21.4337 5.81124 21.7168 6.20408C22 6.59692 22 7.11873 21.9999 8.16234V8.23487C21.9999 9.09561 21.9999 9.52598 21.7927 9.87809C21.5855 10.2302 21.2093 10.4392 20.4569 10.8572L17.5 12.5"
+                  stroke="white" stroke-width="1.5" />
+                <path
+                  d="M4.99994 5L4.05132 5.31621C3.06126 5.64623 2.56623 5.81124 2.2831 6.20408C1.99996 6.59692 1.99997 7.11873 2 8.16234V8.23487C2.00003 9.09561 2.00004 9.52598 2.20723 9.87809C2.41441 10.2302 2.79063 10.4392 3.54305 10.8572L6.49994 12.5"
+                  stroke="white" stroke-width="1.5" />
+                <path d="M12 17V19" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path
+                  d="M15.5 22H8.5L8.83922 20.3039C8.93271 19.8365 9.34312 19.5 9.8198 19.5H14.1802C14.6569 19.5 15.0673 19.8365 15.1608 20.3039L15.5 22Z"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M18 22H6" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <p class="M-boton">Mis torneos</p>
+            </a>
+          </li>
+          <li class="nav-item {% if request.path == equipos_url %}active{% endif %}">
+            <a href="{% url 'equipos' %}" class="d-flex flex-row align-items-center nav-link text-white"
+              style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+                  stroke="white" stroke-width="1.5" />
+                <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white" stroke-width="1.5"
+                  stroke-linecap="round" />
+                <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white" stroke-width="1.5"
+                  stroke-linecap="round" />
+                <path
+                  d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+                  stroke="white" stroke-width="1.5" />
+                <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="white"
+                  stroke-width="1.5" stroke-linecap="round" />
+                <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="white"
+                  stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <p class="M-boton">Equipos</p>
+            </a>
+          </li>
+          <li class="nav-item {% if request.path == busqueda_url %}active{% endif %}">
+            <a href="{% url 'busqueda' %}" class="d-flex flex-row align-items-center nav-link text-white"
+              style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+                  stroke="white" stroke-width="1.5" />
+                <path d="M18.5 18.5L22 22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <p class="M-boton">Búsqueda</p>
+            </a>
+          </li>
+          <li class="nav-item {% if request.path == partidos_url %}active{% endif %}">
+            <a href="{% url 'partidos' %}" class="d-flex flex-row align-items-center nav-link text-white"
+              style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 18" fill="none">
+                <path
+                  d="M8.57138 9C8.57138 9.90931 8.9326 10.7814 9.57558 11.4244C10.2186 12.0673 11.0906 12.4286 11.9999 12.4286C12.9093 12.4286 13.7813 12.0673 14.4243 11.4244C15.0673 10.7814 15.4285 9.90931 15.4285 9C15.4285 8.09068 15.0673 7.21861 14.4243 6.57563C13.7813 5.93265 12.9093 5.57143 11.9999 5.57143C11.0906 5.57143 10.2186 5.93265 9.57558 6.57563C8.9326 7.21861 8.57138 8.09068 8.57138 9ZM1.71423 5.57143H5.1428V12.4286H1.71423V5.57143ZM18.8571 5.57143H22.2857V12.4286H18.8571V5.57143Z"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path
+                  d="M11.9999 1V17M1.71423 3.28571C1.71423 2.67951 1.95505 2.09812 2.3837 1.66947C2.81236 1.24082 3.39374 1 3.99995 1H19.9999C20.6062 1 21.1875 1.24082 21.6162 1.66947C22.0448 2.09812 22.2857 2.67951 22.2857 3.28571V14.7143C22.2857 15.3205 22.0448 15.9019 21.6162 16.3305C21.1875 16.7592 20.6062 17 19.9999 17H3.99995C3.39374 17 2.81236 16.7592 2.3837 16.3305C1.95505 15.9019 1.71423 15.3205 1.71423 14.7143V3.28571Z"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <p class="M-boton">Partidos</p>
+            </a>
+          </li>
+          {% with name=request.resolver_match.url_name %}
+          <li class="nav-item {% if name == 'mi_perfil' or name == 'perfil' %}active{% endif %}">
+            {% endwith %}
+            <a href="{% url 'mi_perfil' %}" class="d-flex flex-row align-items-center nav-link text-white"
+              style="gap: 5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="9" r="3" stroke="white" stroke-width="1.5" />
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                <path d="M17.9691 20C17.81 17.1085 16.9247 15 11.9999 15C7.07521 15 6.18991 17.1085 6.03076 20"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <p class="M-boton">Perfil</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <g opacity="0.5">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                <path
+                  d="M6 4.71053C6.78024 5.42105 8.38755 7.36316 8.57481 9.44737C8.74984 11.3955 10.0357 12.9786 12 13C12.7549 13.0082 13.5183 12.4629 13.5164 11.708C13.5158 11.4745 13.4773 11.2358 13.417 11.0163C13.3331 10.7108 13.3257 10.3595 13.5 10C14.1099 8.74254 15.3094 8.40477 16.2599 7.72186C16.6814 7.41898 17.0659 7.09947 17.2355 6.84211C17.7037 6.13158 18.1718 4.71053 17.9377 4"
+                  stroke="white" stroke-width="1.5" />
+                <path
+                  d="M22 13C21.6706 13.931 21.4375 16.375 17.7182 16.4138C17.7182 16.4138 14.4246 16.4138 13.4365 18.2759C12.646 19.7655 13.1071 21.3793 13.4365 22"
+                  stroke="white" stroke-width="1.5" />
+              </g>
+            </svg>
+            <a class="nav-link text-white transparent-text" href="{% url 'adelantos' %}">Mi mundial</a>
+          </li>
+          <li class="nav-item logout-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9.00195 7C9.01406 4.82497 9.11051 3.64706 9.87889 2.87868C10.7576 2 12.1718 2 15.0002 2H16.0002C18.8286 2 20.2429 2 21.1215 2.87868C22.0002 3.75736 22.0002 5.17157 22.0002 8V16C22.0002 18.8284 22.0002 20.2426 21.1215 21.1213C20.2429 22 18.8286 22 16.0002 22H15.0002C12.1718 22 10.7576 22 9.87889 21.1213C9.11051 20.3529 9.01406 19.175 9.00195 17"
+                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M15 12H2M2 12L5.5 9M2 12L5.5 15" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <a class="nav-link btn btn-sm btn-outline-light" href="{% url 'logout' %}">Cerrar sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- CONTENIDO -->
+  <div class="pantalla-crear">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- BOOTSTRAP JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script>
+    const overlay = document.getElementById('offcanvas-overlay');
+    const offcanvas = document.getElementById('offcanvasMenu');
+
+    offcanvas.addEventListener('show.bs.offcanvas', () => {
+      overlay.classList.add('active');
+    });
+
+    offcanvas.addEventListener('hide.bs.offcanvas', () => {
+      overlay.classList.remove('active');
+    });
+  </script>
+  <script>
+    window.addEventListener('load', () => {
+      document.documentElement.classList.remove('sin-estilos');
+    });
+  </script>
+
+
+<script>
+  window.addEventListener("load", () => {
+    const blocker = document.getElementById("desktopBlocker");
+    const closeBtn = document.getElementById("desktopBlockerClose");
+    if (!blocker) return;
+
+    const isDesktop = window.matchMedia("(min-width: 992px)").matches;
+    if (!isDesktop) return;
+
+    const STORAGE_KEY = "ticas_desktop_warning_v1";
+
+    const lock = () => {
+      document.documentElement.classList.add("desktop-locked");
+      document.body.classList.add("desktop-locked");
+    };
+
+    const unlock = () => {
+      document.documentElement.classList.remove("desktop-locked");
+      document.body.classList.remove("desktop-locked");
+    };
+
+    // Si ya lo vio antes → no mostrar
+    if (localStorage.getItem(STORAGE_KEY) === "seen") {
+      blocker.style.display = "none";
+      unlock();
+      return;
+    }
+
+    // Mostrar y bloquear scroll
+    lock();
+
+    closeBtn.addEventListener("click", () => {
+      localStorage.setItem(STORAGE_KEY, "seen");
+      blocker.style.display = "none";
+      unlock();
+    });
+  });
+</script>
+
+
+
+</body>
+
+</html>

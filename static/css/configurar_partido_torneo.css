@@ -1,0 +1,319 @@
+.pantalla-crear {
+    top: 0 !important;
+}
+
+.container-volver {
+    box-sizing: border-box;
+    display: flex;
+    padding: 0px 0px 20px 0px;
+}
+
+.icono-volver {
+    padding: 13px;
+}
+
+.container-titulo {
+    justify-content: center;
+    display: flex;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 15px 16px 25px 16px;
+}
+
+.contenido-scroll {
+    flex: 1;
+}
+
+#btnVolver {
+    background-color: transparent;
+    border: none;
+}
+
+.footer-fijo {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.footer-fijo button {
+    width: 100%;
+    max-width: 160px;
+}
+
+.container-marcador {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.container-marcador .container-1 {
+    width: 280px;
+    display: flex;
+    flex-direction: row;
+}
+
+.container-marcador .container-1 .linea-divisora {
+    background-color: #535368;
+    width: 100%;
+    margin: 16px 0;
+}
+
+.container-marcador .container-1 .linea-divisora.activado {
+    background-color: var(--No-se, #733BDE);
+    margin: 15px 0;
+}
+
+.container-marcador .container-1 .linea-divisora.completado {
+    background-color: var(--No-se, #733BDE);
+    margin: 15px 0;
+}
+
+.container-marcador .container-1 .container-icon {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 11px;
+}
+
+.container-marcador .container-1 .container-icon.activado {
+    background: var(--No-se, #733BDE);
+}
+
+.container-marcador .container-1 .container-icon.completado {
+    background: var(--No-se, #733BDE);
+}
+
+.container-marcador .container-1 .container-icon.completado svg {
+    opacity: 0.5;
+}
+
+.container-marcador .container-2 {
+    width: 328px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.container-marcador .container-2 .M-body-s {
+    width: 82px;
+}
+
+.container-marcador .container-2 .M-body-s.completado {
+    opacity: 0.5;
+}
+
+/* Inputs paso 1 */
+
+.input-text.filled,
+.input-custom.filled,
+.input-fecha-custom.filled,
+.input-hora-custom.filled,
+.flatpickr-input.filled,
+.select2-container .select2-selection.filled {
+    background: #3F374E !important;
+}
+
+.container-select {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: end;
+    width: 100%;
+    gap: 5px;
+}
+
+.container-select .container-icon {
+    height: 46px;
+    display: flex;
+    align-items: center;
+}
+
+.container-select .container-general {
+    width: 100%;
+}
+
+.container-select .container-general .container {
+    padding: 0;
+    margin: 0;
+}
+
+.container-select .container-general #s2-cancha {
+    padding: 0;
+    margin: 0;
+}
+
+#select-cancha {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-selection {
+    background: #373639;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 10px;
+    height: 42px !important;
+    display: flex;
+    align-items: center;
+}
+
+.select2-selection.filled {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: #733BDE;
+}
+
+.select2-selection__rendered {
+    color: white !important;
+    font-size: 0.95rem;
+}
+
+.select2-selection__arrow b {
+    border-color: white transparent transparent transparent !important;
+}
+
+/* Paso 2 */
+
+#paso2 {
+    padding-top: 30px;
+}
+
+.campo-fecha,
+.campo-hora {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Selects fecha y hora */
+
+.container-1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.container-1 label {
+    font-size: 16px;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.container-1 label p {
+    opacity: 0.5;
+    font-size: 16px;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.input-custom {
+    border: none;
+    background-color: #373639;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    flex: 1;
+    padding: 13px 10px 13px 50px;
+    border-radius: 5px;
+    width: 160px;
+}
+
+.input-custom::placeholder {
+    color: #FFF !important;
+}
+
+.input-custom.con-valor {
+    background-color: #3F374E;
+    color: white;
+}
+
+.input-custom:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.selector-fecha {
+    position: relative;
+}
+
+.selector-hora {
+    position: relative;
+}
+
+.container-icono {
+    position: absolute;
+    margin-top: 8px;
+    margin-left: 13px;
+    pointer-events: none;
+    color: white;
+    font-size: 18px;
+    z-index: 1;
+}
+
+.flatpickr-input::placeholder {
+    color: #FFF !important;
+}
+
+.input-custom.form-control.input.active {
+    background-color: #3F374E !important;
+}
+
+/* Paso 3 */
+
+#paso3 {
+    padding-top: 5px;
+}
+
+#paso3 .container-datos{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 20px;
+}
+
+#paso3 .container-datos .container-1{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#paso3 .container-datos .container-2{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+#paso3 .container-datos .container-2 div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#paso3 .container-datos .container-3{
+    display: flex;
+    flex-direction: row;
+}
+
+#paso3 .container-card .card-partido .card-partido-contenido .container-1 .info-central .fecha{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}

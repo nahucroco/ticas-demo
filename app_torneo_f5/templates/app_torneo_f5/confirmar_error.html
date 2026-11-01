@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Error de verificación — Ticas</title>
+
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/Outfit-Regular.woff2' %}" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/CalSans-Regular.woff2' %}" crossorigin>
+
+    <link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+    <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+    <meta name="theme-color" content="#4F9639">
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+      .form-errors { margin: 12px 0 0; }
+      .form-errors .error { color:#b00020; font:600 14px system-ui,sans-serif; margin:6px 0; }
+      .center { text-align:center; }
+      .mt-16 { margin-top:16px; }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo-container-image center">
+        <img class="logo" src="{% static 'images/logo.png' %}" width="120" height="120" alt="Ticas">
+        <div><p>tus partidos, tus números</p></div>
+      </div>
+
+      <div class="login-form-container" style="padding:24px">
+        <h1 class="M-Subtitulos center" style="margin:0 0 8px;color:#b00020">Enlace inválido</h1>
+        <p class="center" style="margin:0 0 12px;color:#555">
+          {{ mensaje|default:"El enlace de verificación no es válido, ya fue usado o expiró." }}
+        </p>
+
+        {% if messages %}
+          <div class="form-errors">
+            {% for message in messages %}<p class="error">{{ message }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="center mt-16">
+          <a class="btn-primario" href="{% url 'login' %}" style="text-decoration:none;cursor:pointer;width: 100px !important; height: 10px !important;" >
+            Volver al login
+          </a>
+        </div>
+
+        {# Opcional: formulario para reenviar verificación #}
+        
+      </div>
+    </div>
+
+    <script src="{% static 'js/modal.js' %}"></script>
+  </body>
+</html>

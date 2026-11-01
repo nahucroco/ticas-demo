@@ -1,0 +1,77 @@
+/*
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', sans-serif;
+    color: #212529;
+  }
+  
+  h2, h3, h4 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+
+  .navbar {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  .navbar .nav-link.active {
+    ;
+    border-bottom: 2px solid #ffffff;
+  }
+  
+
+  .card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.02);
+  }
+  
+  .card-img-top {
+    object-fit: cover;
+    max-height: 180px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  
+
+  .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+  }
+
+  .perfil-header {
+    background: linear-gradient(to right, #0d6efd, #6610f2);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+  }
+  
+  .perfil-foto {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #fff;
+  }
+  
+
+  .footer {
+    background-color: #343a40;
+    color: #adb5bd;
+    padding: 2rem 0;
+    text-align: center;
+    margin-top: 4rem;
+  }
+   */

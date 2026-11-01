@@ -1,0 +1,270 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .pantalla-crear{
+        height: 100dvh;
+        padding-top: 85px;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="cargar_estadisticas_2">
+
+        <div class="header">
+            <div class="container-1">
+                {% if tipo == 'amistoso' %}
+                <p class="M-subtitulos texto-transparente">Partido amistoso</p>
+                {% else %}
+                <p class="M-subtitulos texto-transparente">{{ partido.torneo.nombre }}</p>
+                {% endif %}
+                <p class="M-subtitulos texto-transparente">{{ partido.dia|date:"d/M" }}</p>
+            </div>
+            <div class="container-2">
+                <div class="container-icons">
+                    <div class="icon-container-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="white"
+                                stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M12 21C15.3137 21 18 19.2091 18 17C18 14.7909 15.3137 13 12 13C8.68629 13 6 14.7909 6 17C6 19.2091 8.68629 21 12 21Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <hr class="linea-1">
+                    <div class="icon-container-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 22H2" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M21 22V14.5C21 13.6716 20.3284 13 19.5 13H16.5C15.6716 13 15 13.6716 15 14.5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M15 22V5C15 3.58579 15 2.87868 14.5607 2.43934C14.1213 2 13.4142 2 12 2C10.5858 2 9.87868 2 9.43934 2.43934C9 2.87868 9 3.58579 9 5V22"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M9 22V9.5C9 8.67157 8.32843 8 7.5 8H4.5C3.67157 8 3 8.67157 3 9.5V22"
+                                stroke="white" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <hr class="linea-2">
+                    <div class="icon-container-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="18.5" cy="4.5" r="2.5" stroke="white" stroke-width="1.5" />
+                            <path
+                                d="M9 17L7.99923 18.2009C7.262 19.0856 6.89338 19.5279 6.38945 19.764C5.88552 20 5.30973 20 4.15813 20H3"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M13.6503 21.9999C13.6503 22.4141 13.9861 22.7499 14.4003 22.7499C14.8145 22.7499 15.1503 22.4141 15.1503 21.9999H13.6503ZM12.5649 16.2457L13.0178 15.6479L13.0178 15.6479L12.5649 16.2457ZM13.7493 17.261L14.3365 16.7945L14.3365 16.7945L13.7493 17.261ZM14.3062 18.3817L15.0327 18.1954L15.0327 18.1954L14.3062 18.3817ZM13.5045 11.555C13.811 11.2763 13.8336 10.802 13.555 10.4955C13.2763 10.189 12.802 10.1664 12.4955 10.445L13.5045 11.555ZM10.8523 13.1644L11.5555 13.4252L11.5555 13.4252L10.8523 13.1644ZM10.922 14.72L10.2449 15.0426H10.2449L10.922 14.72ZM14.4003 19.9389H13.6503V21.9999H14.4003H15.1503V19.9389H14.4003ZM12.5649 16.2457L12.112 16.8436C12.7756 17.3463 12.9992 17.5226 13.162 17.7276L13.7493 17.261L14.3365 16.7945C14.0282 16.4065 13.6192 16.1035 13.0178 15.6479L12.5649 16.2457ZM14.4003 19.9389H15.1503C15.1503 19.1844 15.1558 18.6754 15.0327 18.1954L14.3062 18.3817L13.5797 18.5681C13.6448 18.8216 13.6503 19.1063 13.6503 19.9389H14.4003ZM13.7493 17.261L13.162 17.7276C13.3588 17.9753 13.5011 18.2617 13.5797 18.5681L14.3062 18.3817L15.0327 18.1954C14.9017 17.6847 14.6645 17.2073 14.3365 16.7945L13.7493 17.261ZM13 11L12.4955 10.445C12.0759 10.8265 11.5507 11.2813 11.1415 11.6686C10.9321 11.8668 10.7317 12.0669 10.5681 12.2554C10.4196 12.4266 10.2415 12.6544 10.1491 12.9037L10.8523 13.1644L11.5555 13.4252C11.5478 13.4461 11.5696 13.39 11.7011 13.2385C11.8175 13.1044 11.9771 12.9431 12.1726 12.758C12.5731 12.3789 13.0371 11.9799 13.5045 11.555L13 11ZM12.5649 16.2457L13.0178 15.6479C12.5303 15.2786 12.2 15.0277 11.9623 14.8161C11.7288 14.6083 11.6414 14.4864 11.5991 14.3975L10.922 14.72L10.2449 15.0426C10.412 15.3935 10.6684 15.6725 10.965 15.9366C11.2574 16.1969 11.6439 16.4889 12.112 16.8436L12.5649 16.2457ZM10.8523 13.1644L10.1491 12.9037C9.89078 13.6003 9.92532 14.3719 10.2449 15.0426L10.922 14.72L11.5991 14.3975C11.4538 14.0926 11.4381 13.7419 11.5555 13.4252L10.8523 13.1644Z"
+                                fill="white" />
+                            <path
+                                d="M5.43568 8.82067L5.06517 8.16858L5.06517 8.16858L5.43568 8.82067ZM3.62949 8.98431C3.26935 9.18893 3.14328 9.64677 3.34791 10.0069C3.55253 10.367 4.01037 10.4931 4.37051 10.2885L3.62949 8.98431ZM13.4066 7.35719L13.1211 8.05073V8.05073L13.4066 7.35719ZM10.4467 6.64289L10.3924 5.89487L10.4467 6.64289ZM21 12.75C21.4142 12.75 21.75 12.4142 21.75 12C21.75 11.5858 21.4142 11.25 21 11.25V12.75ZM15.7681 9.53622L15.0973 9.87163V9.87163L15.7681 9.53622ZM5.43568 8.82067L5.06517 8.16858L3.62949 8.98431L4 9.6364L4.37051 10.2885L5.80619 9.47277L5.43568 8.82067ZM13.4066 7.35719L13.6921 6.66365C12.3481 6.1104 11.6111 5.80624 10.3924 5.89487L10.4467 6.64289L10.5011 7.39092C11.3248 7.33103 11.7575 7.48943 13.1211 8.05073L13.4066 7.35719ZM5.43568 8.82067L5.80619 9.47277C8.30813 8.05121 9.35849 7.47401 10.5011 7.39092L10.4467 6.64289L10.3924 5.89487C8.83282 6.00827 7.4432 6.81743 5.06517 8.16858L5.43568 8.82067ZM19.7546 12V12.75H21V12V11.25H19.7546V12ZM15.7681 9.53622L15.0973 9.87163C15.9793 11.6357 17.7823 12.75 19.7546 12.75V12V11.25C18.3505 11.25 17.0669 10.4567 16.4389 9.20082L15.7681 9.53622ZM15.7681 9.53622L16.4389 9.20082C15.8611 8.0451 14.8765 7.15119 13.6921 6.66365L13.4066 7.35719L13.1211 8.05073C13.9811 8.40473 14.6864 9.04993 15.0973 9.87163L15.7681 9.53622Z"
+                                fill="white" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="container-textos">
+                    <p class="M-body-s text-container-1">Equipo</p>
+                    <p class="M-body-s text-container-2">Rendimiento</p>
+                    <p class="M-body-s text-container-3">Participacion</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-main">
+            <p class="M-subtitulos">¿Que tal tu juego?</p>
+
+            <div class="lista-jugadores">
+                <div class="container-jugador">
+                    <div class="d-flex flex-row justify-content-between" style="padding: 5px 10px;">
+                        <label for="calificacion_defensivo" class="d-flex flex-row">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+                                fill="none">
+                                <path
+                                    d="M3 10.9167C3 7.71907 3 6.12028 3.37752 5.58241C3.75503 5.04454 5.25832 4.52996 8.26491 3.50079L8.83772 3.30472C10.405 2.76824 11.1886 2.5 12 2.5C12.8114 2.5 13.595 2.76824 15.1623 3.30472L15.7351 3.50079C18.7417 4.52996 20.245 5.04454 20.6225 5.58241C21 6.12028 21 7.71907 21 10.9167C21 11.3996 21 11.9234 21 12.4914C21 18.1294 16.761 20.8655 14.1014 22.0273C13.38 22.3424 13.0193 22.5 12 22.5C10.9807 22.5 10.62 22.3424 9.89856 22.0273C7.23896 20.8655 3 18.1294 3 12.4914C3 11.9234 3 11.3996 3 10.9167Z"
+                                    stroke="white" stroke-width="1.5" />
+                            </svg>
+                            <div>
+                                <p class="M-body">Rendimiento defensivo</p>
+                                <p class="M-body-s texto-transparente">cortes, marca, recuperación de pelota, anticipos,
+                                    etc.</p>
+                            </div>
+                        </label>
+                        <span id="valor_defensivo">1</span>
+                    </div>
+                    <div style="height: 25px;">
+                        <input type="range" min="1" max="5" step="1" name="calificacion_defensivo"
+                            id="calificacion_defensivo" value="0" oninput="actualizarValor('calificacion_defensivo')"
+                            class="slider slider-rendimiento">
+                        <div class="slider-overlay"></div>
+                    </div>
+                    <div class="container-descripcion d-flex justify-content-center" style="padding: 5px 10px;">
+                        <span id="texto_defensivo" class="texto-calificacion M-boton"></span>
+                    </div>
+                </div>
+                <div class="container-jugador">
+                    <div class="d-flex flex-row justify-content-between" style="padding: 5px 10px;">
+                        <label for="calificacion_manejo" class="d-flex flex-row">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+                                fill="none">
+                                <path
+                                    d="M3.84453 8.42226C2.71849 7.29623 2.71849 5.47056 3.84453 4.34453C4.97056 3.21849 6.79623 3.21849 7.92226 4.34453L20.1555 16.5777C21.2815 17.7038 21.2815 19.5294 20.1555 20.6555C19.0294 21.7815 17.2038 21.7815 16.0777 20.6555L3.84453 8.42226Z"
+                                    stroke="white" stroke-width="1.5" />
+                                <path d="M6 10.5L10 6.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                                <path
+                                    d="M16.1 2.80719C16.261 2.3976 16.8385 2.3976 16.9994 2.80719L17.4298 3.90247C17.479 4.02752 17.5776 4.12651 17.7022 4.17583L18.7934 4.6078C19.2015 4.76934 19.2015 5.349 18.7934 5.51054L17.7022 5.94252C17.5776 5.99184 17.479 6.09082 17.4298 6.21587L16.9995 7.31115C16.8385 7.72074 16.261 7.72074 16.1 7.31116L15.6697 6.21587C15.6205 6.09082 15.5219 5.99184 15.3973 5.94252L14.3061 5.51054C13.898 5.349 13.898 4.76934 14.3061 4.6078L15.3973 4.17583C15.5219 4.12651 15.6205 4.02752 15.6697 3.90247L16.1 2.80719Z"
+                                    stroke="white" />
+                                <path
+                                    d="M19.9672 9.62945C20.1281 9.21987 20.7057 9.21987 20.8666 9.62945L21.0235 10.0288C21.0727 10.1539 21.1713 10.2528 21.2959 10.3022L21.6937 10.4597C22.1018 10.6212 22.1018 11.2009 21.6937 11.3624L21.2959 11.5199C21.1713 11.5692 21.0727 11.6682 21.0235 11.7932L20.8666 12.1926C20.7057 12.6022 20.1281 12.6022 19.9672 12.1926L19.8103 11.7932C19.7611 11.6682 19.6625 11.5692 19.5379 11.5199L19.14 11.3624C18.732 11.2009 18.732 10.6212 19.14 10.4597L19.5379 10.3022C19.6625 10.2528 19.7611 10.1539 19.8103 10.0288L19.9672 9.62945Z"
+                                    stroke="white" />
+                                <path
+                                    d="M5.1332 15.8072C5.29414 15.3976 5.87167 15.3976 6.03261 15.8072L6.18953 16.2065C6.23867 16.3316 6.33729 16.4306 6.46188 16.4799L6.85975 16.6374C7.26783 16.7989 7.26783 17.3786 6.85975 17.5401L6.46188 17.6976C6.33729 17.7469 6.23867 17.8459 6.18953 17.971L6.03261 18.3703C5.87167 18.7799 5.29414 18.7799 5.1332 18.3703L4.97628 17.971C4.92714 17.8459 4.82852 17.7469 4.70393 17.6976L4.30606 17.5401C3.89798 17.3786 3.89798 16.7989 4.30606 16.6374L4.70393 16.4799C4.82852 16.4306 4.92714 16.3316 4.97628 16.2065L5.1332 15.8072Z"
+                                    stroke="white" />
+                            </svg>
+                            <div>
+                                <p class="M-body">Manejo de la pelota</p>
+                                <p class="M-body-s texto-transparente">control, regates, técnica, jugadas individuales,
+                                    etc.</p>
+                            </div>
+                        </label>
+                        <span id="valor_manejo">1</span>
+                    </div>
+                    <div style="height: 25px;">
+                        <input type="range" min="1" max="5" step="1" name="calificacion_manejo" id="calificacion_manejo"
+                            value="0" oninput="actualizarValor('calificacion_manejo')"
+                            class="slider slider-rendimiento">
+                        <div class="slider-overlay"></div>
+                    </div>
+                    <div class="container-descripcion d-flex justify-content-center" style="padding: 5px 10px;">
+                        <span id="texto_manejo" class="texto-calificacion M-boton"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="boton-fijo-inferior d-flex justify-content-between">
+        <a href="{% url 'promo_estadisticas_paso1' %}" id="btn-anterior" class="btn-secundario" style="text-decoration: none;">
+            <p class="M-boton">Anterior</p>
+        </a>
+        <button class="btn-primario">
+           <p class="M-boton">Siguiente</p> 
+        </button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const sliderDefensivo = document.getElementById("calificacion_defensivo");
+        const sliderManejo = document.getElementById("calificacion_manejo");
+        const spanDefensivo = document.getElementById("valor_defensivo");
+        const spanManejo = document.getElementById("valor_manejo");
+
+        const spanTextoDefensivo = document.getElementById("texto_defensivo");
+        const spanTextoManejo = document.getElementById("texto_manejo");
+
+        let calificaciones = JSON.parse(localStorage.getItem("calificaciones_propio_juego")) || {};
+
+        const textosDefensivo = {
+            1: "Estuve flojo en la marca",
+            2: "Aporté, pero con errores",
+            3: "Cumplí sin destacar",
+            4: "Recuperé bastante y marqué bien",
+            5: "Firme, anticipé todo y no me pasaron"
+        };
+
+        const textosManejo = {
+            1: "Nada preciso, perdí muchas pelotas",
+            2: "Tuve momentos buenos, pero fallé",
+            3: "Correcto, sin destacar",
+            4: "Jugué bien, con buenos toques y control",
+            5: "Estuve iluminado, todo salió redondo"
+        };
+
+        function actualizarSlider(slider, spanValor, spanTexto, key, textos) {
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const val = parseFloat(slider.value);
+            const porcentaje = ((val - min) / (max - min)) * 100;
+
+            slider.style.background = `linear-gradient(to right, #733BDE ${porcentaje}%, #535368 ${porcentaje}%)`;
+            spanValor.textContent = val;
+            spanTexto.textContent = textos[val] || "";
+
+            if (val > 0) {
+                calificaciones[key] = val;
+            } else {
+                delete calificaciones[key];
+            }
+            localStorage.setItem("calificaciones_propio_juego", JSON.stringify(calificaciones));
+        }
+
+        if (calificaciones.defensivo) {
+            sliderDefensivo.value = calificaciones.defensivo;
+            spanDefensivo.textContent = calificaciones.defensivo;
+        }
+        if (calificaciones.manejo) {
+            sliderManejo.value = calificaciones.manejo;
+            spanManejo.textContent = calificaciones.manejo;
+        }
+
+        actualizarSlider(sliderDefensivo, spanDefensivo, spanTextoDefensivo, "defensivo", textosDefensivo);
+        actualizarSlider(sliderManejo, spanManejo, spanTextoManejo, "manejo", textosManejo);
+
+        sliderDefensivo.addEventListener("input", () =>
+            actualizarSlider(sliderDefensivo, spanDefensivo, spanTextoDefensivo, "defensivo", textosDefensivo)
+        );
+        sliderManejo.addEventListener("input", () =>
+            actualizarSlider(sliderManejo, spanManejo, spanTextoManejo, "manejo", textosManejo)
+        );
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // ...tu código existente de sliders...
+
+        const btnAnterior = document.getElementById("btn-anterior");
+        btnAnterior.addEventListener("click", () => {
+            // 1) Si hay referrer del mismo origen, usalo (vuelve exactamente a la vista anterior)
+            if (document.referrer) {
+                try {
+                    const ref = new URL(document.referrer);
+                    if (ref.origin === window.location.origin) {
+                        window.location.href = document.referrer;
+                        return;
+                    }
+                } catch (e) { /* ignore URL parse errors */ }
+            }
+
+            // 2) Si hay historial navegable, usá history.back()
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+
+            // 3) Fallback seguro a Home (Django URL name 'home')
+            window.location.href = "{% url 'home' %}";
+        });
+    });
+</script>
+
+
+
+
+
+{% endblock %}

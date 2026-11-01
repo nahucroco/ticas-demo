@@ -1,0 +1,253 @@
+.pantalla-crear {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.armado-equipos {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.armado-equipos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background-color: var(--No-se, #733BDE);
+  border-radius: 10px;
+  color: white;
+  width: fit-content;
+}
+
+.titulo-armado {
+  font-size: 18px;
+  color: white;
+  padding: 0;
+  margin: 0;
+}
+
+.boton-aleatorio-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.boton-aleatorio {
+  background: #4F9639;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 14px 80px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0px 4px 0px 0px #284B1D;
+
+}
+
+.icono-aleatorio {
+  width: 20px;
+  height: 20px;
+}
+
+.equipos-vs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.equipox {
+  padding: 8px 20px;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 127px;
+  height: 55px;
+  border-radius: 10px;
+  padding-top: 15px;
+  padding-right: 10px;
+  padding-bottom: 15px;
+  padding-left: 10px;
+}
+
+/* Contenedores "Equipo 1" y "Equipo 2" */
+
+
+
+/* Cards de usuario: fondo/borde por color, transición suave al mover */
+.card-usuario {
+  background: var(--team-bg, #FFF);
+  color: var(--team-text, #111);
+  border-radius: 12px;
+  transition: transform .25s ease, background .25s ease, border-color .25s ease, color .25s ease;
+}
+
+/* Contenido interno de la card que deba heredar contraste */
+.card-usuario .nombre,
+.card-usuario .apellido {
+  color: inherit;
+}
+
+/* Si preferís que el fondo de la card sea más suave y solo el borde lleve color: */
+.card-usuario.suave {
+  background: color-mix(in srgb, var(--team-bg, #FFF) 12%, #FFF);
+}
+
+
+.vs-text {
+  font-size: 18px;
+  ;
+  color: white;
+}
+
+.cantidad {
+  opacity: 0.5;
+}
+
+.container-jugadores {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.card-usuario {
+  width: 100%;
+  height: 55px;
+  border-radius: 10px;
+  padding: 5px 10px;
+  background: #2C2A44;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.4s ease;
+  overflow: hidden;
+  /* recorta cualquier fuga */
+  backface-visibility: hidden;
+  will-change: transform;
+  /* avisa que vamos a animar transform */
+  transition: transform .35s ease;
+  /* transición por FLIP */
+  contain: paint;
+  /* aisla repintado */
+}
+
+.card-usuario.equipo-b {
+  background-color: #F54B58;
+}
+
+.contenido-jugador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(0);
+
+}
+
+/* Al hacer clic: animación de salida */
+/* .card-usuario.animando .contenido-jugador {
+  transform: translateX(180%);
+  opacity: 1;
+  transition: transform 0.4s ease;
+} */
+
+/* Cuando ya está en el otro lado: entrada desde la izquierda */
+/* .card-usuario.equipo-b.animando .contenido-jugador {
+  transform: translateX(-180%);
+  opacity: 1;
+  transition: transform 0.4s ease;
+} */
+
+/* Imagen de avatar */
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Nombre + apellido */
+.nombre-container {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  align-items: flex-start;
+}
+
+/* Botón/flecha */
+.icono-mover-wrapper {
+  flex: 0 0 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  transition: transform 350ms cubic-bezier(.2, .7, .2, 1), opacity 120ms ease;
+}
+
+
+.card-usuario.animando,
+.card-usuario.animando * {
+  pointer-events: none !important;
+}
+
+
+/* Durante la animación, que quede apenas atenuada (opcional) */
+.card-usuario.animando .icono-mover-wrapper {
+  opacity: .85;
+  /* antes era 0; ahora se ve */
+}
+
+/* Mantener el giro cuando está en B */
+.card-usuario.equipo-b .icono-mover-wrapper {
+  transform: rotate(180deg);
+  order: -1;
+}
+
+.error-message,
+.advertencia-message {
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  ;
+  color: white;
+}
+
+.error-message {
+  background-color: #e74c3c;
+}
+
+.advertencia-message {
+  background-color: #f39c12;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

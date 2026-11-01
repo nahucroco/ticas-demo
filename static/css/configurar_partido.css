@@ -1,0 +1,273 @@
+body,
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container-volver {
+    width: 100%;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    padding: 20px 0;
+    background-color: transparent !important;
+}
+
+.container-titulo {
+    margin: 0 !important;
+}
+
+.main {
+    flex: 1;
+    width: 100%;
+    padding: 0 16px !important;
+    box-sizing: border-box;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    /* o scroll */
+    -ms-overflow-style: none;
+    /* IE/Edge antiguo */
+    scrollbar-width: none;
+}
+
+.main::-webkit-scrollbar {
+    /* Chrome/Safari/Edge */
+    width: 0;
+    height: 0;
+    display: none;
+    /* por si acaso */
+}
+
+.pantalla-crear {
+    position: absolute;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    top: 0 !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.icono-volver {
+    padding: 13px;
+}
+
+input:-webkit-autofill {
+    background-color: #3F374E !important;
+    -webkit-box-shadow: 0 0 0 1000px #3F374E inset !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: white !important;
+    border-radius: 5px !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+
+
+/* Contenedor del campo con label flotante */
+.campo {
+    position: relative;
+    width: 100%;
+}
+
+/* Label flotante generado dinámicamente a partir del placeholder */
+.label-flotante {
+    position: absolute;
+    left: 7px !important;
+    /* se alinea con tu padding de inputs */
+    top: -20px !important;
+    /* que “flote” sobre el borde superior */
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+
+    /* Fondo para “cortar” el borde del input; usa tu color de fondo */
+    background: #161618;
+    color: #FFFFFF80;
+    /* similar a tu “texto-transparente” */
+}
+
+/* Cuando el input tiene valor o foco, mostramos el label */
+.campo.activo .label-flotante {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Container 1 */
+
+.container-selects {
+    gap: 20px !important;
+}
+
+.container-selects .container {
+    margin-top: 20px !important;
+}
+
+.container-selects .container {
+    padding: 0;
+}
+
+.container-selects-1{
+    margin-top: 30px;
+}
+
+/* Linea divisora */
+
+.linea-divisora {
+    width: 100%;
+    background-color: #000;
+    margin: 20px 0;
+    padding: 0.5px;
+}
+
+
+/* Container 2 */
+
+.container-selects-2 .container-1 {
+    justify-content: space-between;
+}
+
+.container-selects-2 .container-1 .campo-fecha,
+.container-selects-2 .container-1 .campo-hora {
+    width: 100%;
+}
+
+.container-selects-2 .container-1 .campo-fecha .selector-fecha,
+.container-selects-2 .container-1 .campo-hora .selector-hora {
+    /* width: 100%; */
+}
+
+.container-selects-2 .container-1 .input-custom {
+    /* width: 100%; */
+}
+
+/* Container 3 */
+
+.container-selects-3 .container-1 {
+    margin-bottom: 30px;
+}
+
+.container-selects-3 .campo-precio {
+    width: 100%;
+}
+
+.container-selects-3 .campo-slider {
+    width: 100%;
+    margin: 0;
+}
+
+.container-selects-3 .container-texto {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}
+
+.container-selects-3 .container-texto p {
+    margin-left: 45px;
+    width: 100%;
+    margin-right: 16px;
+}
+
+.input-precio-wrapper .campo.activo .label-flotante{
+    top: -32px !important;
+    left: -3px !important;
+}
+
+/* Switch */
+
+.campo-formulario-switch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch-label {
+    color: white;
+    font-size: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 16px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: #6E786A;
+    border-radius: 24px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.3s;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 0px;
+    bottom: -4px;
+    background-color: #9BA398;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #2E5E1E;
+    /* verde oscuro */
+}
+
+input:checked+.slider::before {
+    transform: translateX(20px);
+    background-color: #4F9639;
+    width: 24px;
+    height: 24px;
+    /* verde claro */
+}
+
+/* Boton guardar partido */
+
+.btn-guardar-configuracion.btn-primario {
+    width: 100%;
+    margin-top: 100px !important;
+}
+
+/* Boton borrar partido */
+
+.container-btn-borar-partido {
+    display: flex;
+    height: 100%;
+    align-items: end;
+}
+
+.container-btn-borar-partido form {
+    width: 100%;
+}
+
+.btn-borrar-partido {
+    width: 100% !important;
+    margin-bottom: 25px !important;
+    height: 51px !important;
+    margin-top: 10px;
+}

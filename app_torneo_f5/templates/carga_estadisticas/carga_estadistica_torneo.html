@@ -1,0 +1,1025 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas_torneo.css' %}">
+<style>
+   .checkbox-wrapper {
+   display: inline-flex;
+   align-items: center;
+   cursor: pointer;
+   position: relative;
+   }
+   .checkbox-wrapper input[type="checkbox"] {
+   opacity: 0;
+   position: absolute;
+   width: 0;
+   height: 0;
+   }
+   .custom-checkbox {
+   width: 22px;
+   height: 22px;
+   border-radius: 5px;
+   background-color: #3F374E;
+   border: 2px solid #FFF;
+   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+   display: inline-block;
+   position: relative;
+   }
+   .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox {
+   background-color: #FFF;
+   }
+   .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox::after {
+   content: "";
+   position: absolute;
+   left: 7px;
+   top: 3px;
+   width: 5px;
+   height: 10px;
+   border: solid #161618;
+   border-width: 0 2px 2px 0;
+   transform: rotate(45deg);
+   }
+</style>
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+{% block content %}
+<div class="pantalla-estadisticas">
+   <h1 class="partido-titulo-torneo opacity-05">Partido de torneo 24/May</h1>
+   <div class="Progreso-Cargar-estadisticas">
+      <section class="header-carga" id="paso-1">
+         <div class="header-top">
+            <div class="header-icon step-icon" data-step="1">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="18.5" cy="4.5" r="2.5" stroke="white" stroke-width="1.5"/>
+                  <path d="M9 17L7.99923 18.2009C7.262 19.0856 6.89338 19.5279 6.38945 19.764C5.88552 20 5.30973 20 4.15813 20H3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M13.6503 21.9999C13.6503 22.4141 13.9861 22.7499 14.4003 22.7499C14.8145 22.7499 15.1503 22.4141 15.1503 21.9999H14.4003H13.6503ZM12.5649 16.2457L13.0178 15.6479L13.0178 15.6479L12.5649 16.2457ZM13.7493 17.261L14.3365 16.7945L14.3365 16.7945L13.7493 17.261ZM14.3062 18.3817L15.0327 18.1954L15.0327 18.1954L14.3062 18.3817ZM13.5045 11.555C13.811 11.2763 13.8336 10.802 13.555 10.4955C13.2763 10.189 12.802 10.1664 12.4955 10.445L13 11L13.5045 11.555ZM10.8523 13.1644L11.5555 13.4252L11.5555 13.4252L10.8523 13.1644ZM10.922 14.72L10.2449 15.0426H10.2449L10.922 14.72ZM14.4003 19.9389H13.6503V21.9999H14.4003H15.1503V19.9389H14.4003ZM12.5649 16.2457L12.112 16.8436C12.7756 17.3463 12.9992 17.5226 13.162 17.7276L13.7493 17.261L14.3365 16.7945C14.0282 16.4065 13.6192 16.1035 13.0178 15.6479L12.5649 16.2457ZM14.4003 19.9389H15.1503C15.1503 19.1844 15.1558 18.6754 15.0327 18.1954L14.3062 18.3817L13.5797 18.5681C13.6448 18.8216 13.6503 19.1063 13.6503 19.9389H14.4003ZM13.7493 17.261L13.162 17.7276C13.3588 17.9753 13.5011 18.2617 13.5797 18.5681L14.3062 18.3817L15.0327 18.1954C14.9017 17.6847 14.6645 17.2073 14.3365 16.7945L13.7493 17.261ZM13 11L12.4955 10.445C12.0759 10.8265 11.5507 11.2813 11.1415 11.6686C10.9321 11.8668 10.7317 12.0669 10.5681 12.2554C10.4196 12.4266 10.2415 12.6544 10.1491 12.9037L10.8523 13.1644L11.5555 13.4252C11.5478 13.4461 11.5696 13.39 11.7011 13.2385C11.8175 13.1044 11.9771 12.9431 12.1726 12.758C12.5731 12.3789 13.0371 11.9799 13.5045 11.555L13 11ZM12.5649 16.2457L13.0178 15.6479C12.5303 15.2786 12.2 15.0277 11.9623 14.8161C11.7288 14.6083 11.6414 14.4864 11.5991 14.3975L10.922 14.72L10.2449 15.0426C10.412 15.3935 10.6684 15.6725 10.965 15.9366C11.2574 16.1969 11.6439 16.4889 12.112 16.8436L12.5649 16.2457ZM10.8523 13.1644L10.1491 12.9037C9.89078 13.6003 9.92532 14.3719 10.2449 15.0426L10.922 14.72L11.5991 14.3975C11.4538 14.0926 11.4381 13.7419 11.5555 13.4252L10.8523 13.1644Z" fill="white"/>
+                  <path d="M5.43568 8.82018L5.06517 8.16809L5.06517 8.16809L5.43568 8.82018ZM3.62949 8.98382C3.26935 9.18844 3.14328 9.64628 3.34791 10.0064C3.55253 10.3666 4.01037 10.4926 4.37051 10.288L4 9.63591L3.62949 8.98382ZM13.4066 7.3567L13.1211 8.05024V8.05024L13.4066 7.3567ZM10.4467 6.64241L10.3924 5.89438L10.4467 6.64241ZM21 12.7495C21.4142 12.7495 21.75 12.4138 21.75 11.9995C21.75 11.5853 21.4142 11.2495 21 11.2495V11.9995V12.7495ZM15.7681 9.53574L15.0973 9.87114V9.87114L15.7681 9.53574ZM5.43568 8.82018L5.06517 8.16809L3.62949 8.98382L4 9.63591L4.37051 10.288L5.80619 9.47228L5.43568 8.82018ZM13.4066 7.3567L13.6921 6.66316C12.3481 6.10991 11.6111 5.80576 10.3924 5.89438L10.4467 6.64241L10.5011 7.39043C11.3248 7.33054 11.7575 7.48894 13.1211 8.05024L13.4066 7.3567ZM5.43568 8.82018L5.80619 9.47228C8.30813 8.05072 9.35849 7.47352 10.5011 7.39043L10.4467 6.64241L10.3924 5.89438C8.83282 6.00778 7.4432 6.81694 5.06517 8.16809L5.43568 8.82018ZM19.7546 11.9995V12.7495H21V11.9995V11.2495H19.7546V11.9995ZM15.7681 9.53574L15.0973 9.87114C15.9793 11.6352 17.7823 12.7495 19.7546 12.7495V11.9995V11.2495C18.3505 11.2495 17.0669 10.4562 16.4389 9.20033L15.7681 9.53574ZM15.7681 9.53574L16.4389 9.20033C15.8611 8.04461 14.8765 7.1507 13.6921 6.66316L13.4066 7.3567L13.1211 8.05024C13.9811 8.40424 14.6864 9.04944 15.0973 9.87114L15.7681 9.53574Z" fill="white"/>
+               </svg>
+            </div>
+            <div class="header-icon-2 step-icon" data-step="2">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.3116 12.6473L20.8293 10.7154C21.4335 8.46034 21.7356 7.3328 21.5081 6.35703C21.3285 5.58657 20.9244 4.88668 20.347 4.34587C19.6157 3.66095 18.4881 3.35883 16.2331 2.75458C13.978 2.15033 12.8504 1.84821 11.8747 2.07573C11.1042 2.25537 10.4043 2.65945 9.86351 3.23687C9.27709 3.86298 8.97128 4.77957 8.51621 6.44561C8.43979 6.7254 8.35915 7.02633 8.27227 7.35057L8.27222 7.35077L7.75458 9.28263C7.15033 11.5377 6.84821 12.6652 7.07573 13.641C7.25537 14.4115 7.65945 15.1114 8.23687 15.6522C8.96815 16.3371 10.0957 16.6392 12.3508 17.2435L12.3508 17.2435C14.3834 17.7881 15.4999 18.0873 16.415 17.9744C16.5152 17.9621 16.6129 17.9448 16.7092 17.9223C17.4796 17.7427 18.1795 17.3386 18.7203 16.7612C19.4052 16.0299 19.7074 14.9024 20.3116 12.6473Z" stroke="white" stroke-width="1.5"/>
+                  <path d="M16.415 17.9741C16.2065 18.6126 15.8399 19.1902 15.347 19.6519C14.6157 20.3368 13.4881 20.6389 11.2331 21.2432C8.97798 21.8474 7.85044 22.1495 6.87466 21.922C6.10421 21.7424 5.40432 21.3383 4.86351 20.7609C4.17859 20.0296 3.87647 18.9021 3.27222 16.647L2.75458 14.7151C2.15033 12.46 1.84821 11.3325 2.07573 10.3567C2.25537 9.58627 2.65945 8.88638 3.23687 8.34557C3.96815 7.66065 5.09569 7.35853 7.35077 6.75428C7.77741 6.63996 8.16368 6.53646 8.51621 6.44531" stroke="white" stroke-width="1.5"/>
+               </svg>
+            </div>
+         </div>
+         <div class="header-info-cards">
+            <span class="M-body-S step-label" data-step="1">Participaciones</span>
+            <span class="M-body-S step-label" data-step="2">Tarjetas</span>
+         </div>
+      </section>
+   </div>
+   <!-- step 1 -->
+   <!-- EQUIPO 1 -->
+   <section class="team-section" id="team-a" step="1">
+      <div class="team-header">
+         <div class="team-badge">
+            <img style="width:30px;height:30px;border-radius:2px"
+               src="{% static 'images/escudo-equipo/a-equipo1.jpg' %}" alt="Escudo">
+         </div>
+         <span class="M-Subtitulos opacity-05 team-name" id="id-equipo-1"></span>
+      </div>
+      <div class="players-container"></div>
+   </section>
+   <!-- EQUIPO 2 (igual estructura) -->
+   <section class="team-section" id="team-b" step="1">
+      <div class="team-header">
+         <div class="team-badge">
+            <img style="width:30px;height:30px;border-radius:2px"
+               src="{% static 'images/escudo-equipo/a-equipo2.jpg' %}" alt="Escudo">
+         </div>
+         <span class="M-Subtitulos opacity-05 team-name" id="equipo2"></span>
+      </div>
+      <div class="players-container"></div>
+   </section>
+   <!-- STEP 2 -->
+
+<!-- EQUIPO A -->
+<section class="team-section" id="team-a-step-2" step="2" style="display: none;">
+  <div class="team-header-cards">
+    <div class="team-header-left">
+      <div class="team-badge">
+        <img src="{% static 'images/escudo-equipo/a-equipo1.jpg' %}"
+             style="width:30px;height:30px;border-radius:2px">
+      </div>
+      <span class="M-Subtitulos opacity-05 team-name">Equipo A</span>
+    </div>
+    <div class="team-header-right">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="2" width="15" height="19" rx="5" fill="#FFD949" stroke="#FFD949" stroke-width="1.5"/>
+</svg>
+<div class="stroke-vertical"></div>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="2" width="15" height="19" rx="5" fill="#D70B22" stroke="#D70B22" stroke-width="1.5"/>
+</svg>
+    </div>
+  </div>
+
+  <!-- 👇 ACÁ VAN LOS JUGADORES -->
+  <div class="players-container"></div>
+</section>
+
+<!-- EQUIPO B -->
+<section class="team-section" id="team-b-step-2" step="2" style="display: none;">
+  <div class="team-header-cards">
+    <div class="team-header-left">
+      <div class="team-badge">
+        <img src="{% static 'images/escudo-equipo/a-equipo2.jpg' %}"
+             style="width:30px;height:30px;border-radius:2px">
+      </div>
+      <span class="M-Subtitulos opacity-05 team-name">Equipo B</span>
+    </div>
+        <div class="team-header-right">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="2" width="15" height="19" rx="5" fill="#FFD949" stroke="#FFD949" stroke-width="1.5"/>
+</svg>
+<div class="stroke-vertical"></div>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="2" width="15" height="19" rx="5" fill="#D70B22" stroke="#D70B22" stroke-width="1.5"/>
+</svg>
+    </div>
+  </div>
+
+  <!-- 👇 ACÁ VAN LOS JUGADORES -->
+  <div class="players-container"></div>
+</section>
+
+
+   <!-- FOOTER -->
+</div>
+<div class="penales-row">
+   <div class="footer-penales-check" id="footer-penales-check">
+      <label class="checkbox-wrapper">
+      <input type="checkbox"
+         id="checkbox-penales"
+         name="hubo_penales">
+      <span class="custom-checkbox"></span>
+      </label>
+      <span class="penales-label">Hubo tanda de penales</span>
+   </div>
+   <div class="footer-penales-nav">
+      <button class="btn-secundario" style="opacity: 0;">
+      <span class="M-boton">Anterior </span></button>
+      <button class="btn-primario">
+      <span class="M-boton">Siguiente</span>
+      </button>
+   </div>
+</div>
+
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+   
+     /* ============================================================
+        1) STEPPER (HEADER DE CARGA)
+     ============================================================ */
+   
+     const stepIcons  = document.querySelectorAll(".step-icon");
+     const stepLabels = document.querySelectorAll(".step-label");
+   const btnSiguiente = document.querySelector(".footer-penales-nav .btn-primario:last-child");
+   
+    let pasoActual = 1;
+
+    function mostrarPaso(paso) {
+      pasoActual = paso;
+
+      // Mostrar / ocultar secciones
+      document.querySelectorAll(".team-section").forEach(section => {
+        const step = Number(section.getAttribute("step"));
+        section.style.display = step === paso ? "block" : "none";
+      });
+
+      // Header (iconos y labels)
+      document.querySelectorAll(".step-icon").forEach(icon => {
+        icon.classList.toggle("active", Number(icon.dataset.step) === paso);
+      });
+
+      document.querySelectorAll(".step-label").forEach(label => {
+        label.classList.toggle("active", Number(label.dataset.step) === paso);
+      });
+    }
+
+   
+   // estado inicial
+   mostrarPaso(1);
+
+   
+   btnSiguiente?.addEventListener("click", () => {
+   if (pasoActual === 1) {
+    const icon = document.querySelector('.step-icon[data-step="1"]');
+    icon?.classList.add("transitioning");
+   
+    setTimeout(() => mostrarPaso(2), 250);
+   } else {
+    // paso 2 → acá después mandás al backend
+    //boton anterior aparece
+    
+    
+    console.log("Paso 2 → submit final");
+   }
+   });
+   
+     /* ============================================================
+        2) EXPANDIR / CONTRAER TARJETA DE JUGADORES
+     ============================================================ */
+   
+     document.querySelectorAll(".player-card").forEach(card => {
+       card.addEventListener("click", () => {
+         card.classList.toggle("expanded");
+       });
+     });
+   
+   
+     /* ============================================================
+        3) CONTADORES GENÉRICOS data-counter
+     ============================================================ */
+   
+     document.querySelectorAll("[data-counter]").forEach(counter => {
+       const valueEl = counter.querySelector("[data-value]");
+       const plus = counter.querySelector("[data-plus]");
+       const minus = counter.querySelector("[data-minus]");
+   
+       let value = parseInt(valueEl.textContent || "0", 10);
+   
+       plus?.addEventListener("click", e => {
+         e.stopPropagation();
+         value++;
+         valueEl.textContent = value;
+       });
+   
+       minus?.addEventListener("click", e => {
+         e.stopPropagation();
+         if (value > 0) value--;
+         valueEl.textContent = value;
+       });
+     });
+   
+   
+     /* ============================================================
+        4) CONTADORES DE ESTADÍSTICAS (stat-counter)
+     ============================================================ */
+   
+     document.querySelectorAll(".stat-counter").forEach(counter => {
+   
+       const valueEl = counter.querySelector(".stat-value");
+       const btnPlus = counter.querySelector(".btn-plus");
+       const btnMinus = counter.querySelector(".btn-minus");
+   
+       let value = parseInt(valueEl.textContent || "0", 10);
+       const min = parseInt(counter.dataset.min ?? "0", 10);
+   
+       function syncUI() {
+         valueEl.textContent = value;
+   
+         btnMinus.classList.toggle("is-disabled", value <= min);
+       }
+   
+       btnPlus?.addEventListener("click", e => {
+         e.stopPropagation();
+         value++;
+         syncUI();
+       });
+   
+       btnMinus?.addEventListener("click", e => {
+         e.stopPropagation();
+         if (value > min) {
+           value--;
+           syncUI();
+         }
+       });
+   
+       syncUI();
+     });
+   
+   
+     /* ============================================================
+        5) BTN VOLVER MOBILE EN NAVBAR
+     ============================================================ */
+   
+     const originalBtn = document.querySelector(".navbar-toggler");
+     if (originalBtn) {
+       const backBtn = document.createElement("button");
+       backBtn.type = "button";
+       backBtn.className = "navbar-toggler btn-volver-mobile";
+       backBtn.innerHTML = `
+         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+           xmlns="http://www.w3.org/2000/svg">
+           <path d="M20 4L4 20M4 4L20 20"
+             stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+         </svg>
+       `;
+   
+       //torneo.id
+   
+       //llevar a la partido/torneo/{id}
+   backBtn.addEventListener("click", () => {
+   const parts = window.location.pathname.split("/");
+   const tipo = parts[2];      // torneo | amistoso
+   const partidoId = parts[3]; // id
+   
+   window.location.href = `/partido/${tipo}/${partidoId}/`;
+   });
+   
+       originalBtn.replaceWith(backBtn);
+     }
+   
+   });
+   
+   
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+   
+     const pathParts = window.location.pathname.split("/");
+   
+     const tipo = pathParts[2];        // "torneo"
+     const partidoId = pathParts[3];   // "2"
+   
+     const url = `/api/partido/${tipo}/${partidoId}/cargar-estadisticas/`;
+   
+     console.log("🔎 Fetch a:", url);
+   
+     fetch(url, {
+       method: "GET",
+       headers: {
+         "Accept": "application/json",
+       },
+       credentials: "include",
+     })
+       .then(response => {
+         if (!response.ok) {
+           throw new Error(`HTTP ${response.status}`);
+         }
+         return response.json();
+       })
+       .then(data => {
+         console.log("📦 DATA CARGA ESTADÍSTICAS:");
+         console.log(data);
+   
+         console.log("Encargados:", data.encargados_del_torneo);
+         console.log("Equipo A:", data.nombre_equipo_a);
+         console.log("Jugadores A:", data.jugadores_a_all);
+         console.log("Equipo B:", data.nombre_equipo_b);
+         console.log("Jugadores B:", data.jugadores_b_all);
+       })
+       .catch(err => {
+         console.error("❌ Error cargando estadísticas:", err);
+       });
+   
+   });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+   const checkboxPenales = document.getElementById("checkbox-penales");
+   
+   function makeStatRow({ label, iconSvg, statKey, initial = 0 }) {
+   const row = document.createElement("div");
+   row.className = "stat-row";
+   row.dataset.statKey = statKey; // ✅ CLAVE CORRECTA
+   
+   row.innerHTML = `
+     <div class="stat-label">
+       ${iconSvg}
+       <span class="M-body">${label}</span>
+     </div>
+     <div class="stat-counter" data-min="0">
+       <button type="button" class="btn-circle btn-minus is-disabled"></button>
+       <span class="stat-value">${initial}</span>
+       <button type="button" class="btn-circle btn-plus"></button>
+     </div>
+   `;
+   return row;
+   }
+   
+   
+   // Iconos (podés reemplazar por los tuyos tal cual)
+   const ICON_GOLES = `
+     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="white" stroke-width="1.5"/>
+       <path d="M2 12H5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+       <path d="M19 12H22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+       <path d="M12 22V19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+       <path d="M12 5V2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+       <path d="M10 12H12H14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+       <path d="M12 14V12V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>
+   `;
+   
+   const ICON_ASIST = `
+     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <path d="M11 17L13 19C13.197 19.197 13.4308 19.3532 13.6882 19.4598C13.9456 19.5665 14.2214 19.6213 14.5 19.6213C14.7786 19.6213 15.0544 19.5665 15.3118 19.4598C15.5692 19.3532 15.803 19.197 16 19C16.197 18.803 16.3532 18.5692 16.4598 18.3118C16.5665 18.0544 16.6213 17.7786 16.6213 17.5C16.6213 17.2214 16.5665 16.9456 16.4598 16.6882C16.3532 16.4308 16.197 16.197 16 16" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+       <path d="M14.0002 13.9995L16.5002 16.4995C16.8981 16.8974 17.4376 17.1208 18.0002 17.1208C18.5628 17.1208 19.1024 16.8974 19.5002 16.4995C19.8981 16.1017 20.1215 15.5621 20.1215 14.9995C20.1215 14.4369 19.8981 13.8974 19.5002 13.4995L15.6202 9.61953C15.0577 9.05773 14.2952 8.74217 13.5002 8.74217C12.7052 8.74217 11.9427 9.05773 11.3802 9.61953L10.5002 10.4995C10.1024 10.8974 9.56284 11.1208 9.00023 11.1208C8.43762 11.1208 7.89805 10.8974 7.50023 10.4995C7.1024 10.1017 6.87891 9.56214 6.87891 8.99953C6.87891 8.43692 7.1024 7.89735 7.50023 7.49953L10.3102 4.68953C11.2225 3.77967 12.4121 3.20008 13.6909 3.0425C14.9696 2.88492 16.2644 3.15836 17.3702 3.81953L17.8402 4.09953C18.266 4.35651 18.7723 4.44564 19.2602 4.34953L21.0002 3.99953" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+       <path d="M21 3L22 14H20M3 3L2 14L8.5 20.5C8.89782 20.8978 9.43739 21.1213 10 21.1213C10.5626 21.1213 11.1022 20.8978 11.5 20.5C11.8978 20.1022 12.1213 19.5626 12.1213 19C12.1213 18.4374 11.8978 17.8978 11.5 17.5M3 4H11" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>
+   `;
+   
+   const ICON_PENALES = `
+     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <path opacity="0.5" d="M2 12.2593H22M22 16.4074H2M2 8.11111H22M8.92027 5V19M16.3146 5V19" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+       <path d="M22 18.7143V7.28571C22 6.67951 21.7659 6.09812 21.3491 5.66947C20.9324 5.24082 20.3672 5 19.7778 5H4.22222C3.63285 5 3.06762 5.24082 2.65087 5.66947C2.23413 6.09812 2 6.67951 2 7.28571V18.7143" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>
+   `;
+   
+   function initCountersWithin(root) {
+     root.querySelectorAll(".stat-counter").forEach(counter => {
+       const valueEl = counter.querySelector(".stat-value");
+       const btnPlus = counter.querySelector(".btn-plus");
+       const btnMinus = counter.querySelector(".btn-minus");
+   
+       let value = parseInt(valueEl.textContent || "0", 10);
+       const min = parseInt(counter.dataset.min ?? "0", 10);
+   
+       const syncUI = () => {
+         valueEl.textContent = value;
+         btnMinus.classList.toggle("is-disabled", value <= min);
+       };
+   
+       btnPlus?.addEventListener("click", e => {
+         e.stopPropagation();
+         value++;
+         syncUI();
+       });
+   
+       btnMinus?.addEventListener("click", e => {
+         e.stopPropagation();
+         if (value > min) value--;
+         syncUI();
+       });
+   
+       syncUI();
+     });
+   }
+   
+   function syncTandaPenalesInCard(card) {
+   const stats = card.querySelector(".player-stats");
+   if (!stats) return;
+   
+   const checkboxPenales = document.getElementById("checkbox-penales");
+   let tanda = stats.querySelector(".tanda-penales");
+   
+   if (checkboxPenales?.checked) {
+     if (!tanda) {
+       tanda = document.createElement("div");
+       tanda.className = "tanda-penales";
+       tanda.innerHTML = `
+         <span class="M-body-Sm">Tanda de penales</span>
+         <div class="stroke-linecap"></div>
+       `;
+   
+       // ✅ CREAR y GUARDAR la fila
+       const row = makeStatRow({
+         label: "Goles",
+         iconSvg: ICON_PENALES,
+         statKey: "gol_penales",
+         initial: 0
+       });
+   
+       tanda.appendChild(row);
+       stats.appendChild(tanda);
+   
+       // ✅ inicializar botones + / -
+       initCountersWithin(tanda);
+     }
+   
+     tanda.classList.add("is-visible");
+   } else {
+     if (tanda) tanda.classList.remove("is-visible");
+   }
+   }
+   
+   function createPlayerCard(jugador, teamKey) {
+     const card = document.createElement("article");
+     card.className = "player-card";
+     card.dataset.jugadorId = jugador.miembro_id;
+     card.dataset.team = teamKey; // ✅ A o B
+   
+   
+     // header
+     card.innerHTML = `
+       <div class="player-header">
+         <div class="player-info">
+           <div class="player-avatar">
+             <img class="player-avatar-img" style="width:45px;height:45px;border-radius:5px"
+                  src="${jugador.avatar || "/static/jugador.png"}" alt="">
+           </div>
+           <div class="player-name-num">
+             <span class="M-body player-name">${jugador.nombre ?? "Jugador"}</span>
+             <span class="M-Boton player-dorsal">${jugador.dorsal ?? ""}</span>
+           </div>
+         </div>
+   
+         <button class="player-toggle" type="button">
+           <span class="icon-closed toggle-icon">
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path d="M5 9L12 15L19 9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>
+           </span>
+           <span class="icon-open toggle-icon">
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path d="M5 15L12 9L19 15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>
+           </span>
+         </button>
+       </div>
+   
+       <div class="player-stats"></div>
+     `;
+   
+     const stats = card.querySelector(".player-stats");
+       stats.appendChild(
+         makeStatRow({
+           label: "Goles",
+           iconSvg: ICON_GOLES,
+           statKey: "goles_comunes"
+         })
+       );
+       
+     stats.appendChild(
+       makeStatRow({
+         label: "Asistencias",
+         iconSvg: ICON_ASIST,
+         statKey: "asistencias"
+       })
+     );
+   
+     // expand/collapse SOLO con el botón (así no se dispara tocando contadores)
+     const toggleBtn = card.querySelector(".player-toggle");
+     toggleBtn.addEventListener("click", (e) => {
+       e.stopPropagation();
+       card.classList.toggle("expanded");
+     });
+   
+     // inicializa contadores dentro de esta card
+     initCountersWithin(card);
+   
+     // penales
+     syncTandaPenalesInCard(card);
+   
+     return card;
+   }
+   
+   function renderEquipo({ teamSelector, teamName, jugadores, teamKey , teamID}) {
+     const team = document.querySelector(teamSelector);
+     if (!team) return;
+   
+     const nameEl = team.querySelector(".team-name");
+       // 🔑 GUARDAR IDS SEGÚN EQUIPO
+      if (teamKey === "a") {
+        EQUIPO_A_ID = teamID;
+      }
+
+      if (teamKey === "b") {
+        EQUIPO_B_ID = teamID;
+      }
+
+      console.log(`🆔 Equipo ${teamKey.toUpperCase()} ID:`, teamID);
+      
+
+
+     const container = team.querySelector(".players-container");
+     if (!nameEl || !container) return;
+   
+     nameEl.textContent = teamName || "";
+     container.innerHTML = "";
+   
+     jugadores.forEach(j => {
+       container.appendChild(createPlayerCard(j, teamKey));
+     });
+   }
+   
+   // checkbox penales global: aplica a todas las cards ya pintadas
+   checkboxPenales?.addEventListener("change", () => {
+     document.querySelectorAll(".player-card").forEach(card => syncTandaPenalesInCard(card));
+   });
+   
+   // === FETCH ===
+   const pathParts = window.location.pathname.split("/");
+   const tipo = pathParts[2];
+   const partidoId = pathParts[3];
+   
+   fetch(`/api/partido/${tipo}/${partidoId}/cargar-estadisticas/`, { credentials: "include" })
+     .then(r => r.json())
+     .then(data => {
+   renderEquipo({
+   teamSelector: "#team-a",
+   teamName: data.nombre_equipo_a,
+   jugadores: data.jugadores_a_all,
+   teamKey: "a",
+   teamID: data.id_equipo_a
+
+   });
+   renderEquipo({
+   teamSelector: "#team-b",
+   teamName: data.nombre_equipo_b,
+   jugadores: data.jugadores_b_all,
+   teamKey: "b",
+   teamID: data.id_equipo_b
+   
+   });
+
+   console.log(data.nombre_equipo_a);
+   console.log(data.nombre_equipo_b);
+   
+   })
+     .catch(console.error);
+   });
+   
+</script>
+<script>
+   function getStatByKey(card, key) {
+     const row = card.querySelector(`.stat-row[data-stat-key="${key}"]`);
+     return row ? parseInt(row.querySelector(".stat-value")?.textContent || "0", 10) : 0;
+   }
+   
+   
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+   
+     const btnSiguiente = document.querySelector(".footer-penales-nav .btn-primario:last-child");
+   
+     btnSiguiente.addEventListener("click", () => {
+   
+       const pathParts = window.location.pathname.split("/");
+       const partidoId = parseInt(pathParts[3], 10); // /partido/torneo/ID/
+   
+       const resultado = [];
+   
+       document.querySelectorAll(".player-card").forEach(card => {
+   
+         const miembroEquipoId = parseInt(card.dataset.jugadorId, 10);
+         if (!miembroEquipoId) return;
+   
+         // helper para leer stats por nombre
+         const getStat = (label) => {
+           const row = [...card.querySelectorAll(".stat-row")]
+             .find(r => r.querySelector(".stat-label span")?.textContent.trim() === label);
+           return row
+             ? parseInt(row.querySelector(".stat-value")?.textContent || "0", 10)
+             : 0;
+         };
+   
+         const estadistica = {
+           miembro_equipo: miembroEquipoId,
+           partido: partidoId,
+   
+           tarjetas_amarillas: 0,   // paso 2
+           tarjeta_roja: false,     // paso 2
+           faltas: 0,
+           atajadas: 0,
+   
+           goles: getStat("Goles"),
+           autogoles: getStat(""),
+           asistencias: getStat("Asistencias"),
+           tiros_arco: 0,
+   
+           jugo: true
+         };
+   
+         resultado.push(estadistica);
+       });
+   
+   
+     });
+   
+   });
+</script>
+<script>
+   function getStat(card, label) {
+   const row = [...card.querySelectorAll(".stat-row")]
+     .find(r =>
+       r.querySelector(".stat-label span")?.textContent.trim() === label
+     );
+   
+   return row
+     ? parseInt(row.querySelector(".stat-value")?.textContent || "0", 10)
+     : 0;
+   }
+   
+</script>
+<script></script>
+<script>
+let pasoActual = 1; // 1 = participaciones | 2 = tarjetas
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btnSiguiente = document.querySelector(".footer-penales-nav .btn-primario");
+  const btnVolver = document.querySelector(".footer-penales-nav .btn-secundario");
+  const checkboxPenales = document.getElementById("checkbox-penales");
+
+  /* =====================================================
+     MOSTRAR PASO
+  ===================================================== */
+  function mostrarPaso(paso) {
+    pasoActual = paso;
+
+    // mostrar / ocultar secciones
+    document.querySelectorAll(".team-section").forEach(section => {
+      const step = Number(section.getAttribute("step"));
+      section.style.display = step === paso ? "block" : "none";
+    });
+
+    // header icons
+    document.querySelectorAll(".step-icon").forEach(icon => {
+      icon.classList.toggle("active", Number(icon.dataset.step) === paso);
+    });
+
+    document.querySelectorAll(".step-label").forEach(label => {
+      label.classList.toggle("active", Number(label.dataset.step) === paso);
+    });
+  }
+
+  function getTarjetasFromCard(card) {
+  const chkAmarilla = card.querySelector(".chk-amarilla");
+  const chkRoja = card.querySelector(".chk-roja");
+
+  return {
+    tarjetas_amarillas: chkAmarilla?.checked ? 1 : 0,
+    tarjeta_roja: chkRoja?.checked ? true : false
+  };
+}
+//const id footer-penales-check
+
+const footerPenalesCheck = document.getElementById("footer-penales-check");
+
+  // estado inicial
+  mostrarPaso(1);
+  btnVolver.style.opacity = "0";
+
+
+  /* =====================================================
+     BOTÓN SIGUIENTE
+  ===================================================== */
+  btnSiguiente?.addEventListener("click", () => {
+
+    // 👉 STEP 1 → STEP 2
+    if (pasoActual === 1) {
+
+      statsStep1 = {};
+
+      document
+        .querySelectorAll("#team-a .player-card, #team-b .player-card")
+        .forEach(card => {
+
+          const id = parseInt(card.dataset.jugadorId, 10);
+          if (!id) return;
+
+          statsStep1[id] = {
+            goles_comunes: getStatByKey(card, "goles_comunes"),
+            gol_penales: checkboxPenales?.checked
+              ? getStatByKey(card, "gol_penales")
+              : 0,
+            asistencias: getStatByKey(card, "asistencias"),
+          };
+        });
+
+      mostrarPaso(2);
+      btnVolver.style.opacity = "1";
+      footerPenalesCheck.style.display = "none";
+
+      
+      return;
+    }
+
+    // 👉 STEP 2 → GUARDAR PAYLOAD (TU LÓGICA)
+    if (pasoActual === 2) {
+
+      const parts = window.location.pathname.split("/");
+      const partidoId = parseInt(parts[3], 10);
+
+      const payload = {
+        partido_id: partidoId,
+        hubo_tanda_penales: !!checkboxPenales?.checked,
+        equipo_a_id: null,
+        equipo_b_id: null,
+        estadisticas: []
+      };
+
+      let golesA = 0;
+      let golesB = 0;
+      let penalesA = 0;
+      let penalesB = 0;
+
+      document
+        .querySelectorAll("#team-a-step-2 .player-card, #team-b-step-2 .player-card")
+        .forEach(card => {
+
+          const id = parseInt(card.dataset.jugadorId, 10);
+          if (!id) return;
+
+          const { tarjetas_amarillas, tarjeta_roja } = getTarjetasFromCard(card);
+          const base = statsStep1[id] || {};
+
+          payload.estadisticas.push({
+            miembro_equipo: id,
+
+            goles_comunes: base.goles_comunes ?? 0,
+            gol_penales: base.gol_penales ?? 0,
+            goles: (base.goles_comunes ?? 0) + (base.gol_penales ?? 0),
+            asistencias: base.asistencias ?? 0,
+
+            tarjetas_amarillas,
+            tarjeta_roja,
+
+            faltas: 0,
+            atajadas: 0,
+            autogoles: 0,
+            tiros_arco: 0,
+            jugo: true
+          });
+        });
+
+      localStorage.setItem("estadisticas_partido", JSON.stringify(payload));
+      console.log("💾 Payload guardado:", payload);
+
+      //reireccionar al partido
+/*       window.location.href = `/partido/torneo/${partidoId}/`;
+ */
+      // mandar el payload a la API
+
+         
+
+    fetch("/api/partido/torneo/" + partidoId + "/cargar-estadisticas/final/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log("✅ Estadisticas cargadas:", data);
+
+        // 👉 redireccionar al partido
+       window.location.href = `/partido/torneo/${partidoId}/`;
+      });
+
+
+
+      
+    }
+  });
+
+  /* =====================================================
+     BOTÓN VOLVER
+  ===================================================== */
+  btnVolver?.addEventListener("click", () => {
+    mostrarPaso(1);
+    btnVolver.style.opacity = "0";
+    footerPenalesCheck.style.display = "flex";
+  });
+
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  console.log("✅ DOMContentLoaded");
+
+  /* ==========================
+     HELPERS
+  ========================== */
+
+function crearPlayerCard(jugador, teamKey) {
+  const card = document.createElement("section");
+  card.className = "player-card";
+  card.dataset.jugadorId = jugador.miembro_id;
+  card.dataset.team = teamKey;
+
+  card.innerHTML = `
+    <div class="player-header-cards">
+      <div class="player-info">
+        <div class="player-avatar">
+          <img src="/static/jugador.png"
+               style="width:45px;height:45px;border-radius:5px"
+               alt="">
+        </div>
+
+        <div class="player-name-num">
+          <span class="M-body">${jugador.nombre}</span>
+          <span class="M-Boton">${jugador.dorsal ?? ""}</span>
+        </div>
+      </div>
+
+      <div class="player-checkbox-cards">
+        <!-- Amarilla -->
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="chk-amarilla">
+          <span class="custom-checkbox"></span>
+        </label>
+
+        <div class="stroke-vertical"></div>
+
+        <!-- Roja -->
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="chk-roja">
+          <span class="custom-checkbox"></span>
+        </label>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+
+  function renderEquipo(teamSelector, teamName, jugadores, teamKey) {
+    console.log(`🎽 Render equipo ${teamKey}:`, teamName);
+
+    const team = document.querySelector(teamSelector);
+    if (!team) {
+      console.error("❌ NO TEAM:", teamSelector);
+      return;
+    }
+
+    const container = team.querySelector(".players-container");
+    if (!container) {
+      console.error("❌ NO CONTAINER en", teamSelector);
+      return;
+    }
+
+    if (!Array.isArray(jugadores)) {
+      console.error("❌ JUGADORES INVALIDOS:", jugadores);
+      return;
+    }
+
+    console.log(`👥 Cantidad jugadores (${teamKey}):`, jugadores.length);
+
+    team.querySelector(".team-name").textContent = teamName || "";
+
+    container.innerHTML = "";
+
+    jugadores.forEach(jugador => {
+      container.appendChild(crearPlayerCard(jugador, teamKey));
+    });
+
+    console.log(`✅ Render completo equipo ${teamKey}`);
+  }
+
+  /* ==========================
+     FETCH
+  ========================== */
+
+  const pathParts = window.location.pathname.split("/");
+  const tipo = pathParts[2];
+  const partidoId = pathParts[3];
+
+  console.log("📍 Ruta:", tipo, partidoId);
+
+  fetch(`/api/partido/${tipo}/${partidoId}/cargar-estadisticas/`, {
+    credentials: "include"
+  })
+    .then(r => {
+      console.log("🌐 HTTP status:", r.status);
+      return r.json();
+    })
+.then(data => {
+  console.log("📦 DATA FETCH:", data);
+
+  renderEquipo(
+    "#team-a-step-2",
+    data.nombre_equipo_a,
+    data.jugadores_a_all,
+    "a"
+  );
+
+  renderEquipo(
+    "#team-b-step-2",
+    data.nombre_equipo_b,
+    data.jugadores_b_all,
+    "b"
+  );
+});
+
+
+});
+</script>
+
+
+
+
+
+
+{% endblock %}

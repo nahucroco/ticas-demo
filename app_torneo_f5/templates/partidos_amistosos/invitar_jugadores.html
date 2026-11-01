@@ -1,0 +1,462 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+  <link rel="stylesheet" href="{% static 'css/busqueda.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Invitaciones{% endblock %}
+
+{% block content %}
+<style>
+
+  .btn-copiar{
+    display: flex;
+  width: 328px;
+  padding: 15px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 20px;
+  background: #4F9639;
+  color: #FFF;
+  border: 0;
+  }
+  .copiar-link{
+    display: flex;
+    justify-content: center;
+}
+.separador{
+  display: flex;
+  width: 328px;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.center{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.no-results{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color:red;
+}
+
+#resultados-api {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+#resultados-api.fade-out {
+  opacity: 0;
+}
+
+.left{
+    display: flex;
+    justify-content: left;
+    padding-left:16px ;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.invitado{
+  background: var(--No-se, #733BDE);
+}
+.card-invitados{
+  display: flex;
+width: 328px;
+flex-direction: column;
+align-items: flex-start;
+gap: 10px;
+}
+.card-invitado{
+  display: flex;
+width: 328px;
+align-items: center;
+gap: 6px;
+}
+.card-imagen{
+width: 45px;
+height: 45px;
+flex-shrink: 0;
+aspect-ratio: 1/1;
+border-radius: 5px;
+}
+
+.invitado-general{
+display: flex;
+width: 328px;
+flex-direction: column;
+align-items: flex-start;
+gap: 15px;
+margin: 0 auto;
+}
+.card-contenido{
+  display: flex;
+flex-direction: column;
+align-items: flex-start;
+flex: 1 0 0;
+}
+
+.invitado-info{
+  display: flex;
+justify-content: space-between;
+align-items: center;
+align-self: stretch;
+}
+
+.invitado-locacion-nombre{
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.card-icono{
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.ya-invitado{
+  border-radius: 5px;
+  background: var(--No-se, #733BDE);
+}
+#resultados-api{
+  display: flex;
+  justify-content: center;
+}
+.invitado-general {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  height: auto;
+}
+
+.invitado-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+  
+</style>
+
+<!-- UUID oculto -->
+<input type="hidden" id="invitationLink" value="{{ uuid_url }}">
+<input type="hidden" id="partidoId" value="{{ partido.id }}">
+
+<!-- Botón copiar link -->
+<div class="copiar-link M-boton">
+  <input type="text" id="linkInvitacion" value="{{ request.build_absolute_uri|cut:request.get_full_path }}{% url 'partido_por_codigo' partido.codigo_invitacion %}" style="position: absolute; left: -9999px;">
+  
+  <button class="btn-copiar" id="btnCopiarLink">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+  <path d="M14.1625 18.9876L13.4417 19.7084C11.053 22.0971 7.18019 22.0971 4.79151 19.7084C2.40283 17.3198 2.40283 13.4469 4.79151 11.0583L5.51236 10.3374" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M9.8374 14.6625L14.1625 10.3374" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M9.8374 6.01236L10.5583 5.29151C12.9469 2.90283 16.8198 2.90283 19.2084 5.29151C21.5971 7.68019 21.5971 11.553 19.2084 13.9417L18.4876 14.6625" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+    Copiar invitación
+  </button>
+</div>
+<!-- division -->
+ <div class="center">
+ <div class="separador">
+  <svg xmlns="http://www.w3.org/2000/svg" width="148" height="2" viewBox="0 0 148 2" fill="none">
+  <path d="M0 1H147.5" stroke="#3F374E"/>
+</svg>
+  <span class="M-body">O</span>
+  <svg xmlns="http://www.w3.org/2000/svg" width="148" height="2" viewBox="0 0 148 2" fill="none">
+  <path d="M0.5 1H148" stroke="#3F374E"/>
+</svg>
+ </div>
+ </div>
+<!-- Buscador -->
+<form action="" id="form-busqueda" autocomplete="off" class="center">
+<div class="buscador">
+  <img src="{% static 'images/lupa.svg' %}" alt="Lupa">
+<input type="text" id="buscador" name="q" placeholder="Busca jugadores..."></input>
+</div>
+</form>
+
+
+<!-- Listado -->
+<div id="resultados-api" class="">
+</div>
+<!-- Ya invitados -->
+<div id="bloqueInvitados" class="invitado-general" style="display: none;">
+  <span class="M-subtitulos">Jugadores invitados</span>
+  <div id="contenedorInvitados" class="card-invitados"></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // Función para copiar el link de invitación
+  document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("btnCopiarLink");
+    const input = document.getElementById("linkInvitacion");
+    const mensaje = document.getElementById("mensajeCopiado");
+
+    btn.addEventListener("click", () => {
+      input.select();
+      input.setSelectionRange(0, 99999); // Para móviles
+      document.execCommand("copy");
+
+      mensaje.style.display = "inline";
+      setTimeout(() => mensaje.style.display = "none", 2000);
+    });
+  });
+
+  // Función para obtener el token CSRF desde cookies
+  function getCSRFToken() {
+    let cookieValue = null;
+    const name = 'csrftoken';
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Función para invitar jugador vía fetch
+  function invitarJugador(partidoId, jugadorId) {
+    fetch(`/invitar/${partidoId}/${jugadorId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Invitación enviada',
+        text: data.mensaje,
+        timer: 2000,
+        showConfirmButton: false
+      });
+      setTimeout(() => location.reload(), 2000);
+    })
+    .catch(err => {
+      console.error("Error al invitar:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al invitar.',
+      });
+    });
+  }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const input = document.querySelector("#form-busqueda input[name='q']");
+  const resultadosContainer = document.getElementById("resultados-api");
+  const partidoId = Number(document.getElementById("partidoId").value);
+  const bloqueInvitados = document.getElementById("bloqueInvitados");
+  const contenedorInvitados = document.getElementById("contenedorInvitados");
+  let timeout = null;
+  const pad4 = v => String(v ?? "").padStart(4, "0");
+
+  input.addEventListener("input", function () {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      const q = input.value.trim();
+
+      if (q.length < 3) {
+        resultadosContainer.innerHTML = "";
+        bloqueInvitados.classList.add("invitado-visible");
+        return;
+      }
+
+      bloqueInvitados.classList.remove("invitado-visible");
+      resultadosContainer.classList.add("fade-out");
+
+      setTimeout(() => {
+        fetch(`/api/busqueda/jugadores/invitar/?q=${encodeURIComponent(q)}&partido_id=${partidoId}`)
+          .then(response => response.json())
+          .then(jugadores => {
+            resultadosContainer.innerHTML = "";
+
+            if (jugadores.length === 0) {
+              resultadosContainer.innerHTML = `<p class="no-results">No se encontraron jugadores.</p>`;
+            } else {
+              jugadores.forEach(jugador => {
+                const div = document.createElement("div");
+                div.className = "card-invitado";
+                div.setAttribute("data-jugador-id", jugador.id);
+                div.setAttribute("data-source", "busqueda");
+
+                if (jugador.invitado) {
+                  div.classList.add("ya-invitado");
+                  div.innerHTML = `
+                    <img class="card-imagen" src="${jugador.img_path || '/static/images/default-avatar.png'}" alt="${jugador.nombre}">
+                    <div class="card-contenido">
+                      <div><span class="M-body">${jugador.nombre}</span></div>
+                      <div class="invitado-info M-body-s opacity">
+                        <div class="invitado-locacion-nombre">
+                          <span>${jugador.provincia || 'ND'}</span>
+                          <span>${jugador.ciudad || 'Sin ciudad'}</span>
+                        </div>
+                        <span>#${pad4(jugador.id)}</span>
+                      </div>
+                    </div>
+                    <a href="#" onclick="cancelarInvitacion(${partidoId}, ${pad4(jugador.id)})" title="Cancelar invitación">
+                      <img class="card-icono" src="/static/images/echar_partida.svg" alt="Cancelar invitación">
+                    </a>
+                  `;
+                } else {
+                  div.innerHTML = `
+                    <img class="card-imagen" src="${jugador.img_path || '/static/images/default-avatar.png'}" alt="${jugador.nombre}">
+                    <div class="card-contenido">
+                      <div><span class="M-body">${jugador.nombre}</span></div>
+                      <div class="invitado-info M-body-s opacity">
+                        <div class="invitado-locacion-nombre">
+                          <span>${jugador.provincia || 'ND'}</span>
+                          <span>${jugador.ciudad || 'Sin ciudad'}</span>
+                        </div>
+                        <span>#${pad4(jugador.id)}</span>
+                      </div>
+                    </div>
+                    <img class="card-icono" src="/static/images/invitar.svg" alt="Invitar"
+                         onclick="invitarJugador(${partidoId}, ${pad4(jugador.id)})">
+                  `;
+                }
+
+                resultadosContainer.appendChild(div);
+              });
+            }
+
+            resultadosContainer.classList.remove("fade-out");
+          })
+          .catch(error => {
+            console.error("Error en la búsqueda de jugadores:", error);
+            resultadosContainer.innerHTML = `<p>⚠️ Error en la búsqueda</p>`;
+            resultadosContainer.classList.remove("fade-out");
+          });
+      }, 200);
+    }, 400);
+  });
+
+  // Cargar jugadores ya invitados al cargar la página
+  fetch(`/api/partido/${partidoId}/invitados/`)
+    .then(res => res.json())
+    .then(jugadores => {
+      if (jugadores.length === 0) {
+        bloqueInvitados.style.display = "none";
+        bloqueInvitados.style.opacity = "0";
+        return;
+      }
+
+      bloqueInvitados.style.display = "flex";
+      bloqueInvitados.style.opacity = "1";
+
+      jugadores.forEach(jugador => {
+        const div = document.createElement("div");
+        div.className = "card-invitado ya-invitado";
+        div.setAttribute("data-jugador-id", jugador.id);
+        div.setAttribute("data-source", "inicial");
+        
+
+        div.innerHTML = `
+          <img class="card-imagen" src="${jugador.img_path || '/static/images/default-avatar.png'}" alt="Imagen de ${jugador.nombre}">
+          <div class="card-contenido">
+            <div><span class="M-body">${jugador.nombre}</span></div>
+            <div class="invitado-info M-body-s opacity">
+              <div class="invitado-locacion-nombre">
+                <span>${jugador.provincia || "ND"}</span>
+                <span>${jugador.ciudad || "Sin ciudad"}</span>
+              </div>
+              <span>#${jugador.id || "0000"}</span>
+            </div>
+          </div>
+          <a href="#" onclick="cancelarInvitacion(${partidoId}, ${pad4(jugador.id)})" title="Cancelar invitación">
+                      <img class="card-icono" src="/static/images/echar_partida.svg" alt="Cancelar invitación">
+                    </a>
+        `;
+
+        contenedorInvitados.appendChild(div);
+      });
+    });
+    
+});
+</script>
+
+<script>
+function cancelarInvitacion(partidoId, jugadorId) {
+  console.log("CLICK → cancelarInvitacion", partidoId, jugadorId);
+
+  fetch(`/cancelar-invitacion/${partidoId}/${jugadorId}/`, {
+    method: "POST",
+    headers: {
+      'X-CSRFToken': getCSRFToken(),
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "Invitación cancelada",
+        timer: 1200,
+        showConfirmButton: false
+      });
+
+      // Eliminar la tarjeta de invitado desde cualquier origen (busqueda o inicial)
+      const card = document.querySelector(`.card-invitado[data-jugador-id='${jugadorId}']`);
+      if (card) {
+        const padre = card.parentElement;
+        card.remove();
+
+        // Si es del bloque "inicial", verificamos si hay más jugadores
+        if (padre && padre.id === "contenedorInvitados") {
+          const restantes = padre.querySelectorAll(".card-invitado");
+          if (restantes.length === 0) {
+            const bloque = document.getElementById("bloqueInvitados");
+            bloque.style.display = "none";
+            bloque.style.opacity = "0";
+          }
+        }
+      }
+
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.error || "No se pudo cancelar la invitación."
+      });
+    }
+  })
+  .catch(err => {
+    console.error("Error al cancelar invitación:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Hubo un problema al cancelar la invitación."
+    });
+  });
+}
+</script>
+
+{% endblock %}

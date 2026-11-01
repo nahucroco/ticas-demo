@@ -1,0 +1,234 @@
+html {
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Edge */
+}
+
+body {
+    background-color: #3F374E !important;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pantalla-crear {
+    background-color: #3F374E;
+}
+
+/* Header */
+
+.pantalla-crear {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.pantalla-crear .container-logo {
+    width: 76px;
+    height: 76px;
+    background-color: #221140;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    margin-bottom: 5px;
+    flex-direction: column;
+}
+
+/* Contenido */
+
+.container-contenido {
+    max-width: 500px;
+    min-height: calc(100vh - 231px);
+    background: #161618;
+    position: absolute;
+    top: 231px;
+    border-radius: 26px 26px 0 0;
+    /* height: 100%; */
+    padding: 40px 16px 75px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    /* right: 0; */
+}
+
+/* Completá tu perfil */
+
+
+.container-contenido .container-4 {
+    padding: 15px 10px 10px 10px;
+    border-radius: 10px 10px 30px 30px;
+    background: #535368;
+    gap: 20px;
+}
+
+.container-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle-container {
+    position: relative;
+    width: 100px;
+    height: 100px
+}
+
+.circle-center,
+.circle-progress {
+    position: absolute;
+    border-radius: 50%
+}
+
+.circle-progress {
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    transform: rotate(225deg)
+}
+
+.circle-progress.primer_paso {
+    background: conic-gradient(#8b42f4 0 18.625%, #3d3750 18.625% 74.5%, #535368 74.5% 100%);
+}
+
+.circle-progress.segundo_paso {
+    background: conic-gradient(#8b42f4 0 37.25%, #3d3750 37.25% 74.5%, #535368 74.5% 100%);
+}
+
+.circle-progress.tercer_paso {
+    background: conic-gradient(#8b42f4 0 55.875%, #3d3750 55.875% 74.5%, #535368 74.5% 100%);
+}
+
+.circle-progress.cuarto_paso {
+    background: conic-gradient(#8b42f4 0 74.5%, #3d3750 74.5% 74.5%, #535368 74.5% 100%);
+}
+
+.circle-center {
+    top: 50%;
+    left: 50%;
+    width: 70px;
+    height: 70px;
+    background: #535368;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: CalSans, sans-serif
+}
+
+/* Registrá tu partido */
+
+.container-contenido .container-1 {
+    gap: 10px;
+}
+
+.container-contenido .container-1 .container-expira-en {
+    background: #733BDE;
+    border-radius: 10px;
+    gap: 3px;
+    padding: 5px;
+}
+
+.container-contenido .container-1 .partido-card {
+    padding: 10px;
+    border-radius: 25px 25px 30px 30px;
+    background: linear-gradient(180deg, var(--Fondo, #161618) 0%, var(--Terciario, #535368) 92.31%);
+}
+
+.container-contenido .container-1 .partido-card .container-equipo {
+    width: 48px;
+    height: 48px;
+    border-radius: 5px;
+}
+
+.container-contenido .container-1 .partido-card .container-resultado .container-equipos .equipo div {
+    gap: 0;
+}
+
+.container-contenido .container-1 .partido-card .btn-registrar {
+    margin-top: 20px;
+    border-radius: 20px;
+    background: #4F9639;
+    border: none;
+    color: #FFF;
+    width: 100%;
+    height: 51px;
+}
+
+/* Tu próximo partido */
+
+.container-contenido .container-2.d-flex.flex-column {
+    gap: 10px;
+}
+
+.card-partido-contenido .container-contenido .container-2 .card-partido .container-equipo {
+    width: 76px;
+    height: 76px;
+    border-radius: 5px;
+}
+
+.container-2.d-flex.flex-column .d-flex.justify-content-center a {
+    text-decoration: none;
+    width: 100%;
+}
+
+/* Torneo actual */
+
+.container-torneo-actual .container-1{
+    padding: 10px;
+}
+
+.container-3 .container-titulo {
+    margin-bottom: 10px 16px;
+}
+
+.container-3 .container-torneo-actual {
+    background: linear-gradient(180deg, var(--Terciario, #535368) 0%, rgba(83, 83, 104, 0.00) 100%);
+    display: flex;
+    /* padding: 10px 16px; */
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    /* gap: 10px; */
+    align-self: stretch;
+    margin: 0 -16px;
+}
+
+.container-3 .container-torneo-actual .container-2 {
+    /* margin: 0 -16px; */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    left: 0;
+    box-sizing: border-box;
+}
+
+.container-3 .container-torneo-actual .container-3 {
+    display: flex;
+
+}
+
+.container-3 .container-torneo-actual .container-3 a {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 5px;
+}
+
+/* Completa tu perfil */
+
+.container-4{
+    background: #535368;
+}

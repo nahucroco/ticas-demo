@@ -1,0 +1,216 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<style>
+    .puente-wrap {
+        min-height: calc(100dvh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #0f172a;
+        color: #e2e8f0
+    }
+
+    .puente-card {
+        width: 100%;
+        max-width: 720px;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 16px;
+        padding: 22px
+    }
+
+    .puente-card h1 {
+        font-size: 1.25rem;
+        margin: 0 0 10px
+    }
+
+    .puente-card p {
+        margin: 0 0 12px;
+        color: #cbd5e1
+    }
+
+    .puente-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px
+    }
+
+    .puente-btn,
+    .puente-btn.ghost {
+        appearance: none;
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        text-decoration: none
+    }
+
+    .puente-btn {
+        background: #93c5fd;
+        color: #0b1220
+    }
+
+    .puente-btn.ghost {
+        background: #334155;
+        color: #e2e8f0
+    }
+
+    .puente-hint {
+        display: block;
+        margin-top: 12px;
+        color: #94a3b8
+    }
+
+    .puente-kbd {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        padding: 2px 6px;
+        border-radius: 6px
+    }
+</style>
+{% endblock %}
+
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<div class="puente-wrap">
+    <div class="puente-card">
+        <h1>Estás viendo esto dentro de Instagram</h1>
+        <p>Para una mejor experiencia, abrilo en tu navegador por defecto.</p>
+
+        <div class="puente-row">
+            <a id="btn-android" class="puente-btn" href="#" rel="noreferrer" style="display:none">Abrir en el navegador
+                (Android)</a>
+            <a id="btn-ios-chrome" class="puente-btn ghost" href="#" rel="noreferrer" style="display:none">Abrir en
+                Chrome (iOS)</a>
+            <a id="btn-ios-firefox" class="puente-btn ghost" href="#" rel="noreferrer" style="display:none">Abrir en
+                Firefox (iOS)</a>
+            <button id="btn-copiar" class="puente-btn ghost">Copiar enlace</button>
+        </div>
+
+        <small class="puente-hint">
+            Si no funciona, en Instagram tocá <span class="puente-kbd">⋮</span> / <span class="puente-kbd">…</span> y
+            luego <strong>“Abrir en el navegador”</strong>.
+        </small>
+    </div>
+</div>
+
+<script>
+  // ===== CONFIG =====
+  const DEFAULT_DESTINO = "https://ticas.octopush.com.ar/";
+  // Limita adónde dejamos salir (seguridad). Agregá dominios si necesitás.
+  const ALLOWLIST = [
+    "ticas.octopush.com.ar",
+    "octopush.com.ar",
+    "play.google.com",
+    "apps.apple.com"
+  ];
+
+  // Lee ?to=... y valida
+  let DESTINO = DEFAULT_DESTINO;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("to");
+    if (raw) {
+      const u = new URL(raw, window.location.origin);
+      const isHttp = (u.protocol === "http:" || u.protocol === "https:");
+      const hostOk = ALLOWLIST.some(h => u.hostname === h || u.hostname.endsWith("." + h));
+      if (isHttp && hostOk) DESTINO = u.toString();
+    }
+  } catch {}
+
+  // Detección de plataforma e in-app browsers
+  const ua = navigator.userAgent || "";
+  const isAndroid = /Android/i.test(ua);
+  const isiOS = /iPhone|iPad|iPod/i.test(ua);
+
+  // Ampliamos in-app (Instagram, Facebook, TikTok, Twitter/X)
+  const isInstagram = /Instagram/i.test(ua);
+  const isFacebook = /\bFBAN|FBAV|FB_IAB|FBAN\/Messenger\b/i.test(ua);
+  const isTikTok = /TikTok/i.test(ua);
+  const isTwitter = /Twitter|Micromessenger|Line\/|Snapchat/i.test(ua); // agrego algunos comunes
+  const isInApp = isInstagram || isFacebook || isTikTok || isTwitter;
+
+  // Mostrar botones por plataforma
+  if (isAndroid) document.getElementById('btn-android').style.display = 'inline-flex';
+  if (isiOS) {
+    document.getElementById('btn-ios-chrome').style.display = 'inline-flex';
+    document.getElementById('btn-ios-firefox').style.display = 'inline-flex';
+    // Edge iOS: agregamos botón dinámico
+    const row = document.querySelector('.puente-row');
+    const edgeBtn = document.createElement('a');
+    edgeBtn.id = 'btn-ios-edge';
+    edgeBtn.className = 'puente-btn ghost';
+    edgeBtn.href = '#';
+    edgeBtn.rel = 'noreferrer noopener';
+    edgeBtn.textContent = 'Abrir en Edge (iOS)';
+    row.insertBefore(edgeBtn, document.getElementById('btn-copiar'));
+    edgeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Edge iOS: microsoft-edge-https:// para https y microsoft-edge-http:// para http
+      const scheme = DESTINO.startsWith("https://") ? "microsoft-edge-https://" : "microsoft-edge-http://";
+      const alt = scheme + DESTINO.replace(/^https?:\/\//, "");
+      window.location.href = alt;
+      setTimeout(()=>{ window.location.href = DESTINO; }, 900);
+    });
+  }
+
+  // Android: intentar salir del webview con intent:// y fallback
+  const btnAndroid = document.getElementById('btn-android');
+  btnAndroid && btnAndroid.addEventListener('click', (e) => {
+    e.preventDefault();
+    try {
+      const u = new URL(DESTINO);
+      const path = u.pathname + (u.search || "") + (u.hash || "");
+      const intent = `intent://${u.host}${path}#Intent;scheme=${u.protocol.replace(':','')};end`;
+      window.location.href = intent;
+      // fallback suave
+      setTimeout(()=>{ window.location.href = DESTINO; }, 700);
+      // compartir a veces dispara "Abrir con..."
+      if (navigator.share) navigator.share({url: DESTINO}).catch(()=>{});
+    } catch {
+      window.location.href = DESTINO;
+    }
+  });
+
+  // iOS Chrome: googlechromes:// (https) o googlechrome:// (http)
+  const btnChrome = document.getElementById('btn-ios-chrome');
+  btnChrome && btnChrome.addEventListener('click', (e) => {
+    e.preventDefault();
+    const scheme = DESTINO.startsWith("https://") ? "googlechromes://" : "googlechrome://";
+    const alt = scheme + DESTINO.replace(/^https?:\/\//, "");
+    window.location.href = alt;
+    setTimeout(()=>{ window.location.href = DESTINO; }, 900);
+  });
+
+  // iOS Firefox
+  const btnFx = document.getElementById('btn-ios-firefox');
+  btnFx && btnFx.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = `firefox://open-url?url=${encodeURIComponent(DESTINO)}`;
+    setTimeout(()=>{ window.location.href = DESTINO; }, 900);
+  });
+
+  // Copiar enlace (fallback con prompt)
+  document.getElementById('btn-copiar').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(DESTINO);
+      alert("Enlace copiado. Pegalo en tu navegador preferido.");
+    } catch {
+      prompt("Copiá el enlace manualmente:", DESTINO);
+    }
+  });
+
+  // Si NO es un in-app browser, redirigí directo
+  if (!isInApp) {
+    window.location.replace(DESTINO);
+  }
+</script>
+
+{% endblock %}

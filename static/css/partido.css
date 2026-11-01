@@ -1,0 +1,153 @@
+.pantalla-crear{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.boton-secundario-largo {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  padding: 15px;
+  text-align: center;
+  ;
+  color: #4F9639;
+  background-color: transparent;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-bottom: 100px;
+}
+
+.boton-fijo.boton-oculto {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
+.btn-primario {
+  width: 100%;
+  max-width: 450px;
+}
+
+.titulos-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px auto 20px auto;
+  width: 100%;
+  max-width: 450px;
+  padding: 0 16px;
+}
+
+.titulos-info h1 {
+  font-family: CalSans, sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.tab-selector {
+  background: #2e2e2e;
+  padding: 4px;
+  display: inline-flex;
+  border-radius: 15px;
+  gap: 4px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  padding: 8px 16px;
+  ;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab.active {
+  background: #7e3ff2;
+  color: white;
+}
+
+.tab p {
+  opacity: 0.5;
+}
+
+.tab.active p {
+  opacity: 1;
+}
+
+.contenido-tab {
+  top: 100px; /* ajustalo según tu layout */
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 0;
+  pointer-events: none; /* evita clics cuando está oculto */
+  display: none;
+}
+
+.contenido-tab.active {
+  display: flex;
+  opacity: 1;
+  z-index: 1;
+  pointer-events: auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+}
+
+.boton-fijo,
+.boton-secundario-largo {
+  will-change: opacity, transform;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  align-items: center;
+}
+
+.boton-oculto {
+  opacity: 0;
+  transform: translateY(30px) scale(0.98);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.error-torneos {
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  width: fit-content;
+  max-width: 90%;
+  margin: 10px auto;
+  opacity: 0;
+  animation: fadeOnly 0.4s ease-out forwards;
+  margin-top: 150px;
+}
+
+@keyframes fadeOnly {
+  to {
+    opacity: 1;
+  }
+}
+
+
+a{
+  display: flex;
+  justify-content: center;
+  max-width: 450px;
+  text-decoration: none;
+  width: 100%;
+}
+
+#amistosos .card-partido-contenido .container-1 .container-equipo{
+  width: 76px;
+  height: 76px;
+  border-radius: 5px;
+}

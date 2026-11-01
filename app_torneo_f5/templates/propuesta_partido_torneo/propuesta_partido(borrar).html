@@ -1,0 +1,223 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .pantalla-crear {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container-descripcion {
+        width: 100%;
+        padding: 0 16px;
+    }
+
+    .descripcion-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .descripcion-header svg {
+        margin: 13px;
+    }
+
+    .container-1 {
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .container-1 img {
+        width: 45px;
+        height: 45px;
+        border-radius: 5px;
+        margin-left: 5px;
+    }
+
+    .barra-divisora {
+        height: 1px;
+        width: 100%;
+        background: #733BDE;
+        margin-top: 20px;
+        margin-bottom: 25px;
+    }
+
+    .container-propuesta {
+        background: #733BDE;
+        border-radius: 10px 10px 30px 30px;
+        display: flex;
+        flex-direction: column;
+        padding: 15px 10px;
+    }
+
+    .btn-primario {
+        box-shadow: none !important;
+        width: 100% !important;
+        margin-top: 20px !important;
+        text-decoration: none !important;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalletorneo.css' %}">
+
+{% endblock %}
+{% block title %}Ticas - Armen el partido{% endblock %}
+
+{% block content %}
+
+<div class="container-descripcion" style="max-width: 450px;">
+    <div id="partido-info" data-partido-id="{{ partido.id }}"></div>
+    <div id="partido-descripcion"></div>
+
+    <div class="barra-divisora"></div>
+
+    {% if mensaje == "Armen el partido" %}
+    <div class="container-propuesta">
+        <p class="M-subtitulos">{{ mensaje }}</p>
+        <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+        {% if es_capitan_1 %}
+        <a href="{% url 'propuesta_partido_1' partido.id %}" class="btn-primario"
+            style="text-align: center; display: block;">
+            <p class="M-boton">Hacer propuesta</p>
+        </a>
+        {% else %}
+        <button class="btn-primario" style="text-align: center; display: block; background: #5E605E;" disabled>
+            <p class="M-boton">Hacer propuesta</p>
+        </button>
+        <div class="d-flex flex-row justify-content-center" style="margin-top: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path opacity="0.5"
+                    d="M22.5 12C22.5 6.47715 18.0228 2 12.5 2C6.97715 2 2.5 6.47715 2.5 12C2.5 17.5228 6.97715 22 12.5 22C18.0228 22 22.5 17.5228 22.5 12Z"
+                    fill="white" />
+                <path
+                    d="M12.5 6.25C12.9142 6.25 13.25 6.58579 13.25 7V13C13.25 13.4142 12.9142 13.75 12.5 13.75C12.0858 13.75 11.75 13.4142 11.75 13V7C11.75 6.58579 12.0858 6.25 12.5 6.25Z"
+                    fill="white" />
+                <path
+                    d="M12.5 17C13.0523 17 13.5 16.5523 13.5 16C13.5 15.4477 13.0523 15 12.5 15C11.9477 15 11.5 15.4477 11.5 16C11.5 16.5523 11.9477 17 12.5 17Z"
+                    fill="white" />
+            </svg>
+            <p class="M-body-s" style="margin: 5px;">Solo los capitanes pueden realizar esta acción.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% elif mensaje == "Esperando una propuesta..." %}
+    <div class="container-propuesta" style="background: #5E605E; border-radius: 10px;">
+        <p class="M-subtitulos">{{ mensaje }}</p>
+        <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+    </div>
+
+    {% elif mensaje == "Propuesta enviada" %}
+    <div class="container-propuesta" style="background: #5E605E;">
+        <p class="M-subtitulos">{{ mensaje }}</p>
+        <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+        <a href="{% url 'detalle_propuesta' partido.id %}" class="btn-primario"
+            style="text-align: center; display: block;">
+            <p class="M-boton">Ver propuesta</p>
+        </a>
+    </div>
+
+    {% elif mensaje == "Propuesta recibida" %}
+    <div class="container-propuesta">
+        <p class="M-subtitulos">{{ mensaje }}</p>
+        <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+        {% if es_capitan_1 or es_capitan_2 %}
+        <a href="{% url 'seleccionar_propuesta' partido.id %}" class="btn-primario"
+            style="text-align: center; display: block;">
+            <p class="M-boton">Ver propuesta</p>
+        </a>
+        {% else %}
+        <button class="btn-primario" style="text-align: center; display: block; background: #5E605E;" disabled>
+            <p class="M-boton">Ver propuesta</p>
+        </button>
+        <div class="d-flex flex-row justify-content-center" style="margin-top: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path opacity="0.5"
+                    d="M22.5 12C22.5 6.47715 18.0228 2 12.5 2C6.97715 2 2.5 6.47715 2.5 12C2.5 17.5228 6.97715 22 12.5 22C18.0228 22 22.5 17.5228 22.5 12Z"
+                    fill="white" />
+                <path
+                    d="M12.5 6.25C12.9142 6.25 13.25 6.58579 13.25 7V13C13.25 13.4142 12.9142 13.75 12.5 13.75C12.0858 13.75 11.75 13.4142 11.75 13V7C11.75 6.58579 12.0858 6.25 12.5 6.25Z"
+                    fill="white" />
+                <path
+                    d="M12.5 17C13.0523 17 13.5 16.5523 13.5 16C13.5 15.4477 13.0523 15 12.5 15C11.9477 15 11.5 15.4477 11.5 16C11.5 16.5523 11.9477 17 12.5 17Z"
+                    fill="white" />
+            </svg>
+            <p class="M-body-s" style="margin: 5px;">Solo los capitanes pueden realizar esta acción.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div class="container-propuesta" style="background: #5E605E; border-radius: 10px;">
+        <p class="M-subtitulos">{{ mensaje }}</p>
+        <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+    </div>
+
+    {% endif %}
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Holaaaaaaaaa gay");
+        const partidoInfo = document.getElementById('partido-info');
+        const partidoId = partidoInfo.dataset.partidoId;
+
+        fetch(`/api/partido/${partidoId}/`)
+            .then(res => res.json())
+            .then(data => {
+                console.log('Datos del partido:', data);
+
+                const descDiv = document.getElementById('partido-descripcion');
+
+                // Render dinámico
+                descDiv.innerHTML = `
+        <div class="descripcion-header d-flex flex-column justify-center">
+          <p class="M-titulo">Partido de torneo</p>
+          <div class="d-flex flex-row" style="gap: 5px; margin-top: 15px; margin-bottom: 25px;">
+            <img src="${data.torneo.foto || '/static/images/copas-default/copa-default.png'}"
+                 alt="Torneo" width="30" height="30" style="border-radius: 2px;">
+            <p class="M-subtitulos">${data.torneo.nombre}</p>
+          </div>
+
+          <div style="padding: 10px; width: 100%;">
+            <div class="d-flex flex-row justify-content-between">
+              <div>
+                <img src="${data.equipo_local.escudo || '/static/images/escudo-equipo/equipo-a.png'}"
+                     width="76" style="border-radius: 5px;">
+              </div>
+              <div class="d-flex flex-column justify-content-between align-items-center">
+                <p class="M-body">Fecha ${data.fecha}</p>
+                <p class="M-titulo" style="font-size: 30px;">VS</p>
+              </div>
+              <div>
+                <img src="${data.equipo_visitante.escudo || '/static/images/escudo-equipo/equipo-b.png'}"
+                     width="76" style="border-radius: 5px;">
+              </div>
+            </div>
+            <div class="d-flex flex-row justify-content-between" style="width: 100%; margin-top: 4px;">
+              <p class="M-body">${data.equipo_local.nombre}</p>
+              <p class="M-body">${data.equipo_visitante.nombre}</p>
+            </div>
+          </div>
+        </div>
+      `;
+            })
+            .catch(err => {
+                console.error('Error al obtener partido:', err);
+                document.getElementById('partido-descripcion').innerHTML =
+                    `<p style="color:red;">Error al cargar los datos del partido.</p>`;
+            });
+    });
+</script>
+
+{% endblock %}

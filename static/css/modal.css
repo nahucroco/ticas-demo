@@ -1,0 +1,90 @@
+/* --- Overlay gris (como el fondo del mockup) --- */
+.swa-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);    /* gris-lila del ejemplo */
+}
+
+/* ocultar todo (agregá esta clase a .swa-overlay cuando no lo uses) */
+.swa--hidden { display: none !important; }
+
+/* --- Card --- */
+.swa{
+  /* width: 340px; */
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  padding: 0px 10px;
+  padding-top: 35px;
+  padding-bottom:15px ;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 10px 40px rgba(0,0,0,.15);
+  max-width: 340px;
+}
+
+/* Texto */
+.swa__content{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.swa__actions{
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+
+.swa__title{
+  color: #161618;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;          /* subilo/bajalo si necesitás */
+  line-height: 1.25;
+  margin: 0;
+}
+
+/* Acciones (dos columnas iguales) */
+.swa__message{
+  color: var(--Fondo, #161618);
+  text-align: center;
+}
+
+/* Botones (pill) */
+.swa__btn{
+  width: 100%;
+  display: inline-flex;
+  height: 56px;
+  padding: 0 18px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 20px;     /* pill */
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .03s ease, filter .15s ease, box-shadow .15s ease;
+}
+
+
+
+/* Cancelar: fondo verde MUY oscuro + texto verde */
+.swa__btn--cancel{
+  background: #0f2109;          /* #11250A del mockup, un toque más oscuro */
+  color: #4F9639;
+}
+
+
+/* Abandonar: verde con texto blanco */
+.swa__btn--confirm{
+  background: #4F9639;
+  color: #fff;
+}
+

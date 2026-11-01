@@ -1,0 +1,370 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #161618 !important;
+        padding: 25px 16px 0 16px;
+        height: 100dvh;
+    }
+
+    .pantalla-crear {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .container-1 {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .container-1 label {
+        margin-left: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .container-1 label p {
+        opacity: 0.5;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .input-custom {
+        border: none;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        flex: 1;
+        padding: 13px 10px 13px 50px;
+        border-radius: 5px;
+        width: 160px;
+    }
+
+    .input-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.con-valor {
+        background-color: #3F374E;
+        color: white;
+    }
+
+    .input-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .campo-fecha {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selector-fecha {
+        position: relative;
+    }
+
+    .selector-hora {
+        position: relative;
+    }
+
+    .container-icono {
+        position: absolute;
+        margin-top: 8px;
+        margin-left: 13px;
+        pointer-events: none;
+        color: white;
+        font-size: 18px;
+        z-index: 1;
+    }
+
+    .flatpickr-input::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.form-control.input.active {
+        background-color: #3F374E !important;
+    }
+
+    .input-text {
+        width: 100%;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        padding: 13px 10px;
+        border-radius: 5px;
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .input-text:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input.con-valor {
+        background-color: #3F374E;
+    }
+
+    .container-posicion {
+        background: #3F374E;
+        padding: 10px;
+        border-radius: 5px;
+        width: 308px;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .icono-posicion {
+        width: 24px;
+        height: 25px;
+        flex-shrink: 0;
+    }
+
+    .checkbox-wrapper {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+    }
+
+    .custom-checkbox {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        background-color: #3F374E;
+        border: 2px solid #FFF;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        display: inline-block;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox {
+        background-color: #FFF;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox::after {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid #161618;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .btn-disabled {
+        background-color: #5E605E !important;
+        color: #ffffff50 !important;
+        cursor: initial !important;
+    }
+
+    .container-botones button {
+        width: 49% !important;
+    }
+
+    .container-posicion.selected {
+        background-color: #733BDE;
+        /* rosa fuerte */
+    }
+    
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+{% block content %}
+<form method="POST" style="height: 100%;" class="d-flex flex-column justify-content-between">
+    {% csrf_token %}
+    <div class="conainer-main">
+
+
+        <div>
+            <a href="{% url 'home' %}" style="text-decoration: none; padding: 13px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 4.00006L4.00006 20M4 4L20 20" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+
+        <p class="M-titulo" style="margin-top: 23px;">Pie favorito</p>
+
+        <p class="M-body" style="margin-top: 5px;">¿Con cual tirás la magia?</p>
+
+        <div class="d-flex flex-row align-items-center" style="gap: 10px; margin-top: 11px;">
+            <p class="M-body-s texto-transparente">3/4</p>
+            <div class="barra-indicadora" style="width: 100%; background: #2C2A44; border-radius: 9px; height: 8px;">
+                <div style="width: 75%; background: #733BDE; border-radius: 9px; height: 8px;"></div>
+            </div>
+        </div>
+
+        <div class="container-2 d-flex flex-column align-items-center justify-content-center"
+            style="margin-top: 40px; gap: 20px;">
+
+            <div class="container-posicion d-flex flex-row justify-content-between align-items-center {% if jugador.pie_preferido == 'Der' %}selected{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M14.625 7.07015C14.212 9.81796 14.9686 11.3203 17.1047 11.6362C19.4794 11.9873 20.4572 10.3969 20.8702 7.64905C21.4261 3.95109 20.1202 1.63874 18.2592 1.50374C16.553 1.37999 15.0385 4.32234 14.625 7.07015ZM13.5164 14.6967C13.3697 16.2562 14.213 17.7126 15.4852 17.962C16.7695 18.2133 18.2372 17.1947 18.5363 15.6562C18.8353 14.1178 17.7042 14.0362 16.3181 13.7709C14.932 13.5056 13.6936 12.8147 13.5164 14.6967Z"
+                        stroke="white" stroke-width="1.5" stroke-miterlimit="10" />
+                    <path
+                        d="M6.89503 16.1367C9.03159 15.8208 9.78815 14.3185 9.37518 11.5707C8.96175 8.82331 7.43503 5.86972 5.74096 6.00425C3.87956 6.15237 2.57409 8.45206 3.12956 12.1496C3.54253 14.8974 4.52081 16.4878 6.89503 16.1367Z"
+                        stroke="white" stroke-opacity="0.25" stroke-width="1.5" stroke-miterlimit="10" />
+                    <path
+                        d="M8.51503 22.4621C9.78721 22.2127 10.6305 20.7567 10.4838 19.1967C10.3066 17.3152 9.06815 18.0066 7.68206 18.2714C6.29596 18.5363 5.16487 18.6178 5.46393 20.1563C5.763 21.6947 7.23065 22.7133 8.51503 22.4621Z"
+                        stroke="white" stroke-opacity="0.25" stroke-width="1.5" stroke-miterlimit="10" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start w-100">
+                    <p class="M-boton" style="text-align: start;">Derecho</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="pie_preferido" id="checkbox-delantero" value="Der" {% if jugador.pie_preferido == 'Der' %}checked{% endif %}/>
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion d-flex flex-row justify-content-between align-items-center {% if jugador.pie_preferido == 'Izq' %}selected{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M9.375 11.5706C9.78797 14.3184 9.03141 15.8208 6.89484 16.1367C4.52062 16.4878 3.54234 14.8973 3.12938 12.1495C2.57391 8.45203 3.87938 6.15234 5.74078 6.00422C7.43484 5.86969 8.96156 8.82328 9.375 11.5706ZM10.4836 19.1967C10.6303 20.7567 9.78703 22.2127 8.51484 22.462C7.23047 22.7133 5.76281 21.6947 5.46375 20.1562C5.16469 18.6178 6.29578 18.5362 7.68187 18.2714C9.06797 18.0066 10.3064 17.3152 10.4836 19.1967Z"
+                        stroke="white" stroke-width="1.5" stroke-miterlimit="10" />
+                    <path
+                        d="M17.1048 11.6363C14.9687 11.3203 14.2122 9.81799 14.6251 7.07018C15.0386 4.32237 16.5531 1.38002 18.2594 1.50377C20.1203 1.63877 21.4262 3.95112 20.8703 7.64909C20.4573 10.3969 19.4795 11.9874 17.1048 11.6363Z"
+                        stroke="white" stroke-opacity="0.25" stroke-width="1.5" stroke-miterlimit="10" />
+                    <path
+                        d="M15.4853 17.9621C14.2131 17.7127 13.3698 16.2563 13.5165 14.6967C13.6937 12.8147 14.9322 13.5056 16.3183 13.771C17.7044 14.0363 18.8354 14.1178 18.5364 15.6563C18.2373 17.1947 16.7697 18.2133 15.4853 17.9621Z"
+                        stroke="white" stroke-opacity="0.25" stroke-width="1.5" stroke-miterlimit="10" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start w-100">
+                    <p class="M-boton" style="text-align: start;">Izquierdo</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="pie_preferido" id="checkbox-delantero" value="Izq" {% if jugador.pie_preferido == 'Izq' %}checked{% endif %}/>
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion d-flex flex-row justify-content-between align-items-center {% if jugador.pie_preferido == 'Amb' %}selected{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M9.375 11.5706C9.78797 14.3184 9.03141 15.8208 6.89484 16.1367C4.52062 16.4878 3.54234 14.8973 3.12938 12.1495C2.57391 8.45202 3.87938 6.15234 5.74078 6.00421C7.43484 5.86968 8.96156 8.82327 9.375 11.5706ZM10.4836 19.1967C10.6303 20.7567 9.78703 22.2126 8.51484 22.462C7.23047 22.7133 5.76281 21.6947 5.46375 20.1562C5.16469 18.6178 6.29578 18.5362 7.68187 18.2714C9.06797 18.0066 10.3064 17.3151 10.4836 19.1967ZM14.625 7.07015C14.212 9.81796 14.9686 11.3203 17.1047 11.6362C19.4794 11.9873 20.4572 10.3969 20.8702 7.64905C21.4261 3.95109 20.1202 1.63874 18.2592 1.50374C16.553 1.37999 15.0384 4.32234 14.625 7.07015ZM13.5164 14.6967C13.3697 16.2562 14.213 17.7126 15.4852 17.962C16.7695 18.2133 18.2372 17.1947 18.5362 15.6562C18.8353 14.1178 17.7042 14.0362 16.3181 13.7709C14.932 13.5056 13.6936 12.8147 13.5164 14.6967Z"
+                        stroke="white" stroke-width="1.5" stroke-miterlimit="10" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start w-100">
+                    <p class="M-boton" style="text-align: start;">Ambidiestro</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="pie_preferido" id="checkbox-delantero" value="Amb" {% if jugador.pie_preferido == 'Amb' %}checked{% endif %}/>
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <input type="hidden" name="pie_preferido" id="input-pie-preferido">
+    <input type="hidden" name="posicion_preferida" value="{{ request.user.jugador.posicion_preferida }}">
+    <input type="hidden" name="nombre" value="{{ request.user.jugador.nombre }}">
+    <input type="hidden" name="fecha_nacimiento" value="{{ request.user.jugador.fecha_nacimiento|date:'Y-m-d' }}">
+    <div class="container-botones w-100 d-flex justify-content-end align-items-end"
+        style="padding-bottom: 25px; gap: 2%;">
+        <button type="button" class="btn-secundario" style="color: #4F9639;" id="btnAnterior">Anterior</button>
+        <button class="btn-primario btn-disabled" style="color: #FFF;" id="btnSiguiente">Siguiente</button>
+    </div>
+
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contenedores = document.querySelectorAll('.container-posicion');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="pie_preferido"]');
+        const botonSiguiente = document.getElementById('btnSiguiente');
+        const botonAnterior = document.getElementById('btnAnterior');
+        const inputPie = document.getElementById('input-pie-preferido');
+        const marcado = document.querySelector('input[name="pie_preferido"]:checked');
+        
+        botonSiguiente.disabled = true;
+        botonSiguiente.classList.add('disabled');
+
+        if (marcado) {
+          inputPie.value = marcado.value;
+          botonSiguiente.disabled = false;
+          botonSiguiente.classList.remove('btn-disabled');
+        }
+
+        contenedores.forEach(container => {
+            container.addEventListener('click', function () {
+                checkboxes.forEach(cb => cb.checked = false);
+
+                // Desmarcar clases seleccionadas
+                contenedores.forEach(c => c.classList.remove('selected'));
+
+                const checkbox = container.querySelector('input[type="checkbox"]');
+                checkbox.checked = true;
+
+                // Agregar clase seleccionada
+                container.classList.add('selected');
+
+                // Guardar en el input hidden
+                inputPie.value = checkbox.value;
+
+                // Activar botón
+                botonSiguiente.disabled = false;
+                botonSiguiente.classList.remove('btn-disabled');
+            });
+        });
+
+        botonSiguiente.addEventListener('click', () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '';
+
+            // CSRF
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            // Pie preferido
+            const pieInput = document.createElement('input');
+            pieInput.type = 'hidden';
+            pieInput.name = 'pie_preferido';
+            pieInput.value = inputPie.value;
+            form.appendChild(pieInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+
+        botonAnterior.addEventListener('click', () => {
+            window.location.href = "{% url 'crear_perfil_2' %}";
+        });
+    });
+
+</script>
+{% endblock %}

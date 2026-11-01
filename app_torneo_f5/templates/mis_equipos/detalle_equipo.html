@@ -1,0 +1,690 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalle_equipo.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+
+{% endblock %}
+{% block title %}{{ equipo.nombre }} - Detalle{% endblock %}
+
+{% block navbar_extra %}
+{% if es_capitan %}
+{% include 'app_torneo_f5/configuracion.html' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fixed">
+  <div class="header">
+    {% if equipo.escudo %}
+    <img src="{{ equipo.escudo.url }}" alt="Escudo" class="escudo">
+    {% else %}
+    <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" alt="Escudo" width="100">
+    {% endif %}
+    <div>
+      <p class="M-titulo">{{ equipo.nombre }}</p>
+      <p class="M-titulo texto-transparente">{{ equipo.nombre_corto|upper }}</p>
+    </div>
+  </div>
+  <div class="datos">
+    <a href="#" data-section="general">
+      <p class="M-subtitulos">General</p>
+    </a>
+    <a href="#" data-section="jugadores">
+      <p class="M-subtitulos">Jugadores</p>
+    </a>
+    <a href="#" data-section="estadisticas">
+      <p class="M-subtitulos">Estadísticas</p>
+    </a>
+    <a href="#" data-section="historial">
+      <p class="M-subtitulos">Historial</p>
+    </a>
+  </div>
+</div>
+<div class="contenido">
+
+  <!-- Sección 'General' -->
+  <div id="seccion-general" class="seccion">
+
+    <!-- Container 'Sobre el club' -->
+    <div class="container-1">
+
+      <!-- Titulo -->
+      <p class="M-subtitulos titulo">Sobre el club</p>
+
+      <!-- Contenedor principal -->
+      <div class="container-principal d-flex flex-column">
+
+        <!-- Contenedor gris grande -->
+        <div class="container-gris d-flex flex-column">
+          <div class="d-flex flex-row">
+            <div class="d-flex flex-column">
+              <p class="M-body texto-transparente">Creado el</p>
+              <p class="M-subtitulos">{{ equipo.fecha_creacion|date:"d/m/y" }}</p>
+            </div>
+            <div class="d-flex flex-column">
+              <p class="M-body texto-transparente">Tag</p>
+              <p class="M-subtitulos">{{ equipo.nombre_corto|upper }}</p>
+            </div>
+            <div class="d-flex flex-column">
+              <p class="M-body texto-transparente">Jugadores</p>
+              <div class="d-flex flex-row">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                  <path
+                    d="M12 10.5C14.2091 10.5 16 8.70914 16 6.5C16 4.29086 14.2091 2.5 12 2.5C9.79086 2.5 8 4.29086 8 6.5C8 8.70914 9.79086 10.5 12 10.5Z"
+                    stroke="white" stroke-width="1.5" />
+                  <path
+                    d="M12 21.5C15.866 21.5 19 19.7091 19 17.5C19 15.2909 15.866 13.5 12 13.5C8.13401 13.5 5 15.2909 5 17.5C5 19.7091 8.13401 21.5 12 21.5Z"
+                    stroke="white" stroke-width="1.5" />
+                </svg>
+                <p class="M-subtitulos">{{ cantidad_jugadores }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-column align-items-center">
+            <p class="M-body texto-transparente">Zona</p>
+            <div class="d-flex flex-row align-items-center gap-1">
+              {% if iniciales_provincia or equipo.ciudad %}
+              <p class="M-subtitulos texto-transparente">
+                {{ iniciales_provincia|default:"" }}
+              </p>
+              <p class="M-subtitulos">
+                {{ equipo.ciudad|default:"" }}
+              </p>
+              {% else %}
+              <p class="M-subtitulos">-</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="gap-3 d-flex flex-row w-100">
+          <!-- Contenedor gris izquierdo -->
+          <div class="container-gris d-flex flex-column w-100 align-items-center">
+            <a href="{% url 'perfil' equipo.capitan.jugador.id %}"
+              style="text-decoration: none; gap: 6px; display: flex; flex-direction: column;">
+              <p class="M-subtitulos">Capitán <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                  viewBox="0 0 24 25" fill="none">
+                  <path
+                    d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+                    stroke="white" stroke-width="1.5" />
+                  <path
+                    d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+                    stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                </svg></p>
+              <div class="d-flex flex-column w-100 align-items-center">
+                {% if equipo.capitan and equipo.capitan.jugador.foto %}
+                <img src="{{ equipo.capitan.jugador.foto.url }}" class="jugador-foto img-76">
+                {% else %}
+                <img src="/static/images/placeholder.png" class="jugador-foto img-76">
+                {% endif %}
+                <p class="M-body mt-1">{{ equipo.capitan.jugador.nombre }}</p>
+              </div>
+            </a>
+          </div>
+          <!-- Contenedor gris derecho -->
+          <div class="container-gris d-flex flex-column w-100 align-items-center">
+            {% if torneo_activo %}
+            <a href="{% url 'detalle_torneo' torneo_activo.id %}" style="text-decoration: none;">
+              {% endif %}
+
+              <p class="M-subtitulos">Torneo actual</p>
+              <div class="d-flex flex-column w-100 align-items-center">
+                {% if torneo_activo.imagen %}
+                <img src="{{ torneo_activo.imagen.url }}" alt="Imagen del torneo" class="img-fluid img-76">
+                {% else %}
+                <img src="{% static 'images/copas-default/copa-default.png' %}" alt="Imagen del torneo"
+                  class="img-fluid img-76">
+                {% endif %}
+                <p class="M-body mt-1">{{ torneo_activo.nombre }} <span class="texto-verde">{{ posicion }}°</span></p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container 'Próximo partido' -->
+    <div class="container-2 d-flex flex-column align-items-start">
+
+      {% if proximo_partido %}
+      <!-- Titulo -->
+      <p class="M-subtitulos titulo">Próximo partido</p>
+
+      <!-- Partido card -->
+      <a href="{{ url_destino_proximo_partido }}"
+        style="text-decoration: none; display: flex; justify-content: center; width: 100%;">
+        <div class="card-partido">
+          <div class="card-partido-contenido">
+            <div class="container-1">
+              {% if proximo_partido.equipo_1 and proximo_partido.equipo_1.escudo %}
+              <img src="{{ proximo_partido.equipo_1.escudo.url }}" width="76" alt="Escudo equipo 1">
+              {% else %}
+              <img src="{% static 'images/escudo-generico.png' %}" width="76" alt="Escudo equipo 1">
+              {% endif %}
+              <div class="info-central">
+                <p class="fecha">
+                  {% if proximo_partido.dia and proximo_partido.hora_inicio and proximo_partido.cancha %}
+                  {{ proximo_partido.dia|date:"d/M" }} - {{ proximo_partido.hora_inicio|time:"H:i" }}
+                  {% else %}
+                  A definir
+                  {% endif %}
+                </p>
+                {% if not proximo_partido.jugado %}
+                <p class="vs">VS</p>
+                {% else %}
+                <div class="resultado">
+                  <p class="goles izq">{{ proximo_partido.goles_equipo_1 }}</p>
+                  <p class="vs">-</p>
+                  <p class="goles der">{{ proximo_partido.goles_equipo_2 }}</p>
+                </div>
+                {% endif %}
+              </div>
+              {% if proximo_partido.equipo_2 and proximo_partido.equipo_2.escudo %}
+              <img src="{{ proximo_partido.equipo_2.escudo.url }}" width="76" alt="Escudo equipo 2">
+              {% else %}
+              <img src="{% static 'images/escudo-generico.png' %}" width="76" alt="Escudo equipo 2">
+              {% endif %}
+            </div>
+
+            <div class="container-2">
+              <p class="equipo-nombre izq M-body">
+                {{ proximo_partido.equipo_1.nombre|default:"Equipo 1" }}
+              </p>
+              <p class="equipo-nombre der M-body">
+                {{ proximo_partido.equipo_2.nombre|default:"Equipo 2" }}
+              </p>
+            </div>
+
+          </div>
+          {% if proximo_partido.dia and proximo_partido.hora_inicio and proximo_partido.cancha %}
+          <div class="badge-cancha">
+            <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+            <p class="M-body">{{ proximo_partido.cancha }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </a>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+  <!-- Sección 'Jugadores' -->
+  <div id="seccion-jugadores" class="seccion" style="display: none;">
+
+    <div class="container-delanteros container-posicion">
+      <div class="container-header">
+        <div class="d-flex flex-row align-items-center justify-content-center">
+          <div class="icono-delanteros">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+              <path
+                d="M20 12.5C20 16.9183 16.4183 20.5 12 20.5C7.58172 20.5 4 16.9183 4 12.5C4 8.08172 7.58172 4.5 12 4.5C16.4183 4.5 20 8.08172 20 12.5Z"
+                stroke="white" stroke-width="1.5" />
+              <path
+                d="M15 12.5C15 14.1569 13.6569 15.5 12 15.5C10.3431 15.5 9 14.1569 9 12.5C9 10.8431 10.3431 9.5 12 9.5C13.6569 9.5 15 10.8431 15 12.5Z"
+                stroke="white" stroke-width="1.5" />
+              <path d="M2 12.5H4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M20 12.5H22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M12 4.5V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M12 22.5V20.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <p class="M-subtitulos">Delanteros</p>
+        </div>
+        <p class="M-titulo">{{ delanteros|length }}</p>
+      </div>
+      {% for del in delanteros %}
+      <a class="jugador-card" href="{% url 'perfil' del.id %}" style="text-decoration: none;">
+        <img src="{{ del.foto.url }}" alt="{{ del.nombre }}" class="jugador-foto img-45">
+        <div class="jugador-info">
+          <p class="jugador-nombre M-body">{{ del.nombre }}</p>
+        </div>
+        {% if del == equipo.capitan %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+            stroke="white" stroke-width="1.5" />
+          <path
+            d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="container-mediocampistas container-posicion">
+      <div class="container-header">
+        <div class="d-flex flex-row align-items-center justify-content-center">
+          <div class="icono-mediocampistas">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+              <path
+                d="M12.5 9.5C10.8431 9.5 9.5 8.15685 9.5 6.5C9.5 4.84315 10.8431 3.5 12.5 3.5C14.1569 3.5 15.5 4.84315 15.5 6.5C15.5 8.15685 14.1569 9.5 12.5 9.5Z"
+                stroke="white" stroke-width="1.5" />
+              <path
+                d="M6 21.5C4.34315 21.5 3 20.1569 3 18.5C3 16.8431 4.34315 15.5 6 15.5C7.65685 15.5 9 16.8431 9 18.5C9 20.1569 7.65685 21.5 6 21.5Z"
+                stroke="white" stroke-width="1.5" />
+              <path
+                d="M19 21.5C17.3431 21.5 16 20.1569 16 18.5C16 16.8431 17.3431 15.5 19 15.5C20.6569 15.5 22 16.8431 22 18.5C22 20.1569 20.6569 21.5 19 21.5Z"
+                stroke="white" stroke-width="1.5" />
+              <path
+                d="M20.5 13.5C20.5 11.1106 19.4525 8.96589 17.7916 7.5M4.5 13.5C4.5 11.1106 5.54752 8.96589 7.20838 7.5M10.5 21.248C11.1392 21.4125 11.8094 21.5 12.5 21.5C13.1906 21.5 13.8608 21.4125 14.5 21.248"
+                stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <p class="M-subtitulos">Centrocampistas</p>
+        </div>
+        <p class="M-titulo">{{ mediocampistas|length }}</p>
+      </div>
+      {% for medi in mediocampistas %}
+      <a class="jugador-card" href="{% url 'perfil' medi.id %}" style="text-decoration: none;">
+        <img src="{{ medi.foto.url }}" alt="{{ medi.nombre }}" class="jugador-foto img-45">
+        <div class="jugador-info">
+          <p class="jugador-nombre M-body">{{ medi.nombre }}</p>
+        </div>
+        {% if medi == equipo.capitan %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+            stroke="white" stroke-width="1.5" />
+          <path
+            d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="container-defensores container-posicion">
+      <div class="container-header">
+        <div class="d-flex flex-row align-items-center justify-content-center">
+          <div class="icono-defensores">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+              <path
+                d="M3 10.9167C3 7.71907 3 6.12028 3.37752 5.58241C3.75503 5.04454 5.25832 4.52996 8.26491 3.50079L8.83772 3.30472C10.405 2.76824 11.1886 2.5 12 2.5C12.8114 2.5 13.595 2.76824 15.1623 3.30472L15.7351 3.50079C18.7417 4.52996 20.245 5.04454 20.6225 5.58241C21 6.12028 21 7.71907 21 10.9167C21 11.3996 21 11.9234 21 12.4914C21 18.1294 16.761 20.8655 14.1014 22.0273C13.38 22.3424 13.0193 22.5 12 22.5C10.9807 22.5 10.62 22.3424 9.89856 22.0273C7.23896 20.8655 3 18.1294 3 12.4914C3 11.9234 3 11.3996 3 10.9167Z"
+                stroke="white" stroke-width="1.5" />
+            </svg>
+          </div>
+          <p class="M-subtitulos">Defensores</p>
+        </div>
+        <p class="M-titulo">{{ defensores|length }}</p>
+      </div>
+      {% for def in defensores %}
+      <a class="jugador-card" href="{% url 'perfil' def.id %}" style="text-decoration: none;">
+        <img src="{{ def.foto.url }}" alt="{{ def.nombre }}" class="jugador-foto img-45">
+        <div class="jugador-info">
+          <p class="jugador-nombre M-body">{{ def.nombre }}</p>
+        </div>
+        {% if def == equipo.capitan %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+            stroke="white" stroke-width="1.5" />
+          <path
+            d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+
+    <div class="container-arqueros container-posicion">
+      <div class="container-header">
+        <div class="d-flex flex-row align-items-center justify-content-center">
+          <div class="icono-arqueros">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+              <path
+                d="M10.4166 11.0253C10.6253 11.3832 11.0845 11.5041 11.4423 11.2954C11.8001 11.0868 11.921 10.6275 11.7124 10.2697L10.4166 11.0253ZM7.53819 13.6329C7.74685 13.9907 8.20607 14.1116 8.56389 13.9029C8.92171 13.6943 9.04263 13.2351 8.83397 12.8772L7.53819 13.6329ZM16.0476 11.6493L16.4198 12.3005C16.5935 12.2012 16.7203 12.0367 16.7721 11.8435C16.8239 11.6502 16.7963 11.4443 16.6955 11.2715L16.0476 11.6493ZM13.7841 16.8002C13.9928 17.158 14.452 17.2789 14.8098 17.0703C15.1677 16.8616 15.2886 16.4024 15.0799 16.0446L13.7841 16.8002ZM4.38288 10.5179C5.01655 10.1557 5.64036 10.3783 5.85442 10.7454L7.1502 9.98978C6.43433 8.76218 4.82711 8.53629 3.63859 9.21555L4.38288 10.5179ZM3.63859 9.21555C2.44774 9.89613 1.83545 11.3971 2.55504 12.6311L3.85081 11.8755C3.64048 11.5148 3.75152 10.8787 4.38288 10.5179L3.63859 9.21555ZM7.04909 5.2505L7.89098 6.69421L9.18675 5.93859L8.34487 4.49488L7.04909 5.2505ZM7.89098 6.69421L10.4166 11.0253L11.7124 10.2697L9.18675 5.93859L7.89098 6.69421ZM8.83397 12.8772L7.1502 9.98978L5.85442 10.7454L7.53819 13.6329L8.83397 12.8772ZM7.1502 9.98978L5.04548 6.38052L3.74971 7.13614L5.85442 10.7454L7.1502 9.98978ZM5.57755 5.02296C6.21122 4.66081 6.83503 4.88343 7.04909 5.2505L8.34487 4.49488C7.629 3.26728 6.02178 3.04139 4.83326 3.72064L5.57755 5.02296ZM4.83326 3.72064C3.64241 4.40123 3.03012 5.90215 3.74971 7.13614L5.04548 6.38052C4.83515 6.01983 4.94619 5.38379 5.57755 5.02296L4.83326 3.72064ZM11.1903 4.80857L13.716 9.13969L15.0118 8.38407L12.4861 4.05295L11.1903 4.80857ZM13.716 9.13969L15.3998 12.0271L16.6955 11.2715L15.0118 8.38407L13.716 9.13969ZM9.71882 4.58103C10.3525 4.21888 10.9763 4.4415 11.1903 4.80857L12.4861 4.05295C11.7702 2.82535 10.163 2.59946 8.97453 3.27871L9.71882 4.58103ZM8.97453 3.27871C7.78368 3.9593 7.17139 5.46022 7.89098 6.69421L9.18675 5.93859C8.97642 5.5779 9.08746 4.94186 9.71882 4.58103L8.97453 3.27871ZM17.0154 7.25405L19.541 11.5852L20.8368 10.8296L18.3111 6.49843L17.0154 7.25405ZM15.5438 7.02651C16.1775 6.66436 16.8013 6.88698 17.0154 7.25405L18.3111 6.49843C17.5953 5.27084 15.9881 5.04494 14.7995 5.7242L15.5438 7.02651ZM14.7995 5.7242C13.6087 6.40478 12.9964 7.90571 13.716 9.13969L15.0118 8.38407C14.8014 8.02338 14.9125 7.38734 15.5438 7.02651L14.7995 5.7242ZM2.55504 12.6311L6.34352 19.1278L7.6393 18.3721L3.85081 11.8755L2.55504 12.6311ZM16.5855 20.1023C13.2186 22.0266 9.24824 21.1312 7.6393 18.3721L6.34352 19.1278C8.45427 22.7474 13.408 23.646 17.3298 21.4047L16.5855 20.1023ZM19.541 11.5852C21.1462 14.3379 19.9502 18.1794 16.5855 20.1023L17.3298 21.4047C21.254 19.162 22.9513 14.4556 20.8368 10.8296L19.541 11.5852ZM15.0799 16.0446C14.4046 14.8865 14.8773 13.182 16.4198 12.3005L15.6755 10.9981C13.5736 12.1995 12.5996 14.7689 13.7841 16.8002L15.0799 16.0446Z"
+                fill="white" />
+            </svg>
+          </div>
+          <p class="M-subtitulos">Arqueros</p>
+        </div>
+        <p class="M-titulo">{{ arqueros|length }}</p>
+      </div>
+      {% for port in arqueros %}
+      <a class="jugador-card" href="{% url 'perfil' port.id %}" style="text-decoration: none;">
+        <img src="{{ port.foto.url }}" alt="{{ port.nombre }}" class="jugador-foto img-45">
+        <div class="jugador-info">
+          <p class="jugador-nombre M-body">{{ port.nombre }}</p>
+        </div>
+        {% if port == equipo.capitan %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+            stroke="white" stroke-width="1.5" />
+          <path
+            d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="container-versatiles container-posicion">
+      <div class="container-header">
+        <div class="d-flex flex-row align-items-center justify-content-center">
+          <div class="icono-versatiles">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+              <path
+                d="M3.67981 11.8333H2.92981H3.67981ZM3.67981 13.5L3.15157 14.0324C3.44398 14.3225 3.91565 14.3225 4.20805 14.0324L3.67981 13.5ZM5.88787 12.3657C6.18191 12.074 6.18377 11.5991 5.89203 11.3051C5.60029 11.011 5.12542 11.0092 4.83138 11.3009L5.88787 12.3657ZM2.52824 11.3009C2.2342 11.0092 1.75933 11.011 1.46759 11.3051C1.17585 11.5991 1.17772 12.074 1.47176 12.3657L2.52824 11.3009ZM18.6156 7.89279C18.8325 8.24565 19.2944 8.35585 19.6473 8.13892C20.0001 7.92199 20.1103 7.46007 19.8934 7.10721L18.6156 7.89279ZM12.0789 3.5V2.75C7.03155 2.75 2.92981 6.8112 2.92981 11.8333H3.67981H4.42981C4.42981 7.65072 7.84884 4.25 12.0789 4.25V3.5ZM3.67981 11.8333H2.92981L2.92981 13.5H3.67981H4.42981L4.42981 11.8333H3.67981ZM3.67981 13.5L4.20805 14.0324L5.88787 12.3657L5.35962 11.8333L4.83138 11.3009L3.15157 12.9676L3.67981 13.5ZM3.67981 13.5L4.20805 12.9676L2.52824 11.3009L2 11.8333L1.47176 12.3657L3.15157 14.0324L3.67981 13.5ZM19.2545 7.5L19.8934 7.10721C18.287 4.49427 15.3873 2.75 12.0789 2.75V3.5V4.25C14.8484 4.25 17.2727 5.70845 18.6156 7.89279L19.2545 7.5Z"
+                fill="white" />
+              <path
+                d="M20.3139 11.5L20.8411 10.9666C20.549 10.6778 20.0788 10.6778 19.7867 10.9666L20.3139 11.5ZM18.1004 12.6333C17.8058 12.9244 17.8031 13.3993 18.0942 13.6939C18.3854 13.9885 18.8603 13.9913 19.1549 13.7001L18.1004 12.6333ZM21.4729 13.7001C21.7675 13.9913 22.2424 13.9885 22.5335 13.6939C22.8247 13.3993 22.822 12.9244 22.5274 12.6332L21.4729 13.7001ZM5.31794 17.1061C5.1004 16.7536 4.6383 16.6442 4.28581 16.8618C3.93331 17.0793 3.82391 17.5414 4.04144 17.8939L5.31794 17.1061ZM11.8827 21.5V22.25C16.9451 22.25 21.0639 18.1915 21.0639 13.1667H20.3139H19.5639C19.5639 17.3466 16.1332 20.75 11.8827 20.75V21.5ZM20.3139 13.1667H21.0639V11.5H20.3139H19.5639V13.1667H20.3139ZM20.3139 11.5L19.7867 10.9666L18.1004 12.6333L18.6277 13.1667L19.1549 13.7001L20.8411 12.0334L20.3139 11.5ZM20.3139 11.5L19.7867 12.0334L21.4729 13.7001L22.0001 13.1667L22.5274 12.6332L20.8411 10.9666L20.3139 11.5ZM4.67969 17.5L4.04144 17.8939C5.65405 20.507 8.56403 22.25 11.8827 22.25V21.5V20.75C9.10023 20.75 6.66584 19.2903 5.31794 17.1061L4.67969 17.5Z"
+                fill="white" />
+            </svg>
+          </div>
+          <p class="M-subtitulos">Versátiles</p>
+        </div>
+        <p class="M-titulo">{{ versatiles|length }}</p>
+      </div>
+      {% for vers in versatiles %}
+      <a class="jugador-card" href="{% url 'perfil' vers.id %}" style="text-decoration: none;">
+        <img src="{{ vers.foto.url }}" alt="{{ vers.nombre }}" class="jugador-foto img-45">
+        <div class="jugador-info">
+          <p class="jugador-nombre M-body">{{ vers.nombre }}</p>
+        </div>
+        {% if vers == equipo.capitan %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+          <path
+            d="M2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5Z"
+            stroke="white" stroke-width="1.5" />
+          <path
+            d="M14 16.1672C13.475 16.3812 12.8952 16.5 12.2857 16.5C9.91878 16.5 8 14.7091 8 12.5C8 10.2909 9.91878 8.5 12.2857 8.5C12.8952 8.5 13.475 8.61876 14 8.83283"
+            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- Sección 'Estadísticas' -->
+  <div id="seccion-estadisticas" class="seccion" style="display: none;">
+
+    <!-- Gráfico torneos -->
+    <div class="grafico-resultado" id="partidos-torneos">
+      <p class="partidos-jugados M-body">{{ partidos }} Partidos jugados</p>
+      {% if grafico_resultados and grafico_resultados != "None" %}
+      <img src="data:image/png;base64,{{ grafico_resultados }}" alt="Gráfico torneos" style="width:120px;">
+      {% else %}
+      <div style="padding: 1rem; border-radius: 5px; background-color: #2f2c3a; color: #aaa; text-align: center;">
+        No hay datos suficientes para mostrar resultados
+      </div>
+      {% endif %}
+      <div class="container-estadisticas">
+        <div>
+          <p class="M-body-s">Victorias</p>
+          <p class="M-body ganados">{{ ganados }} - {{ promedio_ganados }}%</p>
+        </div>
+        <div>
+          <p class="M-body-s">Empates</p>
+          <p class="M-body empatados">{{ empatados }} - {{ promedio_empatados }}%</p>
+        </div>
+        <div>
+          <p class="M-body-s">Derrotas</p>
+          <p class="M-body perdidos">{{ perdidos }} - {{ promedio_perdidos }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goles -->
+    <div class="container-gris d-flex flex-column container-promedio-dato">
+      <div class="d-flex flex-row justify-content-between align-items-center container-1">
+        <div class="texto-transparente d-flex flex-row align-items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+            <path
+              d="M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5Z"
+              stroke="white" stroke-width="1.5" />
+            <path d="M2 12.5H5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M19 12.5H22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M12 22.5V19.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M12 5.5V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M10 12.5H12H14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 14.5V12.5V10.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          <p class="M-body">Goles</p>
+        </div>
+        <div class="container-promedio d-flex flex-row align-items-center gap-2">
+          <p class="M-body">Prom.</p>
+          <p class="M-subtitulos">{{ promedio_goles }}</p>
+        </div>
+      </div>
+      {% if goleador %}
+      <div class="d-flex flex-row justify-content-between align-items-center container-2">
+        <div class="d-flex flex-row align-items-center gap-2">
+          <img src="{{ goleador.foto.url }}" alt="" class="img-45">
+          <p class="M-body">{{ goleador.nombre }}</p>
+        </div>
+        <div class="d-flex flex-row container-cantidad-icono">
+          <p class="M-subtitulos">{{ goles_goleador }}</p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+            <path
+              d="M11.1459 7.52251C11.5259 6.84084 11.7159 6.5 12 6.5C12.2841 6.5 12.4741 6.84084 12.8541 7.52251L12.9524 7.69887C13.0603 7.89258 13.1143 7.98944 13.1985 8.05334C13.2827 8.11725 13.3875 8.14097 13.5972 8.18841L13.7881 8.23161C14.526 8.39857 14.895 8.48205 14.9828 8.76432C15.0706 9.04659 14.819 9.34072 14.316 9.92898L14.1858 10.0812C14.0429 10.2483 13.9714 10.3319 13.9392 10.4353C13.9071 10.5387 13.9179 10.6502 13.9395 10.8733L13.9592 11.0763C14.0352 11.8612 14.0733 12.2536 13.8435 12.4281C13.6136 12.6025 13.2682 12.4435 12.5773 12.1254L12.3986 12.0431C12.2022 11.9527 12.1041 11.9075 12 11.9075C11.8959 11.9075 11.7978 11.9527 11.6014 12.0431L11.4227 12.1254C10.7318 12.4435 10.3864 12.6025 10.1565 12.4281C9.92674 12.2536 9.96476 11.8612 10.0408 11.0763L10.0605 10.8733C10.0821 10.6502 10.0929 10.5387 10.0608 10.4353C10.0286 10.3319 9.95713 10.2483 9.81418 10.0812L9.68403 9.92898C9.18097 9.34072 8.92945 9.04659 9.01723 8.76432C9.10501 8.48205 9.47396 8.39857 10.2119 8.23161L10.4028 8.18841C10.6125 8.14097 10.7173 8.11725 10.8015 8.05334C10.8857 7.98944 10.9397 7.89258 11.0476 7.69887L11.1459 7.52251Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M19 9.5C19 13.366 15.866 16.5 12 16.5C8.13401 16.5 5 13.366 5 9.5C5 5.63401 8.13401 2.5 12 2.5C15.866 2.5 19 5.63401 19 9.5Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L8.22855 20.4728C7.68843 21.0321 7.41837 21.3117 7.18967 21.4084C6.66852 21.6289 6.09042 21.4402 5.81628 20.9602C5.69597 20.7495 5.65848 20.3695 5.5835 19.6095C5.54117 19.1804 5.52 18.9658 5.45575 18.7861C5.31191 18.3838 5.00966 18.0708 4.6211 17.9219C4.44754 17.8554 4.24033 17.8335 3.82589 17.7896C3.09187 17.712 2.72486 17.6732 2.52138 17.5486C2.05772 17.2648 1.87548 16.6662 2.08843 16.1266C2.18188 15.8898 2.45194 15.6102 2.99206 15.0509L5.45575 12.5"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L15.7715 20.4728C16.3116 21.0321 16.5816 21.3117 16.8103 21.4084C17.3315 21.6289 17.9096 21.4402 18.1837 20.9602C18.304 20.7495 18.3415 20.3695 18.4165 19.6095C18.4588 19.1804 18.48 18.9658 18.5442 18.7861C18.6881 18.3838 18.9903 18.0708 19.3789 17.9219C19.5525 17.8554 19.7597 17.8335 20.1741 17.7896C20.9081 17.712 21.2751 17.6732 21.4786 17.5486C21.9423 17.2648 22.1245 16.6662 21.9116 16.1266C21.8181 15.8898 21.5481 15.6102 21.0079 15.0509L18.5442 12.5"
+              stroke="white" stroke-width="1.5" />
+          </svg>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Asistencias -->
+    <div class="container-gris d-flex flex-column container-promedio-dato">
+      <div class="d-flex flex-row justify-content-between align-items-center container-1">
+        <div class="texto-transparente d-flex flex-row align-items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="21" viewBox="0 0 22 21" fill="none">
+            <path
+              d="M10 15.5L12 17.5C12.197 17.697 12.4308 17.8532 12.6882 17.9598C12.9456 18.0665 13.2214 18.1213 13.5 18.1213C13.7786 18.1213 14.0544 18.0665 14.3118 17.9598C14.5692 17.8532 14.803 17.697 15 17.5C15.197 17.303 15.3532 17.0692 15.4598 16.8118C15.5665 16.5544 15.6213 16.2786 15.6213 16C15.6213 15.7214 15.5665 15.4456 15.4598 15.1882C15.3532 14.9308 15.197 14.697 15 14.5"
+              stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M13 12.5L15.5 15C15.8978 15.3978 16.4374 15.6213 17 15.6213C17.5626 15.6213 18.1022 15.3978 18.5 15C18.8978 14.6022 19.1213 14.0626 19.1213 13.5C19.1213 12.9374 18.8978 12.3978 18.5 12L14.62 8.12002C14.0575 7.55821 13.295 7.24265 12.5 7.24265C11.705 7.24265 10.9425 7.55821 10.38 8.12002L9.49998 9.00002C9.10216 9.39784 8.56259 9.62134 7.99998 9.62134C7.43737 9.62134 6.89781 9.39784 6.49998 9.00002C6.10216 8.60219 5.87866 8.06262 5.87866 7.50002C5.87866 6.93741 6.10216 6.39784 6.49998 6.00002L9.30998 3.19002C10.2222 2.28016 11.4119 1.70057 12.6906 1.54299C13.9694 1.38541 15.2641 1.65885 16.37 2.32002L16.84 2.60002C17.2658 2.857 17.772 2.94613 18.26 2.85002L20 2.50002"
+              stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M20 1.5L21 12.5H19M2 1.5L1 12.5L7.5 19C7.89782 19.3978 8.43739 19.6213 9 19.6213C9.56261 19.6213 10.1022 19.3978 10.5 19C10.8978 18.6022 11.1213 18.0626 11.1213 17.5C11.1213 16.9374 10.8978 16.3978 10.5 16M2 2.5H10"
+              stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="M-body">Asistencias</p>
+        </div>
+        <div class="container-promedio d-flex flex-row align-items-center gap-2">
+          <p class="M-body">Prom.</p>
+          <p class="M-subtitulos">{{ asistencias_promedio }}</p>
+        </div>
+      </div>
+      {% if asistidor %}
+      <div class="d-flex flex-row justify-content-between align-items-center container-2">
+        <div class="d-flex flex-row align-items-center gap-2">
+          <img src="{{ asistidor.foto.url }}" alt="" class="img-45">
+          <p class="M-body">{{ asistidor.nombre }}</p>
+        </div>
+        <div class="d-flex flex-row container-cantidad-icono">
+          <p class="M-subtitulos">{{ asistencias_asistidor }}</p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+            <path
+              d="M11.1459 7.52251C11.5259 6.84084 11.7159 6.5 12 6.5C12.2841 6.5 12.4741 6.84084 12.8541 7.52251L12.9524 7.69887C13.0603 7.89258 13.1143 7.98944 13.1985 8.05334C13.2827 8.11725 13.3875 8.14097 13.5972 8.18841L13.7881 8.23161C14.526 8.39857 14.895 8.48205 14.9828 8.76432C15.0706 9.04659 14.819 9.34072 14.316 9.92898L14.1858 10.0812C14.0429 10.2483 13.9714 10.3319 13.9392 10.4353C13.9071 10.5387 13.9179 10.6502 13.9395 10.8733L13.9592 11.0763C14.0352 11.8612 14.0733 12.2536 13.8435 12.4281C13.6136 12.6025 13.2682 12.4435 12.5773 12.1254L12.3986 12.0431C12.2022 11.9527 12.1041 11.9075 12 11.9075C11.8959 11.9075 11.7978 11.9527 11.6014 12.0431L11.4227 12.1254C10.7318 12.4435 10.3864 12.6025 10.1565 12.4281C9.92674 12.2536 9.96476 11.8612 10.0408 11.0763L10.0605 10.8733C10.0821 10.6502 10.0929 10.5387 10.0608 10.4353C10.0286 10.3319 9.95713 10.2483 9.81418 10.0812L9.68403 9.92898C9.18097 9.34072 8.92945 9.04659 9.01723 8.76432C9.10501 8.48205 9.47396 8.39857 10.2119 8.23161L10.4028 8.18841C10.6125 8.14097 10.7173 8.11725 10.8015 8.05334C10.8857 7.98944 10.9397 7.89258 11.0476 7.69887L11.1459 7.52251Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M19 9.5C19 13.366 15.866 16.5 12 16.5C8.13401 16.5 5 13.366 5 9.5C5 5.63401 8.13401 2.5 12 2.5C15.866 2.5 19 5.63401 19 9.5Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L8.22855 20.4728C7.68843 21.0321 7.41837 21.3117 7.18967 21.4084C6.66852 21.6289 6.09042 21.4402 5.81628 20.9602C5.69597 20.7495 5.65848 20.3695 5.5835 19.6095C5.54117 19.1804 5.52 18.9658 5.45575 18.7861C5.31191 18.3838 5.00966 18.0708 4.6211 17.9219C4.44754 17.8554 4.24033 17.8335 3.82589 17.7896C3.09187 17.712 2.72486 17.6732 2.52138 17.5486C2.05772 17.2648 1.87548 16.6662 2.08843 16.1266C2.18188 15.8898 2.45194 15.6102 2.99206 15.0509L5.45575 12.5"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L15.7715 20.4728C16.3116 21.0321 16.5816 21.3117 16.8103 21.4084C17.3315 21.6289 17.9096 21.4402 18.1837 20.9602C18.304 20.7495 18.3415 20.3695 18.4165 19.6095C18.4588 19.1804 18.48 18.9658 18.5442 18.7861C18.6881 18.3838 18.9903 18.0708 19.3789 17.9219C19.5525 17.8554 19.7597 17.8335 20.1741 17.7896C20.9081 17.712 21.2751 17.6732 21.4786 17.5486C21.9423 17.2648 22.1245 16.6662 21.9116 16.1266C21.8181 15.8898 21.5481 15.6102 21.0079 15.0509L18.5442 12.5"
+              stroke="white" stroke-width="1.5" />
+          </svg>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Atajadas -->
+    <div class="container-gris d-flex flex-column container-promedio-dato">
+      <div class="d-flex flex-row justify-content-between align-items-center container-1">
+        <div class="texto-transparente d-flex flex-row align-items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+            <g clip-path="url(#clip0_1214_4448)">
+              <path
+                d="M2.66135 13.3222C2.65067 13.3052 2.64161 13.2871 2.63256 13.2691C2.29594 12.6484 2.25065 11.9001 2.50782 11.2182C2.68292 10.7527 2.97706 10.358 3.35472 10.0713C3.27183 9.9788 3.18559 9.8828 3.10423 9.79276L3.06766 9.7525L3.03919 9.70715C2.79302 9.30964 2.66664 8.85838 2.66935 8.39156L2.66172 8.37941L2.67836 8.18833C2.69945 7.9414 2.75542 7.69967 2.84577 7.47135L2.86825 7.41546C3.10225 6.8531 3.51911 6.40399 4.04206 6.14003C4.0318 6.07873 4.02549 6.01834 4.02051 5.95825C3.91732 4.79587 4.65424 3.69311 5.77324 3.3338C6.14121 3.21681 6.51706 3.1897 6.88722 3.25423C7.07184 3.28395 7.25864 3.34054 7.44346 3.42094L7.51622 3.31204C7.81982 2.89113 8.23786 2.57337 8.70101 2.41017L8.72287 2.39645L8.79682 2.37937C9.59568 2.13412 10.4287 2.28852 11.0855 2.80418L11.1135 2.82723L14.0206 5.76397L14.0392 5.45543L14.0623 5.38443C14.6307 3.65709 16.0821 3.03603 17.2688 3.18739C18.4598 3.33833 19.7155 4.32244 19.8368 6.17904C19.8969 7.09299 19.8622 8.04839 19.8292 8.97226C19.8011 9.75647 19.772 10.5661 19.8026 11.327C19.823 11.8234 19.8633 12.3174 19.9246 12.8016C19.9439 12.8053 19.9618 12.8087 19.9795 12.8134C20.7118 12.9802 22.3248 14.8013 22.4388 14.9487C23.3622 16.1606 22.8256 16.9242 22.196 17.6028C21.2233 18.6538 20.1508 19.6624 19.1128 20.6381C18.1322 21.5596 17.1179 22.5137 16.202 23.4895L16.1513 23.5382C16.0956 23.5845 16.0377 23.6253 15.9778 23.6629C15.4604 23.9878 14.7641 24.0242 14.2127 23.7393C13.7578 23.5021 12.3845 22.068 12.1415 21.7476C11.9383 21.4778 11.6927 21.0866 11.6808 20.5929C9.58211 19.4889 7.55237 18.3291 5.73344 16.5719C5.65098 16.4928 5.55248 16.3988 5.44159 16.2923C4.24386 15.1487 3.04263 13.978 2.66969 13.3372L2.66054 13.3227L2.66135 13.3222ZM5.55597 13.957L6.28211 14.691C6.28211 14.691 8.3468 16.6958 8.59792 16.8836C8.82671 17.0538 9.06813 17.2082 9.31905 17.3453L9.91605 17.6705L12.9151 19.4138L18.4844 13.935C18.3066 13.2202 18.2248 12.4858 18.1854 11.7541C18.0877 9.94934 18.377 7.91061 18.2095 6.1586C18.1938 5.99688 18.1905 5.78668 18.1347 5.63659C17.6626 4.36489 15.7948 4.56548 15.6061 6.02175C15.5432 6.50603 15.6867 8.40515 15.508 8.66182C15.0793 9.28092 14.5077 8.62938 14.2022 8.25784L13.4178 7.47233L12.9107 6.92708L11.11 5.11441L10.2189 4.21297C10.1843 4.17037 10.1461 4.13113 10.1041 4.09655C9.85919 3.89353 9.49114 3.81978 9.19755 3.93297C8.66183 4.1406 8.50683 4.8306 8.80034 5.28193L10.4426 6.94117L11.2098 7.71719L11.2106 7.71668L11.3807 7.88873C11.5074 8.01689 11.5057 8.22456 11.3781 8.35211L11.1022 8.62469C10.9737 8.75275 10.766 8.75104 10.638 8.62259L10.1873 8.16722L7.30415 5.25262C7.2497 5.18746 7.19394 5.13102 7.13688 5.0833C6.7514 4.75519 6.32538 4.78331 6.02824 4.99695C6.00527 5.0125 5.9825 5.03019 5.96075 5.04949C5.94446 5.0631 5.92949 5.07701 5.91421 5.09225C5.90824 5.09712 5.90197 5.10332 5.89702 5.10982C5.87932 5.12657 5.86263 5.14495 5.84777 5.16444C5.82199 5.1953 5.79773 5.2286 5.77713 5.26411C5.76662 5.27974 5.75875 5.29597 5.75007 5.31271C5.61678 5.55896 5.5938 5.87481 5.75447 6.18827L5.75914 6.19211L5.76066 6.19454L6.22996 6.66872L6.96848 7.4153L7.57407 8.02745L8.37819 8.83896L8.38073 8.84301L9.98219 10.4624C10.1097 10.59 10.108 10.7977 9.98039 10.9253L9.70445 11.1979C9.57549 11.3251 9.36833 11.3242 9.24027 11.1957L8.48448 10.4307L6.14653 8.06793L6.138 8.05974L6.13596 8.0565C6.07531 7.98507 6.00585 7.91578 5.93255 7.85117L5.92686 7.8457C5.70045 7.64691 5.42588 7.49189 5.14545 7.49296C5.11099 7.49202 5.07724 7.49401 5.04289 7.49864C4.99203 7.50574 4.93915 7.51861 4.88689 7.53787C4.86947 7.54429 4.85256 7.55152 4.83565 7.55875C4.82866 7.56201 4.82087 7.56578 4.81307 7.56954C4.8077 7.57178 4.80234 7.57402 4.79748 7.57707C4.79049 7.58033 4.78351 7.58359 4.77703 7.58765C4.76224 7.59468 4.74716 7.60302 4.73339 7.61166C4.67326 7.64715 4.61933 7.68892 4.57057 7.73533C4.52646 7.77657 4.48835 7.82195 4.45571 7.87066C4.44691 7.88183 4.43863 7.89381 4.43136 7.9074C4.4161 7.93166 4.40186 7.95753 4.38894 7.9837C4.37552 8.00907 4.3631 8.03605 4.35333 8.06364C4.33216 8.11983 4.31647 8.17935 4.30686 8.23957C4.30366 8.25965 4.30096 8.28053 4.29908 8.30091C4.29738 8.31439 4.2965 8.32737 4.29612 8.34115C4.29493 8.35544 4.29506 8.37004 4.29519 8.38463C4.29512 8.3971 4.29555 8.41037 4.29598 8.42365C4.29641 8.43692 4.29735 8.45101 4.29829 8.4651C4.30004 8.47867 4.30098 8.49276 4.30273 8.50634C4.30561 8.52711 4.3093 8.54737 4.31299 8.56763C4.31484 8.57776 4.31668 8.5879 4.31985 8.59833C4.32864 8.63571 4.34007 8.67369 4.35392 8.71015C4.35831 8.72433 4.50087 8.90465 4.50087 8.90465L5.05974 9.46936L5.26417 9.67631L5.42372 9.83693L5.81634 10.2339L5.81837 10.2372L5.8202 10.2383L5.82121 10.2399L5.82223 10.2415L6.48255 10.9085L7.20686 11.6414L8.49136 12.9394C8.50892 12.9566 8.52325 12.9758 8.53596 12.996C8.61578 13.1232 8.60051 13.2931 8.48925 13.4036L8.21332 13.6761C8.08435 13.8034 7.87719 13.8025 7.74994 13.6735L7.55972 13.4802L6.58497 12.4958C6.58497 12.4958 5.40832 11.2996 5.39877 11.2897C5.3938 11.2872 5.38832 11.2839 5.38335 11.2814L5.38233 11.2797C5.10057 11.1258 4.79099 11.1452 4.53553 11.2706C4.53179 11.2718 4.52804 11.273 4.5248 11.2751C4.11811 11.4401 3.8468 11.8927 4.01879 12.3446C4.0247 12.3612 4.03112 12.3787 4.03916 12.3951C4.04588 12.4112 4.05443 12.4284 4.06379 12.4451C4.06531 12.4475 4.06552 12.4496 4.06704 12.4521L4.06857 12.4545L4.15042 12.5363L4.87656 13.2704L5.55597 13.957ZM19.6521 14.4391C19.4466 14.3401 19.1224 14.8541 18.962 14.9853L20.6978 16.806C20.7921 16.6147 21.3474 16.2943 21.2841 16.0891C21.2057 15.8312 19.8897 14.7619 19.6521 14.4391ZM13.2442 20.571L15.0177 22.3781L19.9571 17.5306L18.1836 15.7235L13.2442 20.571Z"
+                fill="white" />
+              <path
+                d="M14.8788 10.751L15.0668 10.937C15.2707 11.1387 15.3054 11.4343 15.1442 11.5973L12.1755 14.5983C12.0143 14.7613 11.7184 14.7298 11.5144 14.5281L11.3264 14.3421C11.1225 14.1404 11.0878 13.8448 11.249 13.6818L14.2177 10.6807C14.3789 10.5178 14.6748 10.5493 14.8788 10.751Z"
+                fill="white" />
+              <path
+                d="M16.6164 12.0546L16.8073 12.2434C17.0143 12.4482 17.0515 12.7463 16.8903 12.9093L12.6292 17.2168C12.4681 17.3798 12.1696 17.3458 11.9625 17.141L11.7716 16.9522C11.5646 16.7474 11.5274 16.4493 11.6886 16.2863L15.9497 11.9788C16.1108 11.8159 16.4093 11.8498 16.6164 12.0546Z"
+                fill="white" />
+            </g>
+            <defs>
+              <clipPath id="clip0_1214_4448">
+                <rect width="24" height="24" fill="white" transform="translate(0 0.5)" />
+              </clipPath>
+            </defs>
+          </svg>
+          <p class="M-body">Atajadas</p>
+        </div>
+        <div class="container-promedio d-flex flex-row align-items-center gap-2">
+          <p class="M-body">Prom.</p>
+          <p class="M-subtitulos">{{ atajadas_promedio }}</p>
+        </div>
+      </div>
+      {% if arquero %}
+      <div class="d-flex flex-row justify-content-between align-items-center container-2">
+        <div class="d-flex flex-row align-items-center gap-2">
+          <img src="{{ arquero.foto.url }}" alt="" class="img-45">
+          <p class="M-body">{{ arquero.nombre }}</p>
+        </div>
+        <div class="d-flex flex-row container-cantidad-icono">
+          <p class="M-subtitulos">{{ atajadas_arquero }}</p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+            <path
+              d="M11.1459 7.52251C11.5259 6.84084 11.7159 6.5 12 6.5C12.2841 6.5 12.4741 6.84084 12.8541 7.52251L12.9524 7.69887C13.0603 7.89258 13.1143 7.98944 13.1985 8.05334C13.2827 8.11725 13.3875 8.14097 13.5972 8.18841L13.7881 8.23161C14.526 8.39857 14.895 8.48205 14.9828 8.76432C15.0706 9.04659 14.819 9.34072 14.316 9.92898L14.1858 10.0812C14.0429 10.2483 13.9714 10.3319 13.9392 10.4353C13.9071 10.5387 13.9179 10.6502 13.9395 10.8733L13.9592 11.0763C14.0352 11.8612 14.0733 12.2536 13.8435 12.4281C13.6136 12.6025 13.2682 12.4435 12.5773 12.1254L12.3986 12.0431C12.2022 11.9527 12.1041 11.9075 12 11.9075C11.8959 11.9075 11.7978 11.9527 11.6014 12.0431L11.4227 12.1254C10.7318 12.4435 10.3864 12.6025 10.1565 12.4281C9.92674 12.2536 9.96476 11.8612 10.0408 11.0763L10.0605 10.8733C10.0821 10.6502 10.0929 10.5387 10.0608 10.4353C10.0286 10.3319 9.95713 10.2483 9.81418 10.0812L9.68403 9.92898C9.18097 9.34072 8.92945 9.04659 9.01723 8.76432C9.10501 8.48205 9.47396 8.39857 10.2119 8.23161L10.4028 8.18841C10.6125 8.14097 10.7173 8.11725 10.8015 8.05334C10.8857 7.98944 10.9397 7.89258 11.0476 7.69887L11.1459 7.52251Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M19 9.5C19 13.366 15.866 16.5 12 16.5C8.13401 16.5 5 13.366 5 9.5C5 5.63401 8.13401 2.5 12 2.5C15.866 2.5 19 5.63401 19 9.5Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L8.22855 20.4728C7.68843 21.0321 7.41837 21.3117 7.18967 21.4084C6.66852 21.6289 6.09042 21.4402 5.81628 20.9602C5.69597 20.7495 5.65848 20.3695 5.5835 19.6095C5.54117 19.1804 5.52 18.9658 5.45575 18.7861C5.31191 18.3838 5.00966 18.0708 4.6211 17.9219C4.44754 17.8554 4.24033 17.8335 3.82589 17.7896C3.09187 17.712 2.72486 17.6732 2.52138 17.5486C2.05772 17.2648 1.87548 16.6662 2.08843 16.1266C2.18188 15.8898 2.45194 15.6102 2.99206 15.0509L5.45575 12.5"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 16.5678L15.7715 20.4728C16.3116 21.0321 16.5816 21.3117 16.8103 21.4084C17.3315 21.6289 17.9096 21.4402 18.1837 20.9602C18.304 20.7495 18.3415 20.3695 18.4165 19.6095C18.4588 19.1804 18.48 18.9658 18.5442 18.7861C18.6881 18.3838 18.9903 18.0708 19.3789 17.9219C19.5525 17.8554 19.7597 17.8335 20.1741 17.7896C20.9081 17.712 21.2751 17.6732 21.4786 17.5486C21.9423 17.2648 22.1245 16.6662 21.9116 16.1266C21.8181 15.8898 21.5481 15.6102 21.0079 15.0509L18.5442 12.5"
+              stroke="white" stroke-width="1.5" />
+          </svg>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Sección 'Historial' -->
+  <div id="seccion-historial" class="seccion" style="display: none;">
+    {% for p in partidos_jugados %}
+    <a href="{% url 'detalle_partido' 'torneo' p.id %}" style="text-decoration: none;">
+      <div class="partido-card">
+        <div class="container-resultado">
+          <div class="container-equipos">
+            <div class="equipo">
+              <div class="container-1">
+                <img src="{{ p.equipo_1_logo }}" alt="Escudo" class="escudo">
+                <p class="M-body nombre-equipo">{{ p.equipo_1.nombre }}</p>
+              </div>
+              <div class="container-2">
+                <div class="d-flex justify-content-center align-items-center">
+                  <p class="M-body">{{ p.goles_equipo_1 }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="equipo">
+              <div class="container-1">
+                <img src="{{ p.equipo_2_logo }}" alt="Escudo" class="escudo">
+                <p class="M-body nombre-equipo">{{ p.equipo_2.nombre }}</p>
+              </div>
+              <div class="container-2">
+                <div class="d-flex justify-content-center align-items-center">
+                  <p class="M-body">{{ p.goles_equipo_2 }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="container-fechahora">
+            <img src="{% static 'svg/vector-1.svg' %}" alt="" class="vector">
+            <div>
+              {% if p.resultado == "V" %}
+              <div class="container-victoria">
+                <p class="M-subtitulos">V</p>
+              </div>
+              {% elif p.resultado == "E" %}
+              <div class="container-empate">
+                <p class="M-subtitulos">E</p>
+              </div>
+              {% else %}
+              <div class="container-derrota">
+                <p class="M-subtitulos">D</p>
+              </div>
+              {% endif %}
+              <p class="M-body transparent-text">{{ p.dia|date:"d/m" }}</p>
+              <p class="M-body transparent-text">-</p>
+              <p class="M-body transparent-text">{{ p.hora_inicio|time:"H:i" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% empty %}
+    <p>No hay partidos recientes.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll(".container-fixed .datos a");
+    const secciones = document.querySelectorAll(".contenido .seccion");
+
+    links.forEach(link => {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        // Cambiar clase activa en los links
+        links.forEach(l => l.classList.remove("activo"));
+        this.classList.add("activo");
+
+        // Mostrar la sección correspondiente
+        const id = this.getAttribute("data-section");
+
+        secciones.forEach(seccion => {
+          if (seccion.id === `seccion-${id}`) {
+            seccion.style.display = "flex";
+          } else {
+            seccion.style.display = "none";
+          }
+        });
+      });
+    });
+
+    // Inicializar primera sección
+    links[0].classList.add("activo");
+  });
+</script>
+
+
+{% endblock %}

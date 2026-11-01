@@ -1,0 +1,107 @@
+{% load widget_tweaks static %}
+
+<!DOCTYPE html>
+<html lang="es">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Ingresar — Ticas</title>
+
+      <link rel="preload" as="font" type="font/woff2"
+         href="{% static 'fonts/Outfit-Regular.woff2' %}" crossorigin>
+      <link rel="preload" as="font" type="font/woff2"
+         href="{% static 'fonts/CalSans-Regular.woff2' %}" crossorigin>
+
+      <link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+      <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+      <link rel="preload" as="image" href="{% static 'images/logo.png' %}">
+
+      <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+      <meta name="theme-color" content="#4F9639">
+
+      <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+   </head>
+
+
+   <style>
+    .register-form-container{
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      text-align: left;
+    }
+    .invalid-feedback{
+      color: var(--Error, #FF0C0C);
+    }
+   </style>
+
+
+<body>
+  
+
+<div class="login-container">
+  <h2 class="register-title">Registro</h2>
+
+  <form method="post" class="register-form-container">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="invalid-feedback d-block">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <!-- Email -->
+    <div class="email-container">
+      <label for="{{ form.email.id_for_label }}" class="label-user">Email</label>
+      {% render_field form.email class+="form-control" placeholder="Email" %}
+      {% if form.email.errors %}
+        <div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Usuario -->
+    <div class="username-container">
+      <label for="{{ form.username.id_for_label }}" class="label-user">Usuario</label>
+      {% render_field form.username class+="form-control" placeholder="Usuario" %}
+      {% if form.username.errors %}
+        <div class="invalid-feedback d-block">{{ form.username.errors|striptags }}</div>
+      {% endif %}
+    </div>
+
+
+    <!-- Contraseña -->
+    <div class="password-container">
+      <label for="{{ form.password.id_for_label }}" class="label-user">Contraseña</label>
+      {% render_field form.password class+="form-control" placeholder="Contraseña" %}
+      {% if form.password.errors %}
+        <div class="invalid-feedback d-block">{{ form.password.errors|striptags }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Repetir contraseña -->
+    <div class="confirm-password-container">
+      <label for="{{ form.confirm_password.id_for_label }}" class="label-user">Repetir contraseña</label>
+      {% render_field form.confirm_password class+="form-control" placeholder="Repetir contraseña" %}
+      {% if form.confirm_password.errors %}
+        <div class="invalid-feedback d-block">{{ form.confirm_password.errors|striptags }}</div>
+      {% endif %}
+    </div>
+
+    <div class="button-container">
+      <button type="submit" class="btn-login">Registrarme</button>
+    </div>
+  </form>
+
+
+
+
+
+  <div class="divider"></div>
+
+ <div class="btn-container">
+            <a class="btn-secundario-registro" href="{% url 'login' %}" style="text-decoration: none;" >Ingresar</a>
+         </div>
+
+</body>
+</html>

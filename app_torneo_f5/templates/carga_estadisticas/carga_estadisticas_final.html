@@ -1,0 +1,436 @@
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+  html {
+    background: #221140;
+  }
+
+  /* --- EXISTENTE --- */
+  #pantalla-cargando {
+    display: flex;
+    opacity: 1;
+    background-color: #221140;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  #stack {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: top .8s ease, transform .8s ease;
+    will-change: top, transform;
+  }
+
+  #stack.to-top {
+    top: calc(env(safe-area-inset-top, 0px) + 24px);
+    transform: translate(-50%, 0);
+  }
+
+  #lottie-cargando {
+    width: 202px;
+    height: 202px;
+    transition: width .8s ease, height .8s ease;
+  }
+
+  #stack.to-top #lottie-cargando {
+    width: 140px;
+    height: 140px;
+  }
+
+  #lottie-cargando svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  #pantalla-cargando .lead {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    color: #fff;
+    font-size: 30px;
+    line-height: 38px;
+    width: 100%;
+    padding: 0 16px;
+    text-align: center;
+    white-space: normal;
+    height: 76px;
+    /* 2 líneas */
+  }
+
+  /* --- NUEVO --- */
+  .oculto {
+    display: none !important;
+  }
+
+  /* Contenedor de tarjetas */
+  .cards-wrap {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /*  grid-template-columns: 1fr; */
+    gap: 12px;
+  }
+
+  @media (min-width: 520px) {
+    .cards-wrap {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .card-ticas {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    flex-direction: column;
+    gap: 5px;
+    border-radius: 20px;
+    background: var(--Terciario, #535368);
+    width: 105px;
+  }
+
+  .card-ticas .container-valor {
+    width: 100%;
+    display: flex;
+    padding: 10px 8px;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 15px;
+    background: var(--Secundario, #3F374E);
+    box-shadow: 0 54px 15px 0 rgba(89, 0, 255, 0.00), 0 34px 14px 0 rgba(89, 0, 255, 0.01), 0 19px 12px 0 rgba(89, 0, 255, 0.05), 0 9px 9px 0 rgba(89, 0, 255, 0.09), 0 2px 5px 0 rgba(89, 0, 255, 0.10);
+  }
+
+  /* Botón fijo: oculto hasta que termine la animación */
+  .boton-fijo-inferior.oculto {
+    display: none;
+  }
+
+  /* ==== ODOMETER ==== */
+  .odometer {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    height: 1em;
+    /* alto de una línea */
+    line-height: 1em;
+    /* cada número ocupa una línea */
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    /* dígitos monoespaciados si la fuente lo soporta */
+  }
+
+  .odometer .digit {
+    position: relative;
+    width: 10px;
+    /* ancho aproximado de un dígito */
+    height: 1em;
+    overflow: hidden;
+  }
+
+  .odometer .digit-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+    transform: translateY(0);
+  }
+
+  .odometer .digit-strip p {
+    display: block;
+    height: 1em;
+    line-height: 1em;
+  }
+
+  .odometer .char {
+    display: inline-block;
+    /* separadores (puntos, comas, etc.) */
+    line-height: 1em;
+  }
+</style>
+{% endblock %}
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<div id="pantalla-cargando" class="pantalla-cargando">
+  <div id="stack" style="width: 100%;">
+    <div id="lottie-cargando">
+      <!-- tu SVG/animación -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="202" height="202" viewBox="0 0 202 202" fill="none">
+        <path
+          d="M164.421 48.8093L132.716 80.6097H132.707C122.717 83.9031 112.043 85.6841 100.949 85.6841C89.8553 85.6841 79.2791 83.921 69.3334 80.6545L69.2888 80.6097L37.584 48.8093L61.5411 24.7711L69.2888 17L92.2585 40.0389L101.003 48.8093L109.756 40.021L132.707 17L140.402 24.7174L164.421 48.8093Z"
+          fill="#733BDE" />
+        <path
+          d="M97.6559 141.461V141.47L97.6291 141.55L86.0238 185L53.287 176.203L42.7137 173.36L51.1188 141.89L54.322 129.907L42.3479 126.694L11 118.264L13.8166 107.721L22.6053 74.8143L65.9154 86.4546H65.9243C73.7643 93.4889 80.6435 101.874 86.1844 111.507C91.7016 121.089 95.4847 131.19 97.6559 141.455V141.461Z"
+          fill="#733BDE" />
+        <path
+          d="M159.634 126.697L147.687 129.91L150.899 141.92L159.295 173.353L148.794 176.178L115.976 184.994L104.371 141.562V141.553C106.533 131.225 110.334 121.059 115.878 111.426C121.395 101.844 128.218 93.4974 136.005 86.481H136.013L136.085 86.4631L179.395 74.8229L188.166 107.658L191 118.272L159.634 126.703V126.697Z"
+          fill="#733BDE" />
+      </svg>
+    </div>
+    <p class="lead">{{ ultima_frase }}</p>
+  </div>
+
+  {# Contenedor de tarjetas (oculto hasta que termine la animación) #}
+  <div id="result-cards" class="cards-wrap" hidden style="display:none">
+    {% if not solo_partido_sumado %}
+    {% if mejor_valoracion %}
+    <div class="card-ticas">
+      <p class="M-body texto-transparente" style="text-align: center;">Mejora de estadística</p>
+      <div class="container-valor">
+        <p>{{ mejor_valoracion.tipo|capfirst }}</p>
+        <div class="d-flex flex-row" style="gap: 5px;">
+          <div class="lottie-icono-mejora" data-lottie-src="{% static 'animaciones/estadisticas-flecha.json' %}"
+            style="width:25px;height:25px;"></div>
+          <div class="d-flex" style="background: #733BDE; padding: 0 2px; border-radius: 5px;">
+            <p>{{ mejor_valoracion.nuevo }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if mejor_total %}
+    <div class="card-ticas">
+      <p class="M-body texto-transparente" style="text-align: center;">Total</p>
+      <div class="container-valor">
+        {% if mejor_total.tipo == 'goles' %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+          <path
+            d="M22.5 12C22.5 17.5228 18.0228 22 12.5 22C6.97715 22 2.5 17.5228 2.5 12C2.5 6.47715 6.97715 2 12.5 2C18.0228 2 22.5 6.47715 22.5 12Z"
+            stroke="white" stroke-width="1.5" />
+          <path d="M2.5 12H5.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M19.5 12H22.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M12.5 22V19" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M12.5 5V2" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M10.5 12H12.5H14.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M12.5 14V12V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {% elif mejor_total.tipo == 'asistencias' %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="21" viewBox="0 0 23 21" fill="none">
+          <path
+            d="M10.5 15L12.5 17C12.697 17.197 12.9308 17.3532 13.1882 17.4598C13.4456 17.5665 13.7214 17.6213 14 17.6213C14.2786 17.6213 14.5544 17.5665 14.8118 17.4598C15.0692 17.3532 15.303 17.197 15.5 17C15.697 16.803 15.8532 16.5692 15.9598 16.3118C16.0665 16.0544 16.1213 15.7786 16.1213 15.5C16.1213 15.2214 16.0665 14.9456 15.9598 14.6882C15.8532 14.4308 15.697 14.197 15.5 14"
+            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path
+            d="M13.5 12L16 14.5C16.3978 14.8978 16.9374 15.1213 17.5 15.1213C18.0626 15.1213 18.6022 14.8978 19 14.5C19.3978 14.1022 19.6213 13.5626 19.6213 13C19.6213 12.4374 19.3978 11.8978 19 11.5L15.12 7.62002C14.5575 7.05821 13.795 6.74265 13 6.74265C12.205 6.74265 11.4425 7.05821 10.88 7.62002L9.99998 8.50002C9.60216 8.89784 9.06259 9.12134 8.49998 9.12134C7.93737 9.12134 7.39781 8.89784 6.99998 8.50002C6.60216 8.10219 6.37866 7.56262 6.37866 7.00002C6.37866 6.43741 6.60216 5.89784 6.99998 5.50002L9.80998 2.69002C10.7222 1.78016 11.9119 1.20057 13.1906 1.04299C14.4694 0.885409 15.7641 1.15885 16.87 1.82002L17.34 2.10002C17.7658 2.357 18.272 2.44613 18.76 2.35002L20.5 2.00002"
+            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path
+            d="M20.5 1L21.5 12H19.5M2.5 1L1.5 12L8 18.5C8.39782 18.8978 8.93739 19.1213 9.5 19.1213C10.0626 19.1213 10.6022 18.8978 11 18.5C11.3978 18.1022 11.6213 17.5626 11.6213 17C11.6213 16.4374 11.3978 15.8978 11 15.5M2.5 2H10.5"
+            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {% elif mejor_total.tipo == 'atajadas' %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+          <g clip-path="url(#clip0_2908_8271)">
+            <path
+              d="M3.16135 12.8222C3.15067 12.8052 3.14161 12.7871 3.13256 12.7691C2.79594 12.1484 2.75065 11.4001 3.00782 10.7182C3.18292 10.2527 3.47706 9.85804 3.85472 9.57127C3.77183 9.4788 3.68559 9.3828 3.60423 9.29276L3.56766 9.2525L3.53919 9.20715C3.29302 8.80964 3.16664 8.35838 3.16935 7.89156L3.16172 7.87941L3.17836 7.68833C3.19945 7.4414 3.25542 7.19967 3.34577 6.97135L3.36825 6.91546C3.60225 6.3531 4.01911 5.90399 4.54206 5.64003C4.5318 5.57873 4.52549 5.51834 4.52051 5.45825C4.41732 4.29587 5.15424 3.19311 6.27324 2.8338C6.64121 2.71681 7.01706 2.6897 7.38722 2.75423C7.57184 2.78395 7.75864 2.84054 7.94346 2.92094L8.01622 2.81204C8.31982 2.39113 8.73786 2.07337 9.20101 1.91017L9.22287 1.89645L9.29682 1.87937C10.0957 1.63412 10.9287 1.78852 11.5855 2.30418L11.6135 2.32723L14.5206 5.26397L14.5392 4.95543L14.5623 4.88443C15.1307 3.15709 16.5821 2.53603 17.7688 2.68739C18.9598 2.83833 20.2155 3.82244 20.3368 5.67904C20.3969 6.59299 20.3622 7.54839 20.3292 8.47226C20.3011 9.25647 20.272 10.0661 20.3026 10.827C20.323 11.3234 20.3633 11.8174 20.4246 12.3016C20.4439 12.3053 20.4618 12.3087 20.4795 12.3134C21.2118 12.4802 22.8248 14.3013 22.9388 14.4487C23.8622 15.6606 23.3256 16.4242 22.696 17.1028C21.7233 18.1538 20.6508 19.1624 19.6128 20.1381C18.6322 21.0596 17.6179 22.0137 16.702 22.9895L16.6513 23.0382C16.5956 23.0845 16.5377 23.1253 16.4778 23.1629C15.9604 23.4878 15.2641 23.5242 14.7127 23.2393C14.2578 23.0021 12.8845 21.568 12.6415 21.2476C12.4383 20.9778 12.1927 20.5866 12.1808 20.0929C10.0821 18.9889 8.05237 17.8291 6.23344 16.0719C6.15098 15.9928 6.05248 15.8988 5.94159 15.7923C4.74386 14.6487 3.54263 13.478 3.16969 12.8372L3.16054 12.8227L3.16135 12.8222ZM6.05597 13.457L6.78211 14.191C6.78211 14.191 8.8468 16.1958 9.09792 16.3836C9.32671 16.5538 9.56813 16.7082 9.81905 16.8453L10.416 17.1705L13.4151 18.9138L18.9844 13.435C18.8066 12.7202 18.7248 11.9858 18.6854 11.2541C18.5877 9.44934 18.877 7.41061 18.7095 5.6586C18.6938 5.49688 18.6905 5.28668 18.6347 5.13659C18.1626 3.86489 16.2948 4.06548 16.1061 5.52175C16.0432 6.00603 16.1867 7.90515 16.008 8.16182C15.5793 8.78092 15.0077 8.12938 14.7022 7.75784L13.9178 6.97233L13.4107 6.42708L11.61 4.61441L10.7189 3.71297C10.6843 3.67037 10.6461 3.63113 10.6041 3.59655C10.3592 3.39353 9.99114 3.31978 9.69755 3.43297C9.16183 3.6406 9.00683 4.3306 9.30034 4.78193L10.9426 6.44117L11.7098 7.21719L11.7106 7.21668L11.8807 7.38873C12.0074 7.51689 12.0057 7.72456 11.8781 7.85211L11.6022 8.12469C11.4737 8.25275 11.266 8.25104 11.138 8.12259L10.6873 7.66722L7.80415 4.75262C7.7497 4.68746 7.69394 4.63102 7.63688 4.5833C7.2514 4.25519 6.82538 4.28331 6.52824 4.49695C6.50527 4.5125 6.4825 4.53019 6.46075 4.54949C6.44446 4.5631 6.42949 4.57701 6.41421 4.59225C6.40824 4.59712 6.40197 4.60332 6.39702 4.60982C6.37932 4.62657 6.36263 4.64495 6.34777 4.66444C6.32199 4.6953 6.29773 4.7286 6.27713 4.76411C6.26662 4.77974 6.25875 4.79597 6.25007 4.81271C6.11678 5.05896 6.0938 5.37481 6.25447 5.68827L6.25914 5.69211L6.26066 5.69454L6.72996 6.16872L7.46848 6.9153L8.07407 7.52745L8.87819 8.33896L8.88073 8.34301L10.4822 9.9624C10.6097 10.09 10.608 10.2977 10.4804 10.4253L10.2045 10.6979C10.0755 10.8251 9.86833 10.8242 9.74027 10.6957L8.98448 9.93066L6.64653 7.56793L6.638 7.55974L6.63596 7.5565C6.57531 7.48507 6.50585 7.41578 6.43255 7.35117L6.42686 7.3457C6.20045 7.14691 5.92588 6.99189 5.64545 6.99296C5.61099 6.99202 5.57724 6.99401 5.54289 6.99864C5.49203 7.00574 5.43915 7.01861 5.38689 7.03787C5.36947 7.04429 5.35256 7.05152 5.33565 7.05875C5.32866 7.06201 5.32087 7.06578 5.31307 7.06954C5.3077 7.07178 5.30234 7.07402 5.29748 7.07707C5.29049 7.08033 5.28351 7.08359 5.27703 7.08765C5.26224 7.09468 5.24716 7.10302 5.23339 7.11166C5.17326 7.14715 5.11933 7.18892 5.07057 7.23533C5.02646 7.27657 4.98835 7.32195 4.95571 7.37066C4.94691 7.38183 4.93863 7.39381 4.93136 7.4074C4.9161 7.43166 4.90186 7.45753 4.88894 7.4837C4.87552 7.50907 4.8631 7.53605 4.85333 7.56364C4.83216 7.61983 4.81647 7.67935 4.80686 7.73957C4.80366 7.75965 4.80096 7.78053 4.79908 7.80091C4.79738 7.81439 4.7965 7.82737 4.79612 7.84115C4.79493 7.85544 4.79506 7.87004 4.79519 7.88463C4.79512 7.8971 4.79555 7.91037 4.79598 7.92365C4.79641 7.93692 4.79735 7.95101 4.79829 7.9651C4.80004 7.97867 4.80098 7.99276 4.80273 8.00634C4.80561 8.02711 4.8093 8.04737 4.81299 8.06763C4.81484 8.07776 4.81668 8.0879 4.81985 8.09833C4.82864 8.13571 4.84007 8.17369 4.85392 8.21015C4.85831 8.22433 5.00087 8.40465 5.00087 8.40465L5.55974 8.96936L5.76417 9.17631L5.92372 9.33693L6.31634 9.73394L6.31837 9.73718L6.3202 9.73829L6.32121 9.73991L6.32223 9.74153L6.98255 10.4085L7.70686 11.1414L8.99136 12.4394C9.00892 12.4566 9.02325 12.4758 9.03596 12.496C9.11578 12.6232 9.10051 12.7931 8.98925 12.9036L8.71332 13.1761C8.58435 13.3034 8.37719 13.3025 8.24994 13.1735L8.05972 12.9802L7.08497 11.9958C7.08497 11.9958 5.90832 10.7996 5.89877 10.7897C5.8938 10.7872 5.88832 10.7839 5.88335 10.7814L5.88233 10.7797C5.60057 10.6258 5.29099 10.6452 5.03553 10.7706C5.03179 10.7718 5.02804 10.773 5.0248 10.7751C4.61811 10.9401 4.3468 11.3927 4.51879 11.8446C4.5247 11.8612 4.53112 11.8787 4.53916 11.8951C4.54588 11.9112 4.55443 11.9284 4.56379 11.9451C4.56531 11.9475 4.56552 11.9496 4.56704 11.9521L4.56857 11.9545L4.65042 12.0363L5.37656 12.7704L6.05597 13.457ZM20.1521 13.9391C19.9466 13.8401 19.6224 14.3541 19.462 14.4853L21.1978 16.306C21.2921 16.1147 21.8474 15.7943 21.7841 15.5891C21.7057 15.3312 20.3897 14.2619 20.1521 13.9391ZM13.7442 20.071L15.5177 21.8781L20.4571 17.0306L18.6836 15.2235L13.7442 20.071Z"
+              fill="white" />
+            <path
+              d="M15.3788 10.2512L15.5668 10.4372C15.7707 10.639 15.8054 10.9346 15.6442 11.0975L12.6755 14.0986C12.5143 14.2615 12.2184 14.2301 12.0144 14.0283L11.8264 13.8423C11.6225 13.6406 11.5878 13.345 11.749 13.1821L14.7177 10.181C14.8789 10.0181 15.1748 10.0495 15.3788 10.2512Z"
+              fill="white" />
+            <path
+              d="M17.1164 11.5548L17.3073 11.7437C17.5143 11.9485 17.5515 12.2466 17.3903 12.4095L13.1292 16.7171C12.9681 16.88 12.6696 16.8461 12.4625 16.6413L12.2716 16.4524C12.0646 16.2476 12.0274 15.9495 12.1886 15.7866L16.4497 11.479C16.6108 11.3161 16.9093 11.35 17.1164 11.5548Z"
+              fill="white" />
+          </g>
+          <defs>
+            <clipPath id="clip0_2908_8271">
+              <rect width="24" height="24" fill="white" transform="translate(0.5)" />
+            </clipPath>
+          </defs>
+        </svg>
+        {% endif %}
+        <p>{{ mejor_total.tipo|capfirst }}</p>
+        <div class="d-flex flex-row" style="gap: 8px;">
+          <div class="d-flex" style="background: #733BDE; padding: 0 2px; border-radius: 5px;">
+            <p>+{{ mejor_total.delta }}</p>
+          </div>
+          <div class="odometer M-body" id="odometer-total" data-target="{{ mejor_total.nuevo }}"
+            aria-label="{{ mejor_total.nuevo }}" style="height: 100%; "></div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="card-ticas" style="grid-column: 1 / -1;">
+      <p class="M-body">✅ ¡Sumaste un partido más!</p>
+      {% if partidos_totales_nuevos %}
+      <p>Ahora llevás {{ partidos_totales_nuevos }} en total.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="boton-fijo-inferior" hidden
+  style="background: #221140; display: flex; flex-direction: column; gap: 34px; justify-content: center; align-items: center;">
+  <div class="d-flex w-100" style="padding: 0 10px 34px 10px; max-width: 500px;">
+    <p class="M-body-s" style="text-align: center;">El resultado del partido va a aparecer cuando todos los jugadores
+      hayan subido sus estadísticas.</p>
+  </div>
+  <a class="btn-primario d-flex" href="{% url 'home' %}"
+    style="text-decoration: none; width: 100% !important; max-width: 500px;">
+    <span class="M-boton">Volver al inicio</span>
+  </a>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const stack = document.getElementById('stack');
+    const cards = document.getElementById('result-cards');
+    const boton = document.querySelector('.boton-fijo-inferior');
+    const texto = document.querySelector('.lead');
+
+    // 1) Iniciar la animación de subir a los 1000ms
+    setTimeout(() => {
+      stack.classList.add('to-top');
+    }, 1000);
+
+    let mostrado = false;
+
+    const setLeadText = (msg) => {
+      if (!texto) return;
+      texto.classList.remove('animate__animated', 'animate__fadeIn'); // limpiar por si acaso
+      texto.textContent = msg; // <-- CLAVE
+      // Si tenés animate.css cargado:
+      texto.classList.add('animate__animated', 'animate__fadeIn');
+    };
+
+    const mostrarUI = () => {
+      if (mostrado) return;
+      mostrado = true;
+
+      setLeadText('¡Estadísticas registradas!');
+
+      // Revelar tarjetas y botón ANTES de construir el odómetro
+      if (cards) {
+        cards.hidden = false;
+        cards.style.display = ''; // quita el display:none inline
+        cards.classList.add('animate__animated', 'animate__fadeInUp');
+      }
+      if (boton) {
+        boton.hidden = false;
+        boton.style.display = 'flex';
+        const link = boton.querySelector('a');
+        if (link) boton.classList.add('animate__animated', 'animate__fadeInUp');
+      }
+
+      // ---- ODOMETER primero (para que no dependa de Lottie) ----
+      const odo = document.getElementById('odometer-total');
+      if (odo) {
+        const target = odo.getAttribute('data-target');
+        if (target !== null && target !== '') {
+          // Pequeño delay para asegurar que el contenedor ya está pintado
+          requestAnimationFrame(() => buildOdometer(odo, String(target), 600));
+        }
+      }
+
+      // ---- LOTTIE con guardas (que no rompa si falla el CDN) ----
+      try {
+        const items = document.querySelectorAll('.lottie-icono-mejora');
+        if (items.length && !window.lottie) {
+          // No cortar la ejecución si no está lottie
+          console.warn('Lottie no disponible, continuo sin animaciones.');
+        } else if (window.lottie) {
+          items.forEach((el) => {
+            const path = el.getAttribute('data-lottie-src');
+            window.lottie.loadAnimation({
+              container: el,
+              renderer: 'svg',
+              loop: false,
+              autoplay: true,
+              path
+            });
+          });
+        }
+      } catch (e) {
+        console.warn('Error inicializando Lottie:', e);
+      }
+    };
+
+
+    // 2) Mostrar al terminar la transición de 'top'
+    stack.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'top') mostrarUI();
+    });
+
+    // 3) Fallback por si no llega el evento (Safari/iOS, cambios de tab, etc.)
+    setTimeout(mostrarUI, 1000 /* delay inicial */ + 800 /* duración transición */ + 80 /* buffer */);
+  });
+
+</script>
+<script>
+  // Construye la odometer por dígitos y anima de 0 hasta el valor final
+  function buildOdometer(el, targetValue, startDelayMs = 0, staggerMs = 100, durationMs = 1400) {
+    if (!el) return;
+    const str = String(targetValue).trim();
+    el.innerHTML = '';
+
+    const digitEntries = [];
+    for (const ch of str) {
+      if (/\d/.test(ch)) {
+        const digit = document.createElement('div');
+        digit.className = 'digit';
+        const strip = document.createElement('div');
+        strip.className = 'digit-strip';
+
+        for (let i = 0; i <= 9; i++) {
+          const s = document.createElement('p');
+          s.textContent = i;
+          strip.appendChild(s);
+        }
+        digit.appendChild(strip);
+        el.appendChild(digit);
+        digitEntries.push({ strip, to: parseInt(ch, 10) });
+      } else {
+        const sep = document.createElement('p');
+        sep.className = 'char';
+        sep.textContent = ch;
+        el.appendChild(sep);
+      }
+    }
+
+    requestAnimationFrame(() => {
+      const sample = el.querySelector('.digit-strip p');
+      let h = sample ? sample.getBoundingClientRect().height : 0;
+      if (!h) {
+        const fs = parseFloat(getComputedStyle(el).fontSize);
+        h = fs || 16;
+      }
+
+      digitEntries.forEach(({ strip, to }, idx) => {
+        strip.style.willChange = 'transform';
+        strip.style.transition = `transform ${durationMs}ms cubic-bezier(.15,.85,.15,1)`;
+        // 🔑 Delay global + stagger por dígito
+        strip.style.transitionDelay = `${startDelayMs + idx * staggerMs}ms`;
+        strip.style.transform = 'translate3d(0,0,0)';
+        void strip.offsetHeight; // reflow
+        requestAnimationFrame(() => {
+          strip.style.transform = `translate3d(0, -${h * to}px, 0)`;
+        });
+      });
+    });
+  }
+
+
+</script>
+
+{% endblock %}

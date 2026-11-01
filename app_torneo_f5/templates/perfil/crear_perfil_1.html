@@ -1,0 +1,527 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #161618 !important;
+        padding: 25px 16px;
+        height: 100dvh;
+    }
+
+    .pantalla-crear {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .container-1 {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .container-1 label {
+        margin-left: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .container-1 label p {
+        opacity: 0.5;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .input-custom {
+        border: none;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        flex: 1;
+        padding: 13px 10px 13px 50px;
+        border-radius: 5px;
+        width: 160px;
+    }
+
+    .input-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.con-valor {
+        background-color: #3F374E;
+        color: white;
+    }
+
+    .input-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input:-internal-autofill-selected {
+        background-color: #3F374E !important;
+        color: white !important;
+    }
+
+    .campo-fecha {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selector-fecha {
+        position: relative;
+    }
+
+    .selector-hora {
+        position: relative;
+    }
+
+    .container-icono {
+        position: absolute;
+        margin-top: 8px;
+        margin-left: 13px;
+        pointer-events: none;
+        color: white;
+        font-size: 18px;
+        z-index: 1;
+    }
+
+    .flatpickr-input::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.form-control.input.active {
+        background-color: #3F374E !important;
+    }
+
+    .input-text {
+        width: 100%;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        padding: 13px 10px;
+        border-radius: 5px;
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .input-text:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input.con-valor {
+        background-color: #3F374E;
+    }
+
+    .btn-disabled {
+        background-color: #5E605E !important;
+        color: #ffffff50 !important;
+        cursor: initial !important;
+    }
+
+    input:-webkit-autofill {
+        background-color: #3F374E !important;
+        -webkit-box-shadow: 0 0 0 1000px #3F374E inset !important;
+        -webkit-text-fill-color: white !important;
+        caret-color: white !important;
+        border-radius: 5px !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+
+    input:-internal-autofill-selected {
+        background-color: #3F374E !important;
+        color: white !important;
+    }
+
+    /* Contenedor del campo con label flotante */
+    .campo {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Label flotante generado dinámicamente a partir del placeholder */
+    .label-flotante {
+        position: absolute;
+        left: 4px;
+        /* se alinea con tu padding de inputs */
+        top: -23px;
+        /* que “flote” sobre el borde superior */
+        font-size: 16px;
+        line-height: 1;
+        padding: 0 6px;
+        border-radius: 4px;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity .15s ease, transform .15s ease;
+        pointer-events: none;
+
+        /* Fondo para “cortar” el borde del input; usa tu color de fondo */
+        background: #161618;
+        color: #FFFFFF80;
+        /* similar a tu “texto-transparente” */
+    }
+
+    /* Cuando el input tiene valor o foco, mostramos el label */
+    .campo.activo .label-flotante {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" style="height: 100%;"
+    class="d-flex flex-column justify-content-between">
+    {% csrf_token %}
+    <div class="conainer-main">
+
+        <div>
+            <a href="{% url 'home' %}" style="text-decoration: none; padding: 13px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 4.00006L4.00006 20M4 4L20 20" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+
+        <p class="M-titulo" style="margin-top: 23px;">Contanos sobre vos</p>
+
+        <p class="M-body" style="margin-top: 5px;">Para que los demás sepan con quién comparten la cancha.</p>
+
+        <div class="d-flex flex-row align-items-center" style="gap: 10px; margin-top: 11px;">
+            <p class="M-body-s texto-transparente">1/4</p>
+            <div class="barra-indicadora" style="width: 100%; background: #2C2A44; border-radius: 9px; height: 8px;">
+                <div style="width: 25%; background: #733BDE; border-radius: 9px; height: 8px;"></div>
+            </div>
+        </div>
+
+        <div class="container-2 d-flex flex-column align-items-center justify-content-center"
+            style="margin-top: 40px; gap: 40px;">
+            <div class="d-flex flex-row align-items-center" style="gap: 20px;">
+                <div id="preview-foto" style="
+    width: 90px;
+    height: 90px;
+    border-radius: 21px;
+    overflow: hidden;
+    background-color: #535368;
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+                    <img src="{{ jugador.foto.url }}" alt="Foto de perfil" class="perfil-foto" style="width: 90px; height: 90px;">
+                </div>
+
+                <button class="btn-secundario" style="color: #4F9639;" type="button">
+                    Subir foto
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+                        <path
+                            d="M17.5 9.50195C19.675 9.51406 20.8529 9.61051 21.6213 10.3789C22.5 11.2576 22.5 12.6718 22.5 15.5002V16.5002C22.5 19.3286 22.5 20.7429 21.6213 21.6215C20.7426 22.5002 19.3284 22.5002 16.5 22.5002H8.5C5.67157 22.5002 4.25736 22.5002 3.37868 21.6215C2.5 20.7429 2.5 19.3286 2.5 16.5002L2.5 15.5002C2.5 12.6718 2.5 11.2576 3.37868 10.3789C4.14706 9.61051 5.32497 9.51406 7.5 9.50195"
+                            stroke="#4F9639" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M12.5 15.5L12.5 2.5M12.5 2.5L15.5 6M12.5 2.5L9.5 6" stroke="#4F9639" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <!-- <input type="file" name="foto" id="input-foto" accept="image/*" style="display: none;"> -->
+                <input type="file" name="foto" id="input-foto" accept="image/jpeg,image/png,image/webp"
+                    style="display:none;">
+            </div>
+            <!-- <input type="text" name="nombre" id="perfil-nombre" placeholder="Nombre y apellido" class="input-text">
+            <input type="number" name="altura" id="perfil-altura" placeholder="Altura (cm)" class="input-text"> -->
+            <div class="campo">
+                <input type="text" name="nombre" id="perfil-nombre" placeholder="Nombre y apellido" class="input-text" value="{{ form.nombre.value|default_if_none:'' }}">
+            </div>
+
+            <div class="campo">
+                <input type="text" inputmode="numeric" maxlength="3" pattern="\d{1,3}" name="altura" id="perfil-altura" placeholder="Altura (cm)" class="input-text" value="{{ form.altura.value|default_if_none:'' }}">
+            </div>
+            <div class="campo-fecha">
+                <label for="fecha" class="label-fecha texto-transparente">Fecha de nacimiento</label>
+                <div class="selector-fecha">
+                    <span class="container-icono"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M7 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M17 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M2.5 9H21.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
+                                fill="white" />
+                            <path
+                                d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
+                                fill="white" />
+                            <path
+                                d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
+                                fill="white" />
+                            <path
+                                d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
+                                fill="white" />
+                            <path
+                                d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
+                                fill="white" />
+                            <path
+                                d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
+                                fill="white" />
+                        </svg></span>
+                    <input type="text" name="fecha_nacimiento" id="fecha"
+                        class="input-fecha-custom input-custom form-control input" placeholder="__/__/__">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w-100 d-flex justify-content-end align-items-end">
+        <button type="submit" id="btn-siguiente" class="btn-primario btn-disabled"
+            style="color: #FFF; width: 49% !important;">Siguiente</button>
+    </div>
+</form>
+
+<script>
+    const inputFoto = document.getElementById('input-foto');
+    const previewFoto = document.getElementById('preview-foto');
+    const btnSubirFoto = document.querySelector('.btn-secundario');
+    const btnSiguiente = document.querySelector('.btn-primario');
+
+    let fotoBase64 = null;
+
+    const MAX_BYTES = 1.5 * 1024 * 1024; // 1.5 MB
+    const MAX_SIDE = 1200;              // máx. ancho/alto
+    const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp']; // admite WebP
+    const BLOCKED_EXT = ['heic', 'heif', 'tiff', 'bmp']; // los vamos a advertir
+
+    // Subir y mostrar la imagen
+    btnSubirFoto.addEventListener('click', () => inputFoto.click());
+
+    inputFoto.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        if (BLOCKED_EXT.includes(ext) || (!ALLOWED_MIME.includes(file.type) && file.type !== '')) {
+            alert('Formato no soportado. Usá JPG/PNG/WebP (o convertí la foto antes de subir).');
+            e.target.value = ''; // limpia selección
+            return;
+        }
+
+        try {
+            const processed = await compressImageFile(file, { maxSide: MAX_SIDE, maxBytes: MAX_BYTES });
+            // Reemplazamos el File dentro del input, así el form manda el archivo comprimido:
+            const dt = new DataTransfer();
+            dt.items.add(processed);
+            inputFoto.files = dt.files;
+
+            // Preview
+            const url = URL.createObjectURL(processed);
+            previewFoto.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            previewFoto.appendChild(img);
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo procesar la imagen. Probá con otra foto (JPG/PNG/WebP).');
+            e.target.value = '';
+        }
+    });
+
+    // Utilidad de compresión/redimensionado
+    async function compressImageFile(file, { maxSide = 1200, maxBytes = 1.5 * 1024 * 1024 }) {
+        // Cargamos en <img>
+        const dataUrl = await fileToDataURL(file);
+        const img = await dataURLToImage(dataUrl);
+
+        // Calculamos tamaño objetivo manteniendo proporción
+        let { width, height } = img;
+        if (Math.max(width, height) > maxSide) {
+            if (width >= height) {
+                height = Math.round(height * (maxSide / width));
+                width = maxSide;
+            } else {
+                width = Math.round(width * (maxSide / height));
+                height = maxSide;
+            }
+        }
+
+        // Dibujamos en canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Intentamos distintas calidades hasta quedar por debajo de maxBytes
+        let quality = 0.85;
+        let blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+        // Si el archivo fuente ya es pequeño y es PNG, podrías preservar PNG.
+        // Para simplificar usamos JPEG.
+        while (blob.size > maxBytes && quality > 0.5) {
+            quality -= 0.05;
+            blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+        }
+
+        // Si ni así baja (fotos enormes), reducimos aún más dimensiones (fallback)
+        let attempt = 0;
+        while (blob.size > maxBytes && attempt < 3) {
+            attempt++;
+            const factor = 0.85; // reduce 15% cada intento
+            canvas.width = Math.round(canvas.width * factor);
+            canvas.height = Math.round(canvas.height * factor);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            quality = Math.max(0.6, quality); // no bajar de 0.6
+            blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+        }
+
+        const finalName = file.name.replace(/\.\w+$/, '') + '.jpg';
+        return new File([blob], finalName, { type: 'image/jpeg', lastModified: Date.now() });
+    }
+
+    function fileToDataURL(file) {
+        return new Promise((res, rej) => {
+            const fr = new FileReader();
+            fr.onload = () => res(fr.result);
+            fr.onerror = rej;
+            fr.readAsDataURL(file);
+        });
+    }
+
+    function dataURLToImage(dataURL) {
+        return new Promise((res, rej) => {
+            const img = new Image();
+            img.onload = () => res(img);
+            img.onerror = rej;
+            img.src = dataURL;
+        });
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+        return new Promise((res) => canvas.toBlob((b) => res(b), type, quality));
+    }
+
+
+    // Validar campos en tiempo real
+    function validarCampos() {
+        const nombre = document.getElementById('perfil-nombre').value.trim();
+        const altura = document.getElementById('perfil-altura').value.trim();
+
+        const fecha = document.getElementById('fecha').value.trim();
+
+        const completos = nombre !== '' && altura !== '' && fecha !== '';
+
+        btnSiguiente.disabled = !completos;
+        btnSiguiente.classList.toggle('btn-disabled', !completos);
+
+        return completos;
+    }
+
+    btnSiguiente.addEventListener('click', (event) => {
+        if (!validarCampos()) {
+            event.preventDefault();  // Evita enviar si falta algo
+            return;
+        }
+
+        // Guardar en localStorage (esto sigue siendo útil para los siguientes pasos)
+        const nombre = document.getElementById('perfil-nombre').value.trim();
+        const altura = document.getElementById('perfil-altura').value.trim();
+        const fecha = document.getElementById('fecha').value.trim();
+
+        localStorage.setItem('perfil_nombre', nombre);
+        localStorage.setItem('perfil_altura', altura);
+        localStorage.setItem('perfil_fecha', fecha);
+    });
+
+    // Estilos dinámicos y validación
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll('.input-text, .input-custom');
+        flatpickr("#fecha", {
+            altInput: true,
+            altFormat: "d / M / y",
+            dateFormat: "Y-m-d",
+            locale: "es",
+            disableMobile: true,
+            maxDate: "today",
+            defaultDate: document.getElementById('fecha').value || null,
+            onChange: function (selectedDates, dateStr) {
+                const inputShowed = document.getElementsByClassName("input-fecha-custom")[1];
+                inputShowed?.classList.toggle("con-valor", !!dateStr);
+            }
+        });
+        inputs.forEach(input => {
+            if (input.value.trim() !== "") {
+                input.classList.add('con-valor');
+            }
+
+            input.addEventListener("input", () => {
+                input.classList.toggle('con-valor', input.value.trim() !== "");
+                validarCampos();
+            });
+        });
+
+        document.getElementById('fecha').addEventListener('change', validarCampos);
+
+        // Crear labels flotantes desde el placeholder (como ya lo tenías)
+        document.querySelectorAll('.campo > .input-text').forEach((input) => {
+            if (!input.parentElement.querySelector('.label-flotante')) {
+                const label = document.createElement('label');
+                label.className = 'label-flotante';
+                label.textContent = input.getAttribute('placeholder') || '';
+                label.setAttribute('for', input.id || '');
+                input.parentElement.prepend(label);
+            }
+        });
+
+        // 👉 Sólo valor, nada de foco
+        function syncCampoState(input) {
+            const campo = input.closest('.campo');
+            if (!campo) return;
+            const tieneValor = (input.value || '').trim() !== '';
+            campo.classList.toggle('activo', tieneValor);   // ← ya no depende del foco
+            input.classList.toggle('con-valor', tieneValor);
+        }
+
+        // Eventos: input + cambio programático (por si autocompletado)
+        document.querySelectorAll('.campo > .input-text').forEach((input) => {
+            // Estado inicial
+            syncCampoState(input);
+
+            input.addEventListener('input', () => syncCampoState(input));
+            input.addEventListener('change', () => syncCampoState(input));
+            // (podés mantener focus/blur si querés estilos de foco, pero NO llamamos a sync por foco)
+        });
+
+        // Rechequeo por autofill del navegador
+        setTimeout(() => {
+            document.querySelectorAll('.campo > .input-text').forEach(syncCampoState);
+        }, 150);
+
+        // Fecha (flatpickr): mantenemos tu lógica de con-valor SOLO por valor
+        const inputFechaVisible = document.getElementsByClassName("input-fecha-custom")[1];
+        if (inputFechaVisible) {
+            const marcarFecha = () => {
+                const tiene = (inputFechaVisible.value || '').trim() !== '';
+                inputFechaVisible.classList.toggle('con-valor', tiene);
+            };
+            inputFechaVisible.addEventListener('input', marcarFecha);
+            inputFechaVisible.addEventListener('change', marcarFecha);
+            setTimeout(marcarFecha, 150);
+        }
+    });
+</script>
+
+{% endblock %}

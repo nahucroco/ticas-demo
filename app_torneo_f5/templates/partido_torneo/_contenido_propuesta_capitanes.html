@@ -1,0 +1,82 @@
+{% if mensaje == "Armen el partido" %}
+<div class="container-propuesta">
+    <p class="M-subtitulos">{{ mensaje }}</p>
+    <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+    {% if es_capitan_1 %}
+    <a href="{% url 'propuesta_partido_1' partido.id %}" class="btn-primario"
+        style="text-align: center; display: block;">
+        <p class="M-boton">Hacer propuesta</p>
+    </a>
+    {% else %}
+    <button class="btn-primario" style="text-align: center; display: block; background: #5E605E;" disabled>
+        <p class="M-boton">Hacer propuesta</p>
+    </button>
+    <div class="d-flex flex-row justify-content-center" style="margin-top: 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+            <path opacity="0.5"
+                d="M22.5 12C22.5 6.47715 18.0228 2 12.5 2C6.97715 2 2.5 6.47715 2.5 12C2.5 17.5228 6.97715 22 12.5 22C18.0228 22 22.5 17.5228 22.5 12Z"
+                fill="white" />
+            <path
+                d="M12.5 6.25C12.9142 6.25 13.25 6.58579 13.25 7V13C13.25 13.4142 12.9142 13.75 12.5 13.75C12.0858 13.75 11.75 13.4142 11.75 13V7C11.75 6.58579 12.0858 6.25 12.5 6.25Z"
+                fill="white" />
+            <path
+                d="M12.5 17C13.0523 17 13.5 16.5523 13.5 16C13.5 15.4477 13.0523 15 12.5 15C11.9477 15 11.5 15.4477 11.5 16C11.5 16.5523 11.9477 17 12.5 17Z"
+                fill="white" />
+        </svg>
+        <p class="M-body-s" style="margin: 5px;">Solo los capitanes pueden realizar esta acción.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% elif mensaje == "Esperando una propuesta..." %}
+<div class="container-propuesta" style="background: #5E605E; border-radius: 10px;">
+    <p class="M-subtitulos">{{ mensaje }}</p>
+    <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+</div>
+
+{% elif mensaje == "Propuesta enviada" %}
+<div class="container-propuesta" style="background: #5E605E;">
+    <p class="M-subtitulos">{{ mensaje }}</p>
+    <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+    <a href="{% url 'propuesta_partido' partido.id %}" class="btn-primario" style="text-align: center; display: block;">
+        <p class="M-boton">Ver propuesta</p>
+    </a>
+</div>
+
+{% elif mensaje == "Propuesta recibida" %}
+<div class="container-propuesta">
+    <p class="M-subtitulos">{{ mensaje }}</p>
+    <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+    {% if es_capitan_1 or es_capitan_2 %}
+    <a href="{% url 'seleccionar_propuesta' partido.id %}" class="btn-primario"
+        style="text-align: center; display: block;">
+        <p class="M-boton">Ver propuesta</p>
+    </a>
+    {% else %}
+    <button class="btn-primario" style="text-align: center; display: block; background: #5E605E;" disabled>
+        <p class="M-boton">Ver propuesta</p>
+    </button>
+    <div class="d-flex flex-row justify-content-center" style="margin-top: 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+            <path opacity="0.5"
+                d="M22.5 12C22.5 6.47715 18.0228 2 12.5 2C6.97715 2 2.5 6.47715 2.5 12C2.5 17.5228 6.97715 22 12.5 22C18.0228 22 22.5 17.5228 22.5 12Z"
+                fill="white" />
+            <path
+                d="M12.5 6.25C12.9142 6.25 13.25 6.58579 13.25 7V13C13.25 13.4142 12.9142 13.75 12.5 13.75C12.0858 13.75 11.75 13.4142 11.75 13V7C11.75 6.58579 12.0858 6.25 12.5 6.25Z"
+                fill="white" />
+            <path
+                d="M12.5 17C13.0523 17 13.5 16.5523 13.5 16C13.5 15.4477 13.0523 15 12.5 15C11.9477 15 11.5 15.4477 11.5 16C11.5 16.5523 11.9477 17 12.5 17Z"
+                fill="white" />
+        </svg>
+        <p class="M-body-s" style="margin: 5px;">Solo los capitanes pueden realizar esta acción.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% else %}
+<div class="container-propuesta" style="background: #5E605E; border-radius: 10px;">
+    <p class="M-subtitulos">{{ mensaje }}</p>
+    <p class="M-body" style="margin-top: 10px;">{{ mensaje2 }}</p>
+</div>
+
+{% endif %}

@@ -1,0 +1,9 @@
+{% for jugador in jugadores %}
+  <div>
+    {{ jugador.nombre }}
+    <form method="post" action="{% url 'invitar_jugador' partido.id jugador.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success btn-sm">Agregar</button>
+    </form>
+  </div>
+{% endfor %}

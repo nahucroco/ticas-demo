@@ -1,0 +1,538 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/editar_partido.css' %}">
+{% endblock %}
+{% block title %}Ticas - Partido{% endblock %}
+{% block navbar_extra %}
+
+{% endblock %}
+
+{% block content %}
+<style>
+   .pantalla-crear {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      gap: 20px;
+   }
+
+   .estado-partido-sinequipo {
+      display: flex;
+      text-align: center;
+      background-color: #733bde;
+      color: white;
+      border-radius: 12px;
+      margin: 16px auto;
+      max-width: 300px;
+      padding: 10px;
+      justify-content: center;
+   }
+
+   .div-invitar {
+      margin: 0px 16px;
+   }
+
+   .btn-invitar-link {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #733BDE;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 999px;
+      ;
+      transition: background-color 0.2s ease;
+   }
+
+   .btn-invitar-link:hover {
+      background-color: #5a2bbf;
+   }
+
+   .btn-invitar-contenido {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      display: flex;
+      justify-content: center;
+   }
+
+   .btn-invitar-centrar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+   }
+
+   .btn-invitar-link {
+      text-decoration: none;
+      border-radius: 10px;
+      background: var(--Secundario, #3F374E);
+      box-shadow:
+         5px 5px 10px 0px #00000040 inset,
+         -5px -5px 10px 0px #00000040 inset;
+      width: 308px;
+      height: 52px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease;
+   }
+
+   .btn-invitar-link:hover {
+      transform: scale(1.02);
+   }
+
+   .btn-invitar-contenido {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+   }
+
+   .goles {
+      color: #FFF;
+      text-align: center;
+      font-family: Outfit;
+      font-size: 30px !important;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+   }
+
+   .equipos-nombres {
+      padding: 0;
+      margin-top: 4px;
+   }
+
+   .resultado-header {
+      padding: 0;
+   }
+
+   .separador {
+      margin: 0;
+      width: 100%;
+      background-color: #733BDE;
+      height: 1px;
+   }
+
+   .marcador {
+      gap: 10px;
+   }
+
+   .descripcion-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+   }
+</style>
+
+<!-- Mensaje del estado del partido -->
+
+{% if not partido.jugado %}
+<div class="descripcion-header d-flex flex-column justify-center">
+   <p class="M-titulo">Partido de torneo</p>
+   <div class="d-flex flex-row" style="gap: 5px; margin-top: 15px; margin-bottom: 25px;">
+      {% if partido.torneo.imagen %}
+      <img src="{{ torneo.imagen.url }}" alt="" width="30" height="30" style="border-radius: 2px;">
+      {% else %}
+      <img src="{% static 'images/copas-default/copa-default.png' %}" width="30" height="30" alt="Escudo equipo 1">
+      {% endif %}
+      <p class="M-subtitulos">{{ partido.torneo.nombre }}</p>
+   </div>
+   <div style="padding: 10px; width: 100%;">
+      <div class="d-flex flex-row justify-content-between">
+         <div>
+            {% if partido.equipo_1.escudo %}
+            <img src="{{ partido.equipo_1.escudo.url }}" alt="" width="76" style="border-radius: 5px;">
+            {% else %}
+            <img src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76" alt="Escudo equipo 1">
+            {% endif %}
+         </div>
+         <div class="d-flex flex-column justify-content-between align-items-center">
+            <p class="M-body">Fecha {{ partido.fecha }}</p>
+            <p class="M-titulo" style="font-size: 30px;">VS</p>
+         </div>
+         <div>
+            {% if partido.equipo_2.escudo %}
+            <img src="{{ partido.equipo_2.escudo.url }}" alt="" width="76" style="border-radius: 5px;">
+            {% else %}
+            <img src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76" alt="Escudo equipo 1">
+            {% endif %}
+         </div>
+      </div>
+      <div class="d-flex flex-row justify-content-between" style="width: 100%; margin-top: 4px;">
+         <p class="M-body">{{ partido.equipo_1.nombre }}</p>
+         <p class="M-body">{{ partido.equipo_2.nombre }}</p>
+      </div>
+   </div>
+</div>
+
+<div class="btn-detalles" id="detalles-card">
+   <div class="detalles-head">
+      <span class="texto-detalles">Detalles</span>
+      <svg class="icono-flecha" width="24" height="25" viewBox="0 0 24 25" fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+         <path d="M19 9.5L12 15.5L5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+      </svg>
+   </div>
+
+   <!-- CONTENIDO que se expande dentro del mismo cuadro -->
+   <div class="detalles-content">
+      <div class="info-partido">
+         <div class="container-datos">
+            <div class="partido-detalles">
+               <div class="fecha">
+                  <p>Día</p>
+                  <strong>{{ partido.dia|date:"d / M"|slice:":8" }}</strong>
+               </div>
+               <div class="horario">
+                  <p>Horario</p>
+                  <strong>{{ partido.hora_inicio|time:"H:i" }}</strong>
+               </div>
+               <div class="precio">
+                  <p>Precio c/u</p>
+                  <strong>${{ precio_por_jugador|floatformat:2 }}</strong>
+               </div>
+            </div>
+            <div class="cancha-info">
+               <p class="cancha-box">Cancha:</p>
+               <p class="cancha-nombre">{{ partido.cancha_text }}</p>
+               <p class="cancha-localidad">{{ partido.ubicacion }}</p>
+            </div>
+
+            <div class="tipo-partido">
+               <p>{{ partido.tipo_cancha_text }}</p>
+               <p>{{ partido.duracion }} minutos</p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="separador">
+</div>
+{% else %}
+<!-- No pasa nada -->
+{% endif %}
+{% if partido.jugando and not partido.horainferior %}
+<div class="estado-partido-en-curso">
+   <p class="titulo-estado">Partido en curso</p>
+   <div class="reloj-partido" id="reloj-cronometro">00:00</div>
+   <div id="cronometro-meta" data-inicio="{{ partido.dia|date:'Y-m-d' }}T{{ partido.hora_inicio|time:'H:i:s' }}"
+      data-duracion="{{ partido.duracion }}">
+   </div>
+</div>
+<!-- metadatos del partido -->
+<div id="cronometro-meta" data-inicio="{{ partido.dia|date:'Y-m-d' }}T{{ partido.hora_inicio|time:'H:i:s' }}"
+   data-duracion="{{ partido.duracion }}">
+</div>
+
+{% elif not partido.jugando and not partido.jugado and existe_equipos %}
+<div class="estado-partido-esperando">
+   <p class="M-subtitulos">Equipos confirmados. Esperando a la hora de inicio para comenzar el partido.</p>
+</div>
+{% elif not partido.jugando and not partido.jugado and not existe_equipos %}
+
+
+</div>
+
+{% elif partido.jugado %}
+<div class="estado-partido-finalizado">
+   <p class="mensaje-finalizado">Partido finalizado</p>
+</div>
+<div class="btn-detalles" id="detalles-card">
+   <div class="detalles-head">
+      <span class="texto-detalles">Detalles</span>
+      <svg class="icono-flecha" width="24" height="25" viewBox="0 0 24 25" fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+         <path d="M19 9.5L12 15.5L5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+      </svg>
+   </div>
+
+   
+
+   <!-- CONTENIDO que se expande dentro del mismo cuadro -->
+   <div class="detalles-content">
+      <div class="info-partido">
+         <div class="container-datos">
+            <div class="partido-detalles">
+               <div class="fecha">
+                  <p>Día</p>
+                  <strong>{{ partido.dia|date:"d / M"|slice:":8" }}</strong>
+               </div>
+               <div class="horario">
+                  <p>Horario</p>
+                  <strong>{{ partido.hora_inicio|time:"H:i" }}</strong>
+               </div>
+               <div class="precio">
+                  <p>Precio c/u</p>
+                  <strong>${{ precio_por_jugador|floatformat:2 }}</strong>
+               </div>
+            </div>
+            <div class="cancha-info">
+               <p class="cancha-box">Cancha:</p>
+               <p class="cancha-nombre">{{ partido.cancha_text }}</p>
+               <p class="cancha-localidad">{{ partido.ubicacion }}</p>
+            </div>
+
+            <div class="tipo-partido">
+               <p>{{ partido.tipo_cancha.nombre }}</p>
+               <p>{{ partido.duracion }} minutos</p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="resultado-card w-100">
+   <div class="resultado-header">
+      {% if partido.equipo_1.escudo %}
+      <img src="{{ partido.equipo_1.escudo.url }}" alt="" style="width: 76px;">
+      {% else %}
+      <img src="{% static 'images/escudo-generico.png' %}" alt="" style="width: 76px;">
+      {% endif %}
+      <div class="d-flex flex-column justify-content-center align-items-center">
+         <div>
+            <p class="M-body">Fecha {{ partido.fecha }}</p>
+         </div>
+         <div class="marcador">
+            <span class="goles">{{ goles_equipo_1 }}</span>
+            <span class="">-</span>
+            <span class="goles">{{ goles_equipo_2 }}</span>
+         </div>
+      </div>
+      {% if partido.equipo_2.escudo %}
+      <img src="{{ partido.equipo_2.escudo.url }}" alt="" style="width: 76px;">
+      {% else %}
+      <img src="{% static 'images/escudo-generico.png' %}" alt="" style="width: 76px;">
+      {% endif %}
+   </div>
+   <div class="equipos-nombres">
+      <p class="M-body">{{ partido.equipo_1.nombre }}</p>
+      <p class="M-body">{{ partido.equipo_2.nombre }}</p>
+   </div>
+   <div class="goles_estadisticas">
+      <div class="pelota-icono">
+         <!-- Pelota SVG -->
+         <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+               d="M14.7973 12.573C15.0907 12.573 15.3286 12.3351 15.3286 12.0417C15.3286 11.7484 15.0907 11.5105 14.7973 11.5105V12.573ZM10.0482 15.0614C9.95552 15.3398 10.106 15.6406 10.3844 15.7333C10.6628 15.8259 10.9636 15.6754 11.0563 15.3971L10.0482 15.0614ZM3.33153 11.5105C3.03814 11.5105 2.80028 11.7484 2.80028 12.0417C2.80028 12.3351 3.03814 12.573 3.33153 12.573V11.5105ZM7.07258 15.3971C7.16527 15.6754 7.46608 15.8259 7.74446 15.7333C8.02283 15.6406 8.17335 15.3398 8.0807 15.0614L7.07258 15.3971ZM4.43534 3.86717C4.35947 3.58374 4.06822 3.41547 3.7848 3.49133C3.50137 3.56718 3.3331 3.85844 3.40896 4.14187L4.43534 3.86717ZM1.65257 8.49151C1.40781 8.65329 1.34055 8.98288 1.50234 9.22761C1.66414 9.47241 1.99371 9.53963 2.23847 9.37785L1.65257 8.49151ZM14.6198 4.14193C14.6956 3.85851 14.5273 3.56725 14.2439 3.49139C13.9605 3.41554 13.6692 3.58381 13.5934 3.86723L14.6198 4.14193ZM15.7902 9.37792C16.035 9.5397 16.3646 9.47248 16.5264 9.22768C16.6882 8.98295 16.6209 8.65336 16.3761 8.49158L15.7902 9.37792ZM11.8971 2.71741C12.1369 2.54831 12.1941 2.21685 12.0251 1.97709C11.856 1.73732 11.5245 1.68004 11.2847 1.84914L11.8971 2.71741ZM6.60241 1.69767C6.36635 1.52342 6.03373 1.57352 5.85948 1.80958C5.68523 2.04563 5.73534 2.37825 5.9714 2.5525L6.60241 1.69767ZM15.5356 8.50008C15.5356 12.1193 12.6052 15.0522 8.99169 15.0522V16.1147C13.1932 16.1147 16.5981 12.7049 16.5981 8.50008H15.5356ZM8.99169 15.0522C5.37814 15.0522 2.44775 12.1193 2.44775 8.50008H1.38525C1.38525 12.7049 4.79018 16.1147 8.99169 16.1147V15.0522ZM2.44775 8.50008C2.44775 4.88089 5.37814 1.948 8.99169 1.948V0.885498C4.79018 0.885498 1.38525 4.29524 1.38525 8.50008H2.44775ZM8.99169 1.948C12.6052 1.948 15.5356 4.88089 15.5356 8.50008H16.5981C16.5981 4.29524 13.1932 0.885498 8.99169 0.885498V1.948ZM9.09844 7.12556L10.3993 8.12049L11.0448 7.27651L9.74387 6.2816L9.09844 7.12556ZM10.4608 8.31379L9.94992 9.96916L10.9652 10.2825L11.4761 8.62716L10.4608 8.31379ZM9.78155 10.0938H8.20176V11.1563H9.78155V10.0938ZM8.03339 9.96916L7.52244 8.31379L6.5072 8.62716L7.01815 10.2825L8.03339 9.96916ZM7.58402 8.12049L8.88487 7.12556L8.23944 6.2816L6.93855 7.27651L7.58402 8.12049ZM14.7973 11.5105H13.6533V12.573H14.7973V11.5105ZM10.4645 13.8113L10.0482 15.0614L11.0563 15.3971L11.4726 14.1469L10.4645 13.8113ZM13.6533 11.5105C13.1733 11.5105 12.7687 11.5097 12.4391 11.5473C12.096 11.5866 11.781 11.6721 11.4952 11.8783L12.1169 12.74C12.2016 12.6788 12.3181 12.6306 12.5598 12.603C12.8151 12.5738 13.1488 12.573 13.6533 12.573V11.5105ZM11.4726 14.1469C11.6321 13.6678 11.7384 13.351 11.8468 13.1176C11.9495 12.8966 12.0321 12.8011 12.1169 12.74L11.4952 11.8783C11.2093 12.0846 11.0289 12.3565 10.8833 12.6699C10.7434 12.9709 10.6163 13.3554 10.4645 13.8113L11.4726 14.1469ZM3.33153 12.573H4.47556V11.5105H3.33153V12.573ZM6.65634 14.1469L7.07258 15.3971L8.0807 15.0614L7.66442 13.8113L6.65634 14.1469ZM4.47556 12.573C4.98005 12.573 5.31375 12.5738 5.56908 12.603C5.81081 12.6306 5.92729 12.6788 6.01198 12.74L6.63371 11.8783C6.34782 11.6721 6.03289 11.5866 5.68974 11.5473C5.36019 11.5097 4.95554 11.5105 4.47556 11.5105V12.573ZM7.66442 13.8113C7.51264 13.3554 7.38547 12.9709 7.24562 12.6699C7.10002 12.3566 6.91954 12.0846 6.63371 11.8783L6.01198 12.74C6.09672 12.8011 6.17936 12.8966 6.28206 13.1176C6.39051 13.351 6.49683 13.6678 6.65634 14.1469L7.66442 13.8113ZM3.40896 4.14187L3.70505 5.24819L4.73143 4.97349L4.43534 3.86717L3.40896 4.14187ZM2.751 7.7654L1.65257 8.49151L2.23847 9.37785L3.3369 8.65181L2.751 7.7654ZM3.70505 5.24819C3.83561 5.736 3.92124 6.05903 3.95918 6.31363C3.99512 6.55473 3.97875 6.68015 3.9416 6.77814L4.93511 7.15474C5.06005 6.82516 5.06102 6.49879 5.01008 6.15699C4.96114 5.82869 4.85567 5.43769 4.73143 4.97349L3.70505 5.24819ZM3.3369 8.65181C3.73747 8.38703 4.07555 8.16447 4.3298 7.95126C4.59453 7.72934 4.81016 7.4844 4.93511 7.15474L3.9416 6.77814C3.90447 6.87608 3.83367 6.98071 3.64711 7.13718C3.45005 7.30236 3.17198 7.48716 2.751 7.7654L3.3369 8.65181ZM13.5934 3.86723L13.2973 4.97355L14.3237 5.24825L14.6198 4.14193L13.5934 3.86723ZM14.6918 8.65188L15.7902 9.37792L16.3761 8.49158L15.2777 7.76547L14.6918 8.65188ZM13.2973 4.97355C13.1731 5.43776 13.0676 5.82875 13.0186 6.15706C12.9677 6.49886 12.9686 6.82523 13.0936 7.15481L14.0871 6.7782C14.05 6.68022 14.0336 6.5548 14.0695 6.31369C14.1075 6.05909 14.1931 5.73607 14.3237 5.24825L13.2973 4.97355ZM15.2777 7.76547C14.8567 7.48724 14.5787 7.30243 14.3816 7.13718C14.195 6.98077 14.1242 6.87615 14.0871 6.7782L13.0936 7.15481C13.2185 7.48447 13.4341 7.72941 13.6989 7.95134C13.9531 8.16454 14.2912 8.3871 14.6918 8.65188L15.2777 7.76547ZM11.2847 1.84914L10.3495 2.50876L10.9619 3.37703L11.8971 2.71741L11.2847 1.84914ZM7.6618 2.47968L6.60241 1.69767L5.9714 2.5525L7.03082 3.33452L7.6618 2.47968ZM10.3495 2.50876C9.93703 2.79963 9.66376 2.99139 9.43822 3.11477C9.22466 3.2316 9.1017 3.2593 8.99743 3.25817L8.98588 4.32061C9.33842 4.32442 9.64506 4.21269 9.94808 4.04693C10.2391 3.88773 10.5694 3.65378 10.9619 3.37703L10.3495 2.50876ZM7.03082 3.33452C7.41715 3.61969 7.74233 3.86073 8.02985 4.02618C8.32926 4.19846 8.63342 4.31679 8.98588 4.32061L8.99743 3.25817C8.89316 3.25704 8.77083 3.22668 8.55982 3.10527C8.33698 2.97704 8.06788 2.7794 7.6618 2.47968L7.03082 3.33452ZM10.3993 8.12049C10.4292 8.14329 10.4501 8.17418 10.4609 8.20896L11.4761 7.89552C11.4019 7.65504 11.2543 7.4368 11.0448 7.27651L10.3993 8.12049ZM10.4609 8.20896C10.4713 8.24253 10.4717 8.2788 10.4608 8.31379L11.4761 8.62716C11.5515 8.38314 11.548 8.12849 11.4761 7.89552L10.4609 8.20896ZM13.3871 6.47569L10.7652 7.5614L11.1717 8.54308L13.7936 7.45734L13.3871 6.47569ZM9.74387 6.2816C9.52195 6.11185 9.25654 6.02687 8.99169 6.02687V7.08936C9.02952 7.08936 9.06677 7.10134 9.09844 7.12556L9.74387 6.2816ZM8.99169 6.02687C8.72685 6.02687 8.46136 6.11185 8.23944 6.2816L8.88487 7.12556C8.91654 7.10134 8.95379 7.08936 8.99169 7.08936V6.02687ZM9.52294 6.55812V3.78939H8.46044V6.55812H9.52294ZM9.94992 9.96916C9.93902 10.0047 9.91798 10.0343 9.89035 10.0561L10.5477 10.8908C10.7406 10.739 10.889 10.5292 10.9652 10.2825L9.94992 9.96916ZM9.89035 10.0561C9.85975 10.0802 9.822 10.0938 9.78155 10.0938V11.1563C10.0668 11.1563 10.3348 11.0585 10.5477 10.8908L9.89035 10.0561ZM12.2079 11.9617L10.6209 10.126L9.81711 10.8209L11.4042 12.6566L12.2079 11.9617ZM8.20176 10.0938C8.16131 10.0938 8.12356 10.0802 8.09296 10.0561L7.43564 10.8908C7.64855 11.0585 7.91651 11.1563 8.20176 11.1563V10.0938ZM8.09296 10.0561C8.06533 10.0343 8.0443 10.0047 8.03339 9.96916L7.01815 10.2825C7.09428 10.5292 7.24277 10.739 7.43564 10.8908L8.09296 10.0561ZM6.74067 12.6372L8.18214 10.8016L7.34647 10.1454L5.90502 11.981L6.74067 12.6372ZM7.52244 8.31379C7.51162 8.2788 7.51206 8.24253 7.52244 8.20896L6.50721 7.89552C6.43531 8.12849 6.43188 8.38314 6.5072 8.62716L7.52244 8.31379ZM7.52244 8.20896C7.53316 8.17418 7.55416 8.14329 7.58402 8.12049L6.93855 7.27651C6.72901 7.4368 6.58144 7.65504 6.50721 7.89552L7.52244 8.20896ZM7.22113 7.56267L4.64467 6.47689L4.23205 7.456L6.80851 8.5418L7.22113 7.56267Z"
+               fill="white" />
+         </svg>
+      </div>
+      <div class="goleadores">
+         <div class="goleadores-lista alineado-izquierda">
+            {% for estadistica in goleadores_equipo_1 %}
+            <div class="jugador-linea">
+               <div class="nombre-jugador">{{ estadistica.jugador.nombre }}</div>
+               <p class="M-body-s izquierda texto-transparente">{{ estadistica.goles }}</p>
+            </div>
+            {% endfor %}
+         </div>
+         <div class="goleadores-lista alineado-derecha">
+            {% for estadistica in goleadores_equipo_2 %}
+            <div class="jugador-linea">
+               <p class="M-body-s derecha texto-transparente">{{ estadistica.goles }}</p>
+               <div class="nombre-jugador">{{ estadistica.jugador.nombre }}</div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+   </div>
+</div>
+{% endif %}
+<!-- Me quede aca me falta hacer bien el cronometro -->
+{% if partido.jugando or partido.jugado or existe_equipos %}
+<div class="equipo-panel">
+   <div class="tab-selector">
+      <button class="tab active" data-tab="equipo-1">{{ partido.equipo_1.nombre }}</button>
+      <button class="tab" data-tab="equipo-2">{{ partido.equipo_2.nombre }}</button>
+   </div>
+   <div class="equipo-lista-jugadores" id="equipo-1">
+      {% for jugador in jugadores_equipo_1 %}
+      <div class="equipo-jugador-card">
+         <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+         <div class="equipo-jugador-info">
+            <span class="equipo-jugador-nombre">{{ jugador.nombre }}</span>
+            <span class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</span>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <div class="equipo-lista-jugadores hidden" id="equipo-2">
+      {% for jugador in jugadores_equipo_2 %}
+      <div class="equipo-jugador-card">
+         <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+         <div class="equipo-jugador-info">
+            <span class="equipo-jugador-nombre">{{ jugador.nombre }}</span>
+            <span class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</span>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+</div>
+
+
+
+{% else %}
+<div class="jugadores-box">
+   <div class="jugadores-header">
+      <span>Jugadores: 👤</span>
+      <span>{{ cantidad_jugadores }} / {{ partido.max_jugadores }}</span>
+   </div>
+   {% for jugador in jugadores_ordenados %}
+   <div class="jugador-item">
+      <img src="{{ jugador.foto.url }}" alt="Jugador" class="jugador-foto">
+      <div class="jugador-info">
+         <div class="jugador-nombre-id">
+            <span class="jugador-nombre">{{ jugador.nombre }}</span>
+            <span class="jugador-id">#{{ jugador.id }}</span>
+         </div>
+         {% if jugador.user == partido.creador %}
+         <div>
+            <img src="{% static 'images/creador.svg' %}" alt="Icono de Creador">
+         </div>
+         {% endif %}
+      </div>
+   </div>
+   {% endfor %}
+   {% if es_creador and not partido.jugando and not partido.jugado %}
+   <div class="btn-invitar-centrar">
+      <a href="{% url 'invitar_jugadores_vista' partido.id %}" class="btn-invitar-link">
+         <div class="btn-invitar-contenido">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path
+                  d="M14.6625 18.4876L13.9417 19.2084C11.553 21.5971 7.68019 21.5971 5.29151 19.2084C2.90283 16.8198 2.90283 12.9469 5.29151 10.5583L6.01236 9.8374"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" />
+               <path d="M10.3374 14.1625L14.6625 9.8374" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+               <path
+                  d="M10.3374 5.51236L11.0583 4.79151C13.4469 2.40283 17.3198 2.40283 19.7084 4.79151C22.0971 7.18019 22.0971 11.053 19.7084 13.4417L18.9876 14.1625"
+                  stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>Invitar jugadores</span>
+         </div>
+      </a>
+      {% endif %}
+   </div>
+
+   {% endif %}
+
+
+   {% if es_creador and not partido.jugando and not partido.jugado %}
+
+   {% else %}
+   <!-- mostrar versión solo lectura -->
+   {% endif %}
+</div>
+{% if es_creador and not partido.jugado %}
+<div class="div-cancelar">
+   <button class="boton-cancelar" id="btnCrearPartido">Cancelar Partido</button>
+</div>
+{% else %}
+<!-- mostrar versión solo lectura -->
+{% endif %}
+<script src="{% static 'js/editar_partido.js' %}"></script>
+<script>
+   // static/js/partido_detalle.js
+
+   document.addEventListener('DOMContentLoaded', () => {
+      const partidoId = document.getElementById('partido-detalle').dataset.partidoId;
+
+      fetch(`/api/partido/${partidoId}/`)
+         .then(res => res.json())
+         .then(data => {
+            console.log('Datos del partido:', data);
+            // acá podés renderizar dinámicamente los datos en el DOM si lo necesitás
+         })
+         .catch(err => console.error('Error al obtener partido:', err));
+   });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+      const $cron = document.getElementById("reloj-cronometro");
+      const meta = document.getElementById("cronometro-meta");
+      if (!$cron || !meta) return;
+
+      const inicioStr = meta.dataset.inicio;          // "YYYY-MM-DDTHH:MM:SS"
+      const durMin = parseInt(meta.dataset.duracion || "0", 10);
+      if (!inicioStr || !durMin) return;
+
+      const inicio = new Date(inicioStr);
+      const fin = new Date(inicio.getTime() + durMin * 60000);
+
+      const pad = n => String(n).padStart(2, "0");
+      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+      function tick() {
+         const ahora = new Date();
+
+         // segundos restantes hasta el final
+         let restante = clamp(Math.floor((fin - ahora) / 1000), 0, durMin * 60);
+
+         const mm = pad(Math.floor(restante / 60));
+         const ss = pad(restante % 60);
+         $cron.textContent = `${mm}:${ss}`;
+
+         if (restante <= 0) {
+            clearInterval(timer);
+            console.log("⏱ Tiempo finalizado");
+         }
+      }
+
+      tick(); // primera ejecución
+      const timer = setInterval(tick, 1000);
+   });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+      const card = document.getElementById("detalles-card");
+      const content = card.querySelector(".detalles-content");
+
+      // Si había estilos inline previos, limpiamos
+      content.style.maxHeight = "0";
+      content.style.opacity = "0";
+
+      card.addEventListener("click", (e) => {
+         // si querés que solo el header sea clickeable, descomentá:
+         // if (!e.target.closest('.detalles-head')) return;
+
+         const isOpen = card.classList.toggle("activo");
+
+         if (isOpen) {
+            // Medimos altura real y animamos a esa altura
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.opacity = "1";
+            // Si el contenido cambia de tamaño más tarde (imágenes, fuentes), reajustamos
+            setTimeout(() => {
+               content.style.maxHeight = content.scrollHeight + "px";
+            }, 50);
+         } else {
+            // Cerramos
+            content.style.maxHeight = "0";
+            content.style.opacity = "0";
+         }
+      });
+
+      // Por si hay imágenes o fuentes que cargan después y cambian la altura
+      window.addEventListener("load", () => {
+         if (card.classList.contains("activo")) {
+            content.style.maxHeight = content.scrollHeight + "px";
+         }
+      });
+   });
+</script>
+
+
+{% endblock %}

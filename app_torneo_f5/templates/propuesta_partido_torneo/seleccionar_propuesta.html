@@ -1,0 +1,596 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #161618;
+        box-sizing: border-box;
+        overflow-y: auto !important;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* Internet Explorer y Edge antiguo */
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari, Edge, Opera */
+    }
+
+    .container-volver {
+        padding: 25px 16px;
+    }
+
+    .container-volver a {
+        padding: 15px 13px;
+    }
+
+    .pantalla-crear {
+        position: relative !important;
+        top: 0 !important;
+        overflow-y: auto;
+        height: auto !important;
+    }
+
+    .main {
+        padding: 0 16px;
+        display: flex;
+        flex-direction: row;
+        /* overflow-y: auto; */
+        /* height: 700px !important; */
+    }
+
+    .barra-lateral {
+        width: 16px;
+        background: #161618;
+        /* height: 100vh; */
+        top: 0;
+        left: 0;
+        z-index: 15 !important;
+    }
+
+    .ocultar-scroll {
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* Internet Explorer y Edge antiguo */
+    }
+
+    .ocultar-scroll::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari y Opera */
+    }
+
+    .pantalla-wrapper {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #535368;
+        display: flex;
+        height: 550px;
+        margin: auto;
+        border-radius: 10px 10px 0 0;
+        flex-direction: column;
+        min-height: 100px;
+    }
+
+    .pantalla {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        /* height: 100%; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        margin: 0;
+        box-sizing: border-box;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    .pantalla-contenido {
+        padding: 15px 10px;
+        width: 100%;
+        background-color: transparent;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        border: none;
+        flex-direction: column;
+        gap: 15px;
+        align-items: start;
+        overflow-y: auto;
+    }
+
+
+    .pantalla-dia-hora {
+        background: #535368;
+        z-index: 2;
+    }
+
+    .pantalla-cancha {
+        background: #535368;
+        z-index: 1;
+        display: none;
+    }
+
+    button {
+        display: flex;
+        width: 100% !important;
+        padding: 15px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        border-radius: 20px;
+        background: #5E605E;
+        transition: width 0.7s ease;
+        box-sizing: border-box;
+        border: none;
+    }
+
+    .btn-primario {
+        color: #FFF !important;
+    }
+
+    .btn-secundario {
+        color: #4F9639 !important;
+    }
+
+    button.reducir-boton {
+        width: 49% !important;
+    }
+
+    .container-opcion {
+        display: flex;
+        padding: 10px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        align-self: stretch;
+        background: #3F374E;
+        border-radius: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .container-opcion.seleccionada {
+        background-color: #733BDE !important;
+        /* Cambialo al color que quieras */
+        transition: background-color 0.1s ease;
+    }
+
+    /* Contenedor del checkbox */
+    .checkbox-container {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 16px;
+        position: relative;
+        padding-left: 30px;
+        user-select: none;
+    }
+
+    /* Ocultar el checkbox original */
+    .checkbox-container input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    /* Estilo del checkmark (la caja visual) */
+    .checkmark {
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 20px;
+        width: 20px;
+        background-color: #3F374E;
+        border-radius: 6px;
+        transition: 0.1s;
+        border: 1px solid #FFF;
+    }
+
+    /* Cuando el checkbox está marcado */
+    .checkbox-container input:checked~.checkmark {
+        background-color: #FFF;
+    }
+
+    /* Mostrar un tick (✔) opcional */
+    .checkmark::after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 6px;
+        top: 2px;
+        width: 6px;
+        height: 12px;
+        border: solid black;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .checkbox-container input:checked~.checkmark::after {
+        display: block;
+    }
+
+
+    .container-botones div {
+        display: flex;
+        justify-content: end;
+        gap: 2%;
+        box-sizing: border-box;
+        z-index: 10;
+    }
+
+    .container-botones {
+        border-radius: 0 0 10px 10px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        background: #535368;
+        padding: 15px 10px;
+        box-sizing: border-box;
+        gap: 10px;
+    }
+
+    .pantalla {
+        animation-duration: 0.7s;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_2.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+{% block content %}
+<div class="container-volver">
+    <a href="{{ url_volver }}" class="icono-volver">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+            <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </a>
+</div>
+<div class="container-titulo">
+    <p class="M-subtitulos">Propuesta partido torneo</p>
+</div>
+<div class="main">
+    <div class="barra-lateral"></div>
+    <div style="width: 100%;">
+        <div class="pantalla-wrapper">
+            <div class="pantalla pantalla-dia-hora">
+                <div class="pantalla-contenido">
+                    <p class="M-titulo">Día y Hora</p>
+                    <div class="container-opcion d-flex flex-column justify-content-center align-items-start">
+                        <p class="M-boton">Opción 1</p>
+                        <div class="d-flex flex-row justify-content-center align-items-center w-100 gap-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Fecha</p>
+                                <p class="M-subtitulos">{{ propuesta.fecha1 }}</p>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Horario</p>
+                                <p class="M-subtitulos">{{ propuesta.hora1 }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-end align-items-center w-100" style="height: 24px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="container-opcion d-flex flex-column justify-content-center align-items-start">
+                        <p class="M-boton">Opción 2</p>
+                        <div class="d-flex flex-row justify-content-center align-items-center w-100 gap-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Fecha</p>
+                                <p class="M-subtitulos">{{ propuesta.fecha2 }}</p>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Horario</p>
+                                <p class="M-subtitulos">{{ propuesta.hora2 }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-end align-items-center w-100" style="height: 24px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="container-opcion d-flex flex-column justify-content-center align-items-start">
+                        <p class="M-boton">Opción 3</p>
+                        <div class="d-flex flex-row justify-content-center align-items-center w-100 gap-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Fecha</p>
+                                <p class="M-subtitulos">{{ propuesta.fecha3 }}</p>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Horario</p>
+                                <p class="M-subtitulos">{{ propuesta.hora3 }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-end align-items-center w-100" style="height: 24px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pantalla pantalla-cancha">
+                <div class="pantalla-contenido">
+                    <p class="M-titulo">Cancha</p>
+                    <div class="container-opcion d-flex flex-column justify-content-center align-items-start">
+                        <p class="M-boton">Opción 1</p>
+                        <div class="d-flex flex-column justify-content-center align-items-center w-100 gap-3">
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Cancha</p>
+                                <p class="M-subtitulos">{{ propuesta.cancha1.nombre }}</p>
+                                <p class="M-body" style="text-align: center;">{{ propuesta.ubicacion1 }}</p>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Precio c/u</p>
+                                <p class="M-subtitulos">{{ precio_unitario1 }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-end align-items-center w-100" style="height: 24px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="container-opcion d-flex flex-column justify-content-center align-items-start">
+                        <p class="M-boton">Opción 2</p>
+                        <div class="d-flex flex-column justify-content-center align-items-center w-100 gap-3">
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Cancha</p>
+                                <p class="M-subtitulos">{{ propuesta.cancha2.nombre }}</p>
+                                <p class="M-body" style="text-align: center;">{{ propuesta.ubicacion2 }}</p>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <p class="M-body texto-transparente">Precio c/u</p>
+                                <p class="M-subtitulos">{{ precio_unitario2 }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-end align-items-center w-100" style="height: 24px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-botones">
+            {% if propuesta.contador == 0 or propuesta.contador == 1 or propuesta.contador == 2 %}
+            <button class="btn-secundario" id="btn-modificar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M14.3601 4.57866L15.2869 3.65178C16.8226 2.11607 19.3125 2.11607 20.8482 3.65178C22.3839 5.18748 22.3839 7.67735 20.8482 9.21306L19.9213 10.1399M14.3601 4.57866C14.3601 4.57866 14.4759 6.54828 16.2138 8.28618C17.9517 10.0241 19.9213 10.1399 19.9213 10.1399M14.3601 4.57866L5.83882 13.0999C5.26166 13.6771 4.97308 13.9656 4.7249 14.2838C4.43213 14.6592 4.18114 15.0653 3.97634 15.495C3.80273 15.8593 3.67368 16.2465 3.41556 17.0208L2.32181 20.3021M19.9213 10.1399L11.4001 18.6612C10.8229 19.2383 10.5344 19.5269 10.2162 19.7751C9.84082 20.0679 9.43469 20.3189 9.00498 20.5237C8.6407 20.6973 8.25352 20.8263 7.47918 21.0844L4.19792 22.1782M4.19792 22.1782L3.39584 22.4456C3.01478 22.5726 2.59466 22.4734 2.31063 22.1894C2.0266 21.9053 1.92743 21.4852 2.05445 21.1042L2.32181 20.3021M4.19792 22.1782L2.32181 20.3021"
+                        stroke="#4F9639" stroke-width="1.5" />
+                </svg>
+                Modificar
+            </button>
+            {% endif %}
+            <div>
+                <button id="btn-volver" class="reducir-boton btn-secundario" style="display: none;">Volver</button>
+                <button id="btn-siguiente" class="btn-primario">Siguiente</button>
+                <form id="form-confirmacion" method="POST" action="{% url 'seleccionar_propuesta' partido.id %}" style="display: none;">
+                    {% csrf_token %}
+                    <input type="hidden" name="opcion_dia_hora" id="input-dia-hora">
+                    <input type="hidden" name="opcion_cancha" id="input-cancha">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="barra-lateral"></div>
+</div>
+
+<script>
+    const btn = document.getElementById("btn-siguiente");
+    const btnVolver = document.getElementById("btn-volver");
+    const diaHora = document.querySelector(".pantalla-dia-hora");
+    const cancha = document.querySelector(".pantalla-cancha");
+
+    // Función para limpiar clases animate.css
+    function limpiarAnimaciones(...elementos) {
+        elementos.forEach(el => {
+            el.classList.remove(
+                "animate__animated",
+                "animate__slideOutLeft",
+                "animate__slideInRight",
+                "animate__slideInLeft",
+                "animate__slideOutRight"
+            );
+        });
+    }
+
+    // Función para desactivar botones temporalmente
+    function bloquearBotones() {
+        btn.disabled = true;
+        btnVolver.disabled = true;
+    }
+
+    function desbloquearBotones() {
+        btn.disabled = false;
+        btnVolver.disabled = false;
+    }
+
+    function actualizarEstadoBotonConfirmar() {
+        // Solo aplica si estamos en la pantalla de cancha
+        if (cancha.style.display === "flex") {
+            const seleccion = cancha.querySelector('input[type="checkbox"]:checked');
+            btn.disabled = !seleccion;
+        } else {
+            btn.disabled = false; // siempre habilitado en la pantalla de Día y Hora
+        }
+    }
+
+    function haySeleccion(pantalla) {
+        return pantalla.querySelector('input[type="checkbox"]:checked') !== null;
+    }
+
+    btn.addEventListener("click", () => {
+        if (cancha.style.display === "flex") {
+             const seleccionCancha = cancha.querySelector('.container-opcion input:checked');
+             const seleccionDiaHora = diaHora.querySelector('.container-opcion input:checked');
+            if (!seleccionCancha || !seleccionDiaHora) return;
+            // Identificar la opción seleccionada en día y hora
+            const indexDiaHora = Array.from(diaHora.querySelectorAll('.container-opcion input')).indexOf(seleccionDiaHora);
+
+            // Identificar la opción seleccionada en cancha
+            const indexCancha = Array.from(cancha.querySelectorAll('.container-opcion input')).indexOf(seleccionCancha);
+
+            // Setear los valores en el formulario
+            document.getElementById("input-dia-hora").value = indexDiaHora + 1; // opción 1, 2 o 3
+            document.getElementById("input-cancha").value = indexCancha + 1;
+
+            // Enviar formulario
+            document.getElementById("form-confirmacion").submit();
+
+            return;
+        }
+
+        if (!haySeleccion(diaHora)) return;
+
+        bloquearBotones();
+        limpiarAnimaciones(diaHora, cancha);
+
+        btn.classList.add("reducir-boton");
+        cancha.style.display = "flex";
+        btnVolver.style.display = "flex";
+        btn.textContent = "Confirmar";
+
+        diaHora.classList.add("animate__animated", "animate__slideOutLeft");
+        cancha.classList.add("animate__animated", "animate__slideInRight");
+
+        diaHora.addEventListener("animationend", function handler() {
+            diaHora.style.display = "none";
+            limpiarAnimaciones(diaHora);
+            diaHora.removeEventListener("animationend", handler);
+        });
+
+        cancha.addEventListener("animationend", function handler2() {
+            limpiarAnimaciones(cancha);
+            cancha.removeEventListener("animationend", handler2);
+            actualizarEstadoBotonConfirmar();  // ✅ verificar botón al entrar a cancha
+            desbloquearBotones();
+        });
+    });
+
+
+    btnVolver.addEventListener("click", () => {
+        bloquearBotones();
+        limpiarAnimaciones(diaHora, cancha);
+
+        btn.classList.remove("reducir-boton");
+        diaHora.style.display = "flex";
+
+        btn.textContent = "Siguiente";
+
+        diaHora.classList.add("animate__animated", "animate__slideInLeft");
+        cancha.classList.add("animate__animated", "animate__slideOutRight");
+
+        cancha.addEventListener("animationend", function handler3() {
+            cancha.style.display = "none";
+            limpiarAnimaciones(cancha);
+            cancha.removeEventListener("animationend", handler3);
+            btnVolver.style.display = "none";
+            desbloquearBotones();
+        });
+
+        diaHora.addEventListener("animationend", function handler4() {
+            limpiarAnimaciones(diaHora);
+            diaHora.removeEventListener("animationend", handler4);
+        });
+    });
+
+    document.querySelectorAll('.container-opcion').forEach(container => {
+        container.addEventListener('click', (e) => {
+            // Evitar que el clic en el checkbox o checkmark no dispare duplicado
+            if (e.target.tagName.toLowerCase() === 'input' || e.target.classList.contains('checkmark')) return;
+
+            const checkbox = container.querySelector('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            const pantalla = container.closest('.pantalla'); // Día y Hora o Cancha
+
+            // Desmarcar todas las opciones de esta pantalla
+            const todasLasOpciones = pantalla.querySelectorAll('.container-opcion');
+            todasLasOpciones.forEach(op => {
+                const cb = op.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = false;
+                op.classList.remove('seleccionada');
+            });
+
+            // Marcar esta opción si no estaba ya marcada
+            checkbox.checked = true;
+            container.classList.add('seleccionada');
+        });
+
+        // También controlar cambios directos sobre el checkbox
+        const checkbox = container.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+            checkbox.addEventListener('change', () => {
+                if (!checkbox.checked) {
+                    container.classList.remove('seleccionada');
+                    return;
+                }
+
+                // Si se marcó directamente, desmarcar los demás en la misma pantalla
+                const pantalla = container.closest('.pantalla');
+                pantalla.querySelectorAll('.container-opcion').forEach(op => {
+                    const cb = op.querySelector('input[type="checkbox"]');
+                    if (cb && cb !== checkbox) cb.checked = false;
+                    if (op !== container) op.classList.remove('seleccionada');
+                });
+
+                container.classList.add('seleccionada');
+            });
+        }
+    });
+
+    document.getElementById("btn-modificar").addEventListener("click", function () {
+        // Borrar valores del localStorage antes de ir a propuesta_1
+        const campos = ["fecha1", "hora1", "fecha2", "hora2", "fecha3", "hora3"];
+        campos.forEach(id => localStorage.removeItem(`partido_${id}`));
+
+        const partidoId = "{{ partido.id }}";
+        window.location.href = `/partido/${partidoId}/propuesta-1/`;
+    });
+
+    // Detectar cambios en los checkboxes de cancha para activar el botón
+    document.querySelectorAll('.pantalla-cancha input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', actualizarEstadoBotonConfirmar);
+    });
+
+</script>
+
+{% endblock %}

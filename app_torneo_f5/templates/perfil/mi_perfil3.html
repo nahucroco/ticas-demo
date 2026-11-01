@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de gráfico</title>
+    <style>
+        body {
+            background-color: #3F374E;
+            color: white;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Prueba de gráfico base64</h1>
+
+    <p>Base64 generado:</p>
+    <p>Longitud: {{ grafico_calificaciones_torneo|length }}</p>
+
+    {% if grafico_calificaciones_torneo|default_if_none:"" %}
+        <img src="data:image/png;base64,{{ grafico_calificaciones_torneo|safe }}" alt="Gráfico calificaciones" style="max-width: 400px;">
+    {% else %}
+        <p>No hay gráfico disponible.</p>
+    {% endif %}
+
+</body>
+</html>

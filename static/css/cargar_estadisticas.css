@@ -1,0 +1,532 @@
+/* Header general */
+
+.header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+}
+
+.header .container-1 {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.header .container-2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.header .container-2 .container-icons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 24px;
+    align-items: center;
+    width: 100%;
+}
+
+.header .container-2 .container-textos {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.header .container-2 .container-textos p {
+    width: 82px;
+}
+
+.header .container-2 .container-icons div {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 11px;
+    height: 34px;
+    width: 34px;
+}
+
+.header .container-2 hr {
+    height: 2px;
+    border: none;
+    background-color: #FFF;
+    opacity: 0.5;
+    margin: 20px 0;
+    width: 100%;
+}
+
+/* Botón inferior */
+
+.boton-fijo-inferior {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #161618;
+    padding: 16px;
+    z-index: 1000;
+    text-align: end;
+}
+
+.boton-fijo-inferior .btn-primario {
+    cursor: pointer;
+    color: white;
+    width: 160px !important;
+    height: 51px !important;
+}
+
+
+/* Carga estadisticas 1 */
+
+.cargar_estadisticas_1 .header .icon-container-1 {
+    background: var(--No-se, #733BDE);
+}
+
+.cargar_estadisticas_1 .container-main,
+.cargar_estadisticas_2 .container-main {
+    width: 100%;
+    padding: 0 16px;
+    gap: 40px;
+}
+
+.cargar_estadisticas_1 .container-main .lista-jugadores {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+.cargar_estadisticas_1 .container-main .lista-jugadores .container-jugador,
+.cargar_estadisticas_1 .container-main .lista-jugadores .container-jugador {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.slider-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.slider-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 12px;
+    background-color: #d1d1d1;
+    pointer-events: none;
+    border-radius: 6px;
+    transition: width 0.2s ease;
+}
+
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 6px;
+    background:
+        linear-gradient(90deg, var(--color-inicio, #F54B58), var(--color-fin, #98CC09));
+    /* gradiente base */
+    position: relative;
+    outline: none;
+    cursor: pointer;
+    border: none;
+}
+
+
+/* Thumb - Chrome/Safari */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    background: #161618;
+    border: 2px solid var(--color-fin, #98CC09);
+    border-radius: 50%;
+    margin-top: -4px;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+/* Thumb - Firefox */
+input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    background: white;
+    border: 2px solid var(--color-fin, #98CC09);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Track - Firefox */
+input[type="range"]::-moz-range-track {
+    height: 10px;
+    background: #d1d1d1;
+    border-radius: 5px;
+}
+
+/* Track (parte rellenada) - Firefox */
+input[type="range"]::-moz-range-progress {
+    height: 10px;
+    background: linear-gradient(90deg,
+            var(--color-inicio, #F54B58),
+            var(--color-fin, #98CC09));
+    border-radius: 5px;
+}
+
+/* Carga estadisticas 2 */
+
+.cargar_estadisticas_2 .header .container-2 .container-textos .text-container-1 {
+    opacity: 0.5;
+}
+
+.cargar_estadisticas_2 .header .container-2 .container-icons .icon-container-1 svg {
+    opacity: 0.5;
+}
+
+.cargar_estadisticas_2 .header .icon-container-1,
+.cargar_estadisticas_2 .header .icon-container-2 {
+    background: var(--No-se, #733BDE);
+}
+
+.cargar_estadisticas_2 .header .container-2 .linea-1 {
+    background: var(--No-se, #733BDE) !important;
+    height: 5px;
+}
+
+.cargar_estadisticas_2 .container-main .lista-jugadores{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 40px;
+}
+
+.cargar_estadisticas_2 input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+    background: #ccc;
+}
+
+.cargar_estadisticas_2 input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    background: #161618;
+    border: 2px solid #733BDE;
+    border-radius: 50%;
+    margin-top: -4px;
+    cursor: pointer;
+}
+
+.cargar_estadisticas_2 input[type="range"]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    background: #161618;
+    border: 2px solid #733BDE;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.cargar_estadisticas_2 .container-main .lista-jugadores .container-jugador label {
+    gap: 5px;
+}
+
+
+
+/* Carga estadisticas 3 */
+
+.cargar_estadisticas_3 .header .container-2 .container-textos .text-container-1,
+.cargar_estadisticas_3 .header .container-2 .container-textos .text-container-2 {
+    opacity: 0.5;
+}
+
+.cargar_estadisticas_3 .header .container-2 .container-icons .icon-container-1 svg,
+.cargar_estadisticas_3 .header .container-2 .container-icons .icon-container-2 svg {
+    opacity: 0.5;
+}
+
+.cargar_estadisticas_3 .header .icon-container-1,
+.cargar_estadisticas_3 .header .icon-container-2,
+.cargar_estadisticas_3 .header .icon-container-3 {
+    background: var(--No-se, #733BDE);
+}
+
+.cargar_estadisticas_3 .header .container-2 .linea-1,
+.cargar_estadisticas_3 .header .container-2 .linea-2 {
+    background: var(--No-se, #733BDE) !important;
+    height: 5px;
+}
+
+.cargar_estadisticas_3 .lista-jugadores{
+    width: 100%;
+}
+
+.cargar_estadisticas_3 .estadisticas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  margin-top: 40px;
+}
+
+.cargar_estadisticas_3 .estadistica-item {
+  background: #3F374E;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0px 54px 15px 0px rgba(89, 0, 255, 0.00), 0px 34px 14px 0px rgba(89, 0, 255, 0.01), 0px 19px 12px 0px rgba(89, 0, 255, 0.05), 0px 9px 9px 0px rgba(89, 0, 255, 0.09), 0px 2px 5px 0px rgba(89, 0, 255, 0.10);
+}
+
+.cargar_estadisticas_3 .icono {
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+
+.cargar_estadisticas_3 .label {
+  flex: 1;
+}
+
+.cargar_estadisticas_3 .contador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cargar_estadisticas_3 .contador button {
+  background: none;
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  font-size: 1.2em;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cargar_estadisticas_3 .contador input {
+  width: 30px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.1em;
+}
+
+
+/* Container main */
+
+.container-main {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.opacity-05{
+    opacity: 0.5;
+}
+
+
+.header-carga{
+    display: flex;
+width: 328px;
+flex-direction: column;
+align-items: center;
+margin-bottom: 40px;
+  position: relative; /* NO absolute / fixed */
+
+}
+
+.header-top{
+    display: flex;
+align-items: center;
+gap: 89px;
+}
+
+.header-icon{
+    display: flex;
+padding: 5px;
+align-items: center;
+gap: 10px;
+border-radius: 11px;
+background: var(--No-se, #733BDE);
+}
+.header-icon-2{
+display: flex;
+padding: 5px;
+align-items: center;
+gap: 10px;
+border-radius: 11px;
+background: var(--Fondo, #161618);
+}
+
+.header-info-cards{
+    display: flex;
+align-items: center;
+gap: 41px;
+margin-top: 3px;
+}
+
+.M-body-S{
+    color: #FFF;
+text-align: center;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+width: 82px;
+}
+
+.partido-titulo-torneo{
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+/* --- ESTADOS --- */
+.step-icon,
+.step-label {
+  opacity: 0.45;
+  transition: 
+    opacity .35s ease,
+    transform .35s ease,
+    background .35s ease,
+}
+
+/* iconos base */
+
+.step-icon.active {
+  opacity: 1;
+  background: #7c48ff;
+  transform: scale(1.08);
+}
+
+.step-label.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* animación suave al cambiar */
+.step-icon.transitioning {
+  transform: scale(0.95);
+  opacity: 0.65;
+}
+
+
+
+/* Fondo de ejemplo */
+.contador-demo-bg {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+
+/* Cada fila (contador) */
+.stat-counter {
+  width: 130px;                 /* ajustá si querés más ancho */
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Valor numérico */
+.stat-value {
+  font-size: 24px;
+}
+
+/* Botones circulares */
+.btn-circle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* “Iconos” + y – dibujados con pseudo-elementos */
+.btn-circle::before,
+.btn-circle::after {
+  content: "";
+  position: absolute;
+  background: #fff;
+  border-radius: 999px;
+}
+
+/* Línea horizontal */
+.btn-circle::before {
+  width: 18px;
+  height: 2px;
+
+}
+
+/* Línea vertical SOLO para el botón plus */
+.btn-plus::after {
+  width: 2px;
+  height: 18px;
+}
+
+/* Hover / active */
+.btn-circle:active:not(.is-disabled) {
+  transform: scale(0.94);
+}
+
+/* Estado deshabilitado (ej: valor mínimo) */
+.btn-circle.is-disabled {
+  opacity: 0.28;
+  cursor: default;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Deshabilitado: no responde a clicks */
+.btn-circle.is-disabled::before,
+.btn-circle.is-disabled::after {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+
+
+
+.stroke-linecap{
+
+  width: 100%;
+  margin: 0 auto;
+  height: 0px;
+  flex-shrink: 0;
+  border: 1px solid #ffffff;
+}
+
+
+

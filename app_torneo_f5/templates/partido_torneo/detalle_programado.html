@@ -1,0 +1,984 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/editar_partido.css' %}">
+{% endblock %}
+{% block title %}Ticas - Partido Programado{% endblock %}
+{% block content %}
+
+<style>
+    .pantalla-crear {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+        gap: 15px;
+    }
+
+    .descripcion-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .reloj-partido {
+        font-size: 26px;
+        font-weight: 600;
+        margin-top: 5px;
+    }
+
+    .btn-detalles {
+        background: transparent;
+        border-radius: 20px;
+        padding: 5px 10px;
+        width: 100%;
+    }
+
+    .detalles-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .detalles-content {
+        overflow: hidden;
+        transition: all 0.3s ease;
+        max-height: 0;
+        opacity: 0;
+    }
+
+    .partido-detalles {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        gap: 10px;
+    }
+
+    .partido-detalles .fecha,
+    .partido-detalles .horario,
+    .partido-detalles .precio {
+        padding: 0;
+        width: 83px;
+    }
+
+    .cancha-info,
+    .tipo-partido {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .equipo-panel {
+        margin-top: 5px;
+        width: 100%;
+    }
+
+    .tab-selector {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        background-color: #2b2830;
+        border-radius: 10px;
+        padding: 5px;
+        overflow: hidden;
+        /* por si el fondo se anima en borde */
+    }
+
+    .tab {
+        position: relative;
+        z-index: 2;
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 5px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: color 0.25s ease;
+        font-weight: 500;
+        white-space: nowrap;
+        /* evita saltos raros */
+    }
+
+    .tab.active {
+        color: white;
+        background-color: transparent;
+    }
+
+    .tab-background {
+        /* width: 50% !important; */
+        position: absolute;
+        top: 5px;
+        left: 0;
+        /* punto de referencia dentro del contenedor */
+        height: calc(100% - 10px);
+        /* respeta padding superior/inferior */
+        width: 0;
+        /* se ajusta por JS */
+        background-color: #733BDE;
+        border-radius: 5px;
+        z-index: 1;
+        transform: translateX(0);
+        /* base para animación */
+        transition: transform 0.28s ease, width 0.28s ease;
+        /* animación suave */
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .equipo-lista-jugadores {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #535368;
+        padding: 15px 10px;
+        border-radius: 10px;
+    }
+
+    .equipo-jugador-card {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .icono-capitan {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .equipo-jugador-img {
+        width: 45px;
+        height: 45px;
+        border-radius: 5px;
+    }
+
+    .equipo-jugador-nombre {
+        font-weight: 600;
+    }
+
+    .equipo-jugador-id {
+        font-size: 13px;
+        opacity: 0.6;
+    }
+
+    .linea-divisora {
+        width: 100%;
+        height: 1px;
+        background-color: #733BDE;
+        margin: 5px 0 10px 0;
+    }
+
+    .estado-partido-en-curso {
+        display: flex;
+        padding: 25px 53px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    #estado-partido-wrapper{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .titulo-estado-en-curso{
+        color: var(--Texto, #FFF);
+        text-align: center;
+        /* M-Titulo */
+        font-family: CalSans, sans-serif;
+        font-size: 30px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+    .reloj-partido-en-curso{
+        display: flex;
+justify-content: center;
+align-items: center;
+gap: 5px;
+    }
+    .estado-partido-reloj{
+        color: var(--Texto, #FFF);
+        text-align: center;
+        font-family: CalSans, sans-serif;
+        font-size: 64px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    .estado-partido-esperando{
+       display: inline-flex;
+padding: 10px 5px;
+flex-direction: column;
+align-items: center;
+gap: 5px;
+
+    }
+   .espera-reloj-wrapper{
+    display: flex;
+justify-content: center;
+align-items: flex-end;
+align-self: stretch;
+   }
+   .espera-reloj-grupo{
+    display: flex;
+width: 75px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+   }
+
+   .espera-reloj-label{
+    color: var(--Texto, #FFF);
+    text-align: center;
+    font-family: Outfit;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.5;
+   }
+  .espera-reloj-valor{
+      color: var(--Texto, #FFF);
+text-align: center;
+
+/* M-Subtitulos */
+font-family: Outfit;
+font-size: 20px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
+  }
+.estado-partido-finalizado2{
+    display: flex;
+width: 328px;
+padding: 25px 41.5px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 5px;
+border-radius: 10px;
+background: var(--No-se, #733BDE);
+}
+
+
+    
+.estado-titulo{
+    color: var(--Texto, #FFF);
+text-align: center;
+
+/* M-Titulo */
+font-family: CalSans, sans-serif;
+font-size: 30px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.estado-subtitulo{
+    color: var(--Texto, #FFF);
+    font-family: Outfit;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    }
+
+.estado-partido-finalizado3{
+    display: flex;
+padding: 15px 10px;
+flex-direction: column;
+align-items: center;
+gap: 20px;
+border-radius: 10px 10px 30px 30px;
+background: var(--No-se, #733BDE);
+
+/* Sombra */
+box-shadow: 0 54px 15px 0 rgba(89, 0, 255, 0.00), 0 34px 14px 0 rgba(89, 0, 255, 0.01), 0 19px 12px 0 rgba(89, 0, 255, 0.05), 0 9px 9px 0 rgba(89, 0, 255, 0.09), 0 2px 5px 0 rgba(89, 0, 255, 0.10);
+}
+.estado-partido-finalizado3 button{
+    width: 100%;
+    color: #FFF;
+text-align: center;
+
+/* M-Boton */
+font-family: CalSans, sans-serif;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.estado-titulo3{
+    color: var(--Texto, #FFF);
+
+/* M-Subtitulos */
+font-family: Outfit;
+font-size: 20px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
+text-align: left;
+}
+.estado-subtitulo3{
+    color: var(--Texto, #FFF);
+
+/* M-Body */
+font-family: Outfit;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.grupo-finalizado{
+    display: flex;
+width: 308px;
+flex-direction: column;
+align-items: flex-start;
+gap: 10px;
+}
+
+</style>
+
+
+
+
+<!-- ENCABEZADO -->
+<div class="descripcion-header">
+    <p class="M-titulo">Partido de torneo</p>
+    <div class="d-flex flex-row justify-content-center" style="gap: 5px; margin-bottom: 10px;">
+        {% if partido.torneo.imagen %}
+        <img src="{{ partido.torneo.imagen.url }}" width="30" height="30" style="border-radius: 2px;">
+        {% else %}
+        <img id="escudo-torneo" src="{% static 'images/copas-default/copa-default.png' %}" width="30" height="30">
+        {% endif %}
+        <p class="M-subtitulos">{{ partido.torneo.nombre }}</p>
+    </div>
+
+    <div class="d-flex flex-column justify-content-between align-items-center w-100" style="gap: 4px; padding: 10px;">
+        <div class="d-flex flex-row justify-content-between w-100">
+            <div>
+                <img id="escudo-local" src="{% static 'images/escudo-equipo/equipo-a.png' %}" width="76"
+                    style="border-radius: 5px;">
+            </div>
+            <div class="d-flex flex-column justify-content-between align-items-center">
+                <p class="M-body" id="numero-fecha">Fecha —</p>
+                <p class="M-titulo">VS</p>
+            </div>
+            <div>
+                <img id="escudo-visitante" src="{% static 'images/escudo-equipo/equipo-b.png' %}" width="76"
+                    style="border-radius: 5px;">
+            </div>
+        </div>
+        <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+            <p class="M-body equipo-nombre izq"></p>
+            <p class="M-body equipo-nombre der"></p>
+        </div>
+    </div>
+
+</div>
+
+<!-- DETALLES -->
+<div class="btn-detalles" id="detalles-card">
+    <div class="detalles-head">
+        <p class="M-subtitulos">Detalles</p>
+        <svg class="icono-flecha" width="24" height="25" viewBox="0 0 24 25" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 9.5L12 15.5L5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </div>
+
+    <div class="detalles-content">
+        <div class="info-partido">
+            <div class="container-datos">
+                <div class="partido-detalles">
+                    <div class="fecha">
+                        <p>Día</p>
+                        <strong>{{ partido.dia|date:"d / M" }}</strong>
+                    </div>
+                    <div class="horario">
+                        <p>Horario</p>
+                        <strong>{{ partido.hora_inicio|time:"H:i" }}</strong>
+                    </div>
+                    <div class="precio">
+                        <p>Precio c/u</p>
+                        <strong>-</strong>
+                    </div>
+                </div>
+                <div class="cancha-info">
+                    <p class="cancha-box">Cancha:</p>
+                    <p class="cancha-nombre">{{ partido.cancha_text }}</p>
+                    <p class="cancha-localidad">{{ partido.ubicacion }}</p>
+                </div>
+                <div class="tipo-partido">
+                    <p>{{ partido.tipo_cancha.nombre }}</p>
+                    <p>{{ partido.duracion }} minutos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- LINEA DIVISORA -->
+<!-- LINEA DIVISORA -->
+<div class="linea-divisora"></div>
+
+<!-- ESTADO (se arma TODO por API) -->
+<div id="estado-partido-wrapper"></div>
+
+<!-- PANEL DE JUGADORES -->
+<div class="equipo-panel">
+    <div class="tab-selector">
+        <div class="tab-background"></div>
+        <button class="M-body tab active" data-tab="equipo-1">{{ partido.equipo_1.nombre }}</button>
+        <button class="M-body tab" data-tab="equipo-2">{{ partido.equipo_2.nombre }}</button>
+    </div>
+
+    <div class="equipo-lista-jugadores" id="equipo-1">
+        {% for jugador in jugadores_equipo_1 %}
+        <div class="equipo-jugador-card">
+            <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+            <div>
+                <p class="M-body equipo-jugador-nombre">{{ jugador.nombre }}</p><br>
+                <p class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="equipo-lista-jugadores hidden" id="equipo-2">
+        {% for jugador in jugadores_equipo_2 %}
+        <div class="equipo-jugador-card">
+            <img src="{{ jugador.foto.url }}" alt="Jugador" class="equipo-jugador-img">
+            <div>
+                <p class="M-body equipo-jugador-nombre">{{ jugador.nombre }}</p><br>
+                <p class="equipo-jugador-id">#{{ jugador.id|stringformat:"04d" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<script src="{% static 'js/editar_partido.js' %}"></script>
+<script>
+    console.log("Detalle partido programado JS");
+    // Cronómetro
+
+
+    // Detalles expandibles
+    document.addEventListener("DOMContentLoaded", () => {
+        const card = document.getElementById("detalles-card");
+        const content = card.querySelector(".detalles-content");
+        content.style.maxHeight = "0";
+        content.style.opacity = "0";
+
+        card.addEventListener("click", () => {
+            const isOpen = card.classList.toggle("activo");
+            if (isOpen) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                content.style.opacity = "1";
+            } else {
+                content.style.maxHeight = "0";
+                content.style.opacity = "0";
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+
+        const partidoId = "{{ partido_id }}";
+        const tipo = "{{ tipo }}";
+        const esEncargado = {{ es_encargado|yesno:"true,false" }};
+
+
+        console.log("Es encargado:", esEncargado);
+
+        const url = `/api/partido/${partidoId}/`;
+        console.log("Cargando partido desde:", url);
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("No se pudo cargar el partido");
+            const data = await res.json();
+
+            // --- Estado del partido tomado desde la API ---
+const estadoWrapper = document.getElementById("estado-partido-wrapper");
+
+if (estadoWrapper) {
+if (data.estado === "EN_CURSO") {
+  const inicioStr = `${data.dia}T${data.hora_inicio}`;
+  const duracion = data.duracion || (data.torneo && data.torneo.duracion_partido) || 90;
+
+  estadoWrapper.innerHTML = `
+    <div class="estado-partido-en-curso">
+      <p class="titulo-estado-en-curso">Partido en curso</p>
+      <div class="reloj-partido-en-curso">
+        <span class="estado-partido-reloj" data-part="min">00</span>
+        <span class="estado-partido-reloj">:</span>
+        <span class="estado-partido-reloj" data-part="seg">00</span>
+      </div>
+      <div id="cronometro-meta"
+           data-inicio="${inicioStr}"
+           data-duracion="${duracion}">
+      </div>
+    </div>
+  `;
+
+  // ⏱ iniciar cronómetro cuando ya está el HTML
+  initCronometro();
+} else if (data.estado === "PROGRAMADO") {
+    estadoWrapper.innerHTML = `
+<div class="estado-partido-esperando">
+  <p class="M-subtitulos">El partido comienza en</p>
+
+  <div class="espera-reloj-wrapper">
+    <div class="espera-reloj-grupo">
+      <span class="espera-reloj-label">Días</span>
+      <span class="espera-reloj-valor" data-part="dias">00</span>
+    </div>
+
+    <span class="espera-reloj-separador">:</span>
+
+    <div class="espera-reloj-grupo">
+      <span class="espera-reloj-label">Horas</span>
+      <span class="espera-reloj-valor" data-part="horas">00</span>
+    </div>
+
+    <span class="espera-reloj-separador">:</span>
+
+    <div class="espera-reloj-grupo">
+      <span class="espera-reloj-label">Minutos</span>
+      <span class="espera-reloj-valor" data-part="minutos">00</span>
+    </div>
+
+    <span class="espera-reloj-separador">:</span>
+
+    <div class="espera-reloj-grupo">
+      <span class="espera-reloj-label">Segundos</span>
+      <span class="espera-reloj-valor" data-part="segundos">00</span>
+    </div>
+  </div>
+</div>
+
+
+    `;
+        iniciarCuentaRegresiva(data);
+
+  }else if (data.estado === "FINALIZADO") {
+
+  if (esEncargado) {
+
+    estadoWrapper.innerHTML = `
+      <div class="estado-partido-finalizado3">
+        <div class="grupo-finalizado">
+          <span class="estado-titulo3">Registra los resultados</span>
+          <span class="estado-descripcion3">
+            Este partido finalizó. Subí los resultados para que todos puedan ver los detalles
+          </span>
+        </div>
+        <button class="btn-primario" id="btnRegistrarPartido">
+          Registrar partido
+        </button>
+      </div>
+    `;
+
+    document
+      .getElementById("btnRegistrarPartido")
+      .addEventListener("click", () => {
+        window.location.href = `/partido/${tipo}/${partidoId}/carga-estadisticas/`;
+      });
+
+  } else {
+
+    estadoWrapper.innerHTML = `
+      <div class="estado-partido-finalizado2">
+        <span class="estado-titulo">Partido terminado</span>
+        <span class="estado-descripcion">
+          Esperando a que el administrador del torneo registre los resultados.
+        </span>
+      </div>
+    `;
+
+  }
+}
+  
+  
+  else {
+    // fallback por si aparece otro estado
+    estadoWrapper.innerHTML = `
+      <div class="estado-partido-esperando">
+        <p class="M-subtitulos">Estado: ${data.estado || "Desconocido"}</p>
+      </div>
+    `;
+  }
+}
+
+
+            console.log("✅ Datos del partido:", data);
+
+            // --- Header torneo ---
+            document.querySelector(".M-titulo").textContent = "Partido de torneo";
+            if (data.torneo && data.torneo.nombre) {
+                document.querySelector(".M-subtitulos").textContent = data.torneo.nombre;
+            }
+
+            // --- Escudos y nombres de equipos ---
+            const eq1 = data.equipo_local;
+            const eq2 = data.equipo_visitante;
+
+            document.querySelector(".equipo-nombre.izq").textContent = eq1?.nombre || "Equipo Local";
+            document.querySelector(".equipo-nombre.der").textContent = eq2?.nombre || "Equipo Visitante";
+
+            const escudo1 = eq1?.escudo ? eq1.escudo : "{% static 'images/escudo-equipo/equipo-a.png' %}";
+            const escudo2 = eq2?.escudo ? eq2.escudo : "{% static 'images/escudo-equipo/equipo-b.png' %}";
+
+            const escudoLocalImg = document.getElementById("escudo-local");
+            const escudoVisitanteImg = document.getElementById("escudo-visitante");
+
+            if (escudoLocalImg) {
+              escudoLocalImg.src = eq1?.escudo || "{% static 'images/escudo-equipo/equipo-a.png' %}";
+            }
+
+            if (escudoVisitanteImg) {
+              escudoVisitanteImg.src = eq2?.escudo || "{% static 'images/escudo-equipo/equipo-b.png' %}";
+            }
+
+            const escudoTorneoImg = document.getElementById("escudo-torneo");
+
+            if (escudoTorneoImg) {
+              escudoTorneoImg.src =
+                data.torneo?.imagen || "{% static 'images/copas-default/copa-default.png' %}";
+            }
+
+            // --- Número de fecha ---
+            if (data.fecha) {
+                document.getElementById("numero-fecha").textContent = `Fecha ${data.fecha}`;
+            } else {
+                document.getElementById("numero-fecha").textContent = "Fecha a definir";
+            }
+
+            // --- Fecha y hora ---
+            const dia = data.dia ? new Date(data.dia).toLocaleDateString("es-AR") : "A definir";
+            const hora = data.hora_inicio || "A definir";
+
+            // --- Día ---
+            const diaElement = document.querySelector(".fecha strong");
+            if (diaElement) {
+                if (data.dia_formateado) {
+                    diaElement.textContent = data.dia_formateado;
+                } else {
+                    diaElement.textContent = "A definir";
+                }
+            }
+
+
+            // --- Horario ---
+            const horaElement = document.querySelector(".horario strong");
+            if (horaElement) {
+                if (data.hora_inicio) {
+                    const [h, m] = data.hora_inicio.split(":");
+                    horaElement.textContent = `${h}:${m}`;
+                } else {
+                    horaElement.textContent = "A definir";
+                }
+            }
+
+            // --- Cancha ---
+            document.querySelector(".cancha-nombre").textContent = data.cancha || "-";
+            document.querySelector(".cancha-localidad").textContent = data.ubicacion || "-";
+
+            // --- Tipo de cancha y duración ---
+            document.querySelector(".tipo-partido").innerHTML = `
+            <p>${data.torneo.tipo_cancha.nombre || "-"}</p>
+            <p>${data.torneo.duracion_partido || 0} minutos</p>
+        `;
+
+            // --- Botones de tabs con nombres cortos de equipos ---
+            const botonEq1 = document.querySelector("button[data-tab='equipo-1']");
+            const botonEq2 = document.querySelector("button[data-tab='equipo-2']");
+
+            if (botonEq1 && data.equipo_local) {
+                botonEq1.textContent = data.equipo_local.nombre_corto || data.equipo_local.nombre;
+            }
+            if (botonEq2 && data.equipo_visitante) {
+                botonEq2.textContent = data.equipo_visitante.nombre_corto || data.equipo_visitante.nombre;
+            }
+
+
+            // --- Mostrar jugadores de cada equipo ---
+            const cont1 = document.getElementById("equipo-1");
+            const cont2 = document.getElementById("equipo-2");
+
+            function renderJugadores(contenedor, jugadores) {
+                if (!jugadores || jugadores.length === 0) {
+                    contenedor.innerHTML = `<p class="M-body-s texto-transparente">Sin jugadores</p>`;
+                    return;
+                }
+
+                contenedor.innerHTML = "";
+                jugadores.forEach(m => {
+                    const j = m.jugador;
+                    const perfilUrl = `/perfil/${j?.id || 0}/`;
+                    const esCapitan =
+                        (contenedor.id === "equipo-1" && j?.id === data.equipo_local?.capitan_id) ||
+                        (contenedor.id === "equipo-2" && j?.id === data.equipo_visitante?.capitan_id);
+
+                    contenedor.innerHTML += `
+                    <a href="${perfilUrl}" class="equipo-jugador-card" style="text-decoration: none; color: inherit; position: relative;">
+                        <img src="${j?.foto || '/static/images/user-placeholder.png'}" alt="${j?.nombre}" class="equipo-jugador-img">
+                        <div>
+                            <p class="M-body equipo-jugador-nombre">${j?.nombre || 'Jugador sin nombre'}</p>
+                            <p class="M-body equipo-jugador-id">#${String(j?.id || 0).padStart(4, '0')}</p>
+                        </div>
+                        ${esCapitan ? `
+                        <div class="icono-capitan" title="Capitán">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z" stroke="white" stroke-width="1.5"/>
+                              <path d="M14 15.6672C13.475 15.8812 12.8952 16 12.2857 16C9.91878 16 8 14.2091 8 12C8 9.79086 9.91878 8 12.2857 8C12.8952 8 13.475 8.11876 14 8.33283" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>` : ""}
+                    </a>`;
+                });
+            }
+
+
+            // --- Mostrar jugadores de cada equipo ---
+            renderJugadores(cont1, data.equipo_local?.jugadores);
+            renderJugadores(cont2, data.equipo_visitante?.jugadores);
+
+            // 👇 Agregar esta parte para reposicionar el fondo después de actualizar los textos
+            const selector = document.querySelector(".tab-selector");
+            const activeTab = selector.querySelector(".tab.active");
+            const background = selector.querySelector(".tab-background");
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (activeTab && background) {
+                        const x = activeTab.offsetLeft;
+                        const w = activeTab.offsetWidth;
+                        background.style.width = `${w}px`;
+                        background.style.transform = `translateX(${x}px)`;
+                    }
+                });
+            });
+
+
+        } catch (err) {
+            console.error("❌ Error:", err);
+            alert("No se pudo cargar la información del partido.");
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const selector = document.querySelector(".tab-selector");
+        const tabs = selector.querySelectorAll(".tab");
+        let background = selector.querySelector(".tab-background");
+
+        if (!background) {
+            background = document.createElement("div");
+            background.className = "tab-background";
+            selector.prepend(background);
+        }
+
+        function moveBackground(toEl) {
+            if (!toEl) return;
+            // offsetLeft/offsetWidth ya están medidos desde el borde interior (padding) del contenedor
+            const x = toEl.offsetLeft;
+            const w = toEl.offsetWidth;
+
+            background.style.width = `${w}px`;
+            background.style.transform = `translateX(${x}px)`;
+        }
+
+        // Inicial: mostrar equipo 1 y ubicar fondo bajo el activo
+        const equipos = document.querySelectorAll(".equipo-lista-jugadores");
+        equipos.forEach(eq => eq.classList.add("hidden"));
+        document.getElementById("equipo-1").classList.remove("hidden");
+
+        // Colocar el fondo después de que los botones tengan el texto definitivo (por el fetch)
+        const activeTab = selector.querySelector(".tab.active") || tabs[0];
+        // Dos rafs para asegurar layout tras cambios de texto/anchos
+        requestAnimationFrame(() => requestAnimationFrame(() => moveBackground(activeTab)));
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+
+                // Mover el fondo
+                moveBackground(tab);
+
+                // Mostrar/ocultar listas
+                equipos.forEach(eq => eq.classList.add("hidden"));
+                document.getElementById(tab.dataset.tab)?.classList.remove("hidden");
+            });
+        });
+
+        // Recalcular en resize (por si cambia el ancho de los botones)
+        window.addEventListener("resize", () => {
+            moveBackground(selector.querySelector(".tab.active") || tabs[0]);
+        });
+    });
+</script>
+<script>
+function initCronometro() {
+  const minEl  = document.querySelector('.estado-partido-reloj[data-part="min"]');
+  const segEl  = document.querySelector('.estado-partido-reloj[data-part="seg"]');
+  const metaEl = document.getElementById("cronometro-meta");
+
+  if (!minEl || !segEl || !metaEl) return;
+
+  const inicioStr = metaEl.getAttribute("data-inicio");   // "YYYY-MM-DDTHH:MM" o "YYYY-MM-DDTHH:MM:SS"
+  const durAttr   = metaEl.getAttribute("data-duracion");
+
+  let duracionMin = parseInt(durAttr, 10);
+  if (Number.isNaN(duracionMin) || duracionMin <= 0) duracionMin = 90;
+
+  if (!inicioStr || !inicioStr.includes("T")) {
+    console.error("❌ Fecha de inicio inválida:", inicioStr);
+    minEl.textContent = "00";
+    segEl.textContent = "00";
+    return;
+  }
+
+  // Parse ISO LOCAL (sin timezone) para evitar corrimientos raros
+  function parseFechaISOLocal(str) {
+    const [fecha, hora] = str.split("T");
+    if (!fecha || !hora) return null;
+
+    const [y, m, d] = fecha.split("-").map(Number);
+    const [hh, mm, ss] = hora.split(":").map(Number);
+
+    if ([y, m, d, hh, mm].some(v => Number.isNaN(v))) return null;
+
+    return new Date(y, (m - 1), d, hh, mm, (Number.isNaN(ss) ? 0 : ss));
+  }
+
+  const inicio = parseFechaISOLocal(inicioStr);
+  if (!inicio) {
+    console.error("❌ No se pudo parsear data-inicio:", inicioStr);
+    minEl.textContent = "00";
+    segEl.textContent = "00";
+    return;
+  }
+
+  const duracionSeg = duracionMin * 60;
+
+  function render(segundos) {
+    const total = Math.max(0, Math.floor(segundos));
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    minEl.textContent = String(m).padStart(2, "0");
+    segEl.textContent = String(s).padStart(2, "0");
+  }
+
+  let intervalId = null;
+
+  function tick() {
+    const ahora = new Date();
+
+    // Antes del inicio: 00:00
+    if (ahora < inicio) {
+      render(0);
+      return;
+    }
+
+    // Tiempo transcurrido
+    const transcurridoSeg = (ahora - inicio) / 1000;
+
+    // Cap al máximo (duración)
+    if (transcurridoSeg >= duracionSeg) {
+      render(duracionSeg);
+      if (intervalId) clearInterval(intervalId);
+      return;
+    }
+
+    render(transcurridoSeg);
+  }
+
+  tick();
+  intervalId = setInterval(tick, 1000);
+}
+</script>
+
+<script>
+function iniciarCuentaRegresiva(data) {
+  const diasEl = document.querySelector('.espera-reloj-valor[data-part="dias"]');
+  const horasEl = document.querySelector('.espera-reloj-valor[data-part="horas"]');
+  const minutosEl = document.querySelector('.espera-reloj-valor[data-part="minutos"]');
+  const segundosEl = document.querySelector('.espera-reloj-valor[data-part="segundos"]');
+
+  if (!diasEl || !horasEl || !minutosEl || !segundosEl) {
+    console.error("❌ No se encontraron elementos del contador PROGRAMADO");
+    return;
+  }
+
+  // Crear fecha/hora del partido
+  const inicioStr = `${data.dia}T${data.hora_inicio}`;
+  const inicio = new Date(inicioStr);
+
+  if (isNaN(inicio.getTime())) {
+    console.error("❌ Fecha de inicio inválida para PROGRAMADO:", inicioStr);
+    return;
+  }
+
+  function actualizar() {
+    const ahora = new Date();
+    let diff = inicio - ahora;
+
+    if (diff <= 0) {
+      // El partido ya debería estar iniciado
+      diasEl.textContent = "00";
+      horasEl.textContent = "00";
+      minutosEl.textContent = "00";
+      segundosEl.textContent = "00";
+      return;
+    }
+
+    const segTot = Math.floor(diff / 1000);
+
+    const dias = Math.floor(segTot / 86400);
+    const horas = Math.floor((segTot % 86400) / 3600);
+    const minutos = Math.floor((segTot % 3600) / 60);
+    const segundos = segTot % 60;
+
+    diasEl.textContent = String(dias).padStart(2, "0");
+    horasEl.textContent = String(horas).padStart(2, "0");
+    minutosEl.textContent = String(minutos).padStart(2, "0");
+    segundosEl.textContent = String(segundos).padStart(2, "0");
+  }
+
+  // Ejecutarlo ya mismo
+  actualizar();
+  // Y luego cada segundo
+  setInterval(actualizar, 1000);
+  
+}
+</script>
+
+
+
+
+
+{% endblock %}

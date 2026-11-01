@@ -1,0 +1,455 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #161618 !important;
+        padding: 25px 16px 0 16px;
+        height: 100dvh;
+        box-sizing: border-box;
+    }
+
+    .pantalla-crear {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+
+    .container-1 {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .container-1 label {
+        margin-left: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .container-1 label p {
+        opacity: 0.5;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .input-custom {
+        border: none;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        flex: 1;
+        padding: 13px 10px 13px 50px;
+        border-radius: 5px;
+        width: 160px;
+    }
+
+    .input-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.con-valor {
+        background-color: #3F374E;
+        color: white;
+    }
+
+    .input-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .campo-fecha {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selector-fecha {
+        position: relative;
+    }
+
+    .selector-hora {
+        position: relative;
+    }
+
+    .container-icono {
+        position: absolute;
+        margin-top: 8px;
+        margin-left: 13px;
+        pointer-events: none;
+        color: white;
+        font-size: 18px;
+        z-index: 1;
+    }
+
+    .flatpickr-input::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.form-control.input.active {
+        background-color: #3F374E !important;
+    }
+
+    .input-text {
+        width: 100%;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        padding: 13px 10px;
+        border-radius: 5px;
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .input-text:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input.con-valor {
+        background-color: #3F374E;
+    }
+
+    .container-posicion {
+        background: #3F374E;
+        padding: 10px;
+        border-radius: 5px;
+        width: 308px;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .icono-posicion {
+        width: 24px;
+        height: 25px;
+        flex-shrink: 0;
+    }
+
+    .checkbox-wrapper {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+    }
+
+    .custom-checkbox {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        background-color: #3F374E;
+        border: 2px solid #FFF;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        display: inline-block;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox {
+        background-color: #FFF;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked+.custom-checkbox::after {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid #161618;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .btn-disabled {
+        background-color: #5E605E !important;
+        color: #ffffff50 !important;
+        cursor: initial !important;
+    }
+
+    .container-botones button {
+        width: 49% !important;
+    }
+
+    .container-posicion.selected.delantero {
+        background-color: #E63E58;
+        /* violeta oscuro */
+    }
+
+    .container-posicion.selected.mediocampista {
+        background-color: #0DA013;
+        /* verde azulado */
+    }
+
+    .container-posicion.selected.defensa {
+        background-color: #0992D5;
+        /* azul */
+    }
+
+    .container-posicion.selected.arquero {
+        background-color: #B2B315;
+        /* naranja */
+    }
+
+    .container-posicion.selected.versatil {
+        background-color: #9315B3;
+        /* rosa fuerte */
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+{% block content %}
+<form method="POST" class="d-flex flex-column justify-content-between" style="height: 100%;">
+    {% csrf_token %}
+    <div class="conainer-main">
+
+
+        <div>
+            <a href="{% url 'home' %}" style="text-decoration: none; padding: 13px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 4.00006L4.00006 20M4 4L20 20" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+
+        <p class="M-titulo" style="margin-top: 23px;">Tu lugar en la cancha</p>
+
+        <p class="M-body" style="margin-top: 5px;">Elegí la posición que más te guste o en la que solés jugar.</p>
+
+        <div class="d-flex flex-row align-items-center" style="gap: 10px; margin-top: 11px;">
+            <p class="M-body-s texto-transparente">2/4</p>
+            <div class="barra-indicadora" style="width: 100%; background: #2C2A44; border-radius: 9px; height: 8px;">
+                <div style="width: 50%; background: #733BDE; border-radius: 9px; height: 8px;"></div>
+            </div>
+        </div>
+
+        <div class="container-2 d-flex flex-column align-items-center justify-content-center"
+            style="margin: 40px 0; gap: 20px;">
+
+            <div class="container-posicion delantero d-flex flex-row justify-content-between align-items-center {% if jugador.posicion_preferida == 'Delantero' %}selected{% endif %}">
+                <svg class="icono-posicion" xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                    viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M20 12.5C20 16.9183 16.4183 20.5 12 20.5C7.58172 20.5 4 16.9183 4 12.5C4 8.08172 7.58172 4.5 12 4.5C16.4183 4.5 20 8.08172 20 12.5Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M15 12.5C15 14.1569 13.6569 15.5 12 15.5C10.3431 15.5 9 14.1569 9 12.5C9 10.8431 10.3431 9.5 12 9.5C13.6569 9.5 15 10.8431 15 12.5Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path d="M2 12.5H4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M20 12.5H22" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M12 4.5V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M12 22.5V20.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start">
+                    <p class="M-boton">Delantero</p>
+                    <p class="M-body-s" style="text-align: start;">Tenés olfato, timing y una sola cosa en la cabeza: el
+                        gol.</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="posicion" id="checkbox-delantero" value="Delantero" {% if jugador.posicion_preferida == 'Delantero' %}checked{% endif %} />
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion mediocampista d-flex flex-row justify-content-between align-items-center {% if jugador.posicion_preferida == 'Mediocampista' %}selected{% endif %}">
+                <svg class="icono-posicion" xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                    viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M12.5 9.5C10.8431 9.5 9.5 8.15685 9.5 6.5C9.5 4.84315 10.8431 3.5 12.5 3.5C14.1569 3.5 15.5 4.84315 15.5 6.5C15.5 8.15685 14.1569 9.5 12.5 9.5Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M6 21.5C4.34315 21.5 3 20.1569 3 18.5C3 16.8431 4.34315 15.5 6 15.5C7.65685 15.5 9 16.8431 9 18.5C9 20.1569 7.65685 21.5 6 21.5Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M19 21.5C17.3431 21.5 16 20.1569 16 18.5C16 16.8431 17.3431 15.5 19 15.5C20.6569 15.5 22 16.8431 22 18.5C22 20.1569 20.6569 21.5 19 21.5Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path
+                        d="M20.5 13.5C20.5 11.1106 19.4525 8.96589 17.7916 7.5M4.5 13.5C4.5 11.1106 5.54752 8.96589 7.20838 7.5M10.5 21.248C11.1392 21.4125 11.8094 21.5 12.5 21.5C13.1906 21.5 13.8608 21.4125 14.5 21.248"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start">
+                    <p class="M-boton">Mediocampista</p>
+                    <p class="M-body-s" style="text-align: start;">Ni muy arriba, ni muy atrás: justo donde el equipo te
+                        necesita.</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="posicion" id="checkbox-mediocampista" value="Mediocampista" {% if jugador.posicion_preferida == 'Mediocampista' %}checked{% endif %} />
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion defensa d-flex flex-row justify-content-between align-items-center {% if jugador.posicion_preferida == 'Defensa' %}selected{% endif %}">
+                <svg class="icono-posicion" xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                    viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M3 10.9167C3 7.71907 3 6.12028 3.37752 5.58241C3.75503 5.04454 5.25832 4.52996 8.26491 3.50079L8.83772 3.30472C10.405 2.76824 11.1886 2.5 12 2.5C12.8114 2.5 13.595 2.76824 15.1623 3.30472L15.7351 3.50079C18.7417 4.52996 20.245 5.04454 20.6225 5.58241C21 6.12028 21 7.71907 21 10.9167C21 11.3996 21 11.9234 21 12.4914C21 18.1294 16.761 20.8655 14.1014 22.0273C13.38 22.3424 13.0193 22.5 12 22.5C10.9807 22.5 10.62 22.3424 9.89856 22.0273C7.23896 20.8655 3 18.1294 3 12.4914C3 11.9234 3 11.3996 3 10.9167Z"
+                        stroke="white" stroke-width="1.5" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start">
+                    <p class="M-boton">Defensa</p>
+                    <p class="M-body-s" style="text-align: start;">El que se ensucia por el equipo, lo tuyo es cortar,
+                        anticipar y sacar.</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="posicion" id="checkbox-defensa" value="Defensa" {% if jugador.posicion_preferida == 'Defensa' %}checked{% endif %} />
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion arquero d-flex flex-row justify-content-between align-items-center {% if jugador.posicion_preferida == 'Arquero' %}selected{% endif %}">
+                <svg class="icono-posicion" xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                    viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M10.4166 11.0252C10.6253 11.383 11.0845 11.5039 11.4423 11.2952C11.8001 11.0866 11.921 10.6273 11.7124 10.2695L10.4166 11.0252ZM7.53819 13.6327C7.74685 13.9905 8.20607 14.1114 8.56389 13.9027C8.92171 13.6941 9.04263 13.2349 8.83397 12.877L7.53819 13.6327ZM16.0476 11.6491L16.4198 12.3003C16.5935 12.201 16.7203 12.0365 16.7721 11.8433C16.8239 11.65 16.7963 11.4441 16.6955 11.2713L16.0476 11.6491ZM13.7841 16.8C13.9928 17.1578 14.452 17.2787 14.8098 17.0701C15.1677 16.8614 15.2886 16.4022 15.0799 16.0444L13.7841 16.8ZM4.38288 10.5177C5.01655 10.1555 5.64036 10.3782 5.85442 10.7452L7.1502 9.9896C6.43433 8.762 4.82711 8.53611 3.63859 9.21537L4.38288 10.5177ZM3.63859 9.21537C2.44774 9.89595 1.83545 11.3969 2.55504 12.6309L3.85081 11.8753C3.64048 11.5146 3.75152 10.8785 4.38288 10.5177L3.63859 9.21537ZM7.04909 5.25032L7.89098 6.69403L9.18675 5.93841L8.34487 4.4947L7.04909 5.25032ZM7.89098 6.69403L10.4166 11.0252L11.7124 10.2695L9.18675 5.93841L7.89098 6.69403ZM8.83397 12.877L7.1502 9.9896L5.85442 10.7452L7.53819 13.6327L8.83397 12.877ZM7.1502 9.9896L5.04548 6.38034L3.74971 7.13596L5.85442 10.7452L7.1502 9.9896ZM5.57755 5.02278C6.21122 4.66063 6.83503 4.88325 7.04909 5.25032L8.34487 4.4947C7.629 3.2671 6.02178 3.04121 4.83326 3.72046L5.57755 5.02278ZM4.83326 3.72046C3.64241 4.40105 3.03012 5.90197 3.74971 7.13596L5.04548 6.38034C4.83515 6.01965 4.94619 5.38361 5.57755 5.02278L4.83326 3.72046ZM11.1903 4.80839L13.716 9.13951L15.0118 8.38389L12.4861 4.05277L11.1903 4.80839ZM13.716 9.13951L15.3998 12.0269L16.6955 11.2713L15.0118 8.38389L13.716 9.13951ZM9.71882 4.58085C10.3525 4.2187 10.9763 4.44132 11.1903 4.80839L12.4861 4.05277C11.7702 2.82517 10.163 2.59928 8.97453 3.27853L9.71882 4.58085ZM8.97453 3.27853C7.78368 3.95912 7.17139 5.46004 7.89098 6.69403L9.18675 5.93841C8.97642 5.57772 9.08746 4.94168 9.71882 4.58085L8.97453 3.27853ZM17.0154 7.25387L19.541 11.585L20.8368 10.8294L18.3111 6.49825L17.0154 7.25387ZM15.5438 7.02633C16.1775 6.66418 16.8013 6.8868 17.0154 7.25387L18.3111 6.49825C17.5953 5.27066 15.9881 5.04476 14.7995 5.72402L15.5438 7.02633ZM14.7995 5.72402C13.6087 6.4046 12.9964 7.90553 13.716 9.13951L15.0118 8.38389C14.8014 8.0232 14.9125 7.38716 15.5438 7.02633L14.7995 5.72402ZM2.55504 12.6309L6.34352 19.1276L7.6393 18.3719L3.85081 11.8753L2.55504 12.6309ZM16.5855 20.1021C13.2186 22.0264 9.24824 21.131 7.6393 18.3719L6.34352 19.1276C8.45427 22.7472 13.408 23.6458 17.3298 21.4045L16.5855 20.1021ZM19.541 11.585C21.1462 14.3377 19.9502 18.1792 16.5855 20.1021L17.3298 21.4045C21.254 19.1618 22.9513 14.4554 20.8368 10.8294L19.541 11.585ZM15.0799 16.0444C14.4046 14.8863 14.8773 13.1818 16.4198 12.3003L15.6755 10.9979C13.5736 12.1993 12.5996 14.7687 13.7841 16.8L15.0799 16.0444Z"
+                        fill="white" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start">
+                    <p class="M-boton">Arquero</p>
+                    <p class="M-body-s" style="text-align: start;">Atajás goles y bancás al equipo, sos la seguridad de
+                        todos.</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="posicion" id="checkbox-arquero" value="Arquero" {% if jugador.posicion_preferida == 'Arquero' %}checked{% endif %} />
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+            <div class="container-posicion versatil d-flex flex-row justify-content-between align-items-center {% if jugador.posicion_preferida == 'Versátil' %}selected{% endif %}">
+                <svg class="icono-posicion" xmlns="http://www.w3.org/2000/svg" width="24" height="25"
+                    viewBox="0 0 24 25" fill="none">
+                    <path
+                        d="M3.67981 11.8333H2.92981H3.67981ZM3.67981 13.5L3.15157 14.0324C3.44398 14.3225 3.91565 14.3225 4.20805 14.0324L3.67981 13.5ZM5.88787 12.3657C6.18191 12.074 6.18377 11.5991 5.89203 11.3051C5.60029 11.011 5.12542 11.0092 4.83138 11.3009L5.88787 12.3657ZM2.52824 11.3009C2.2342 11.0092 1.75933 11.011 1.46759 11.3051C1.17585 11.5991 1.17772 12.074 1.47176 12.3657L2.52824 11.3009ZM18.6156 7.89279C18.8325 8.24565 19.2944 8.35585 19.6473 8.13892C20.0001 7.92199 20.1103 7.46007 19.8934 7.10721L18.6156 7.89279ZM12.0789 3.5V2.75C7.03155 2.75 2.92981 6.8112 2.92981 11.8333H3.67981H4.42981C4.42981 7.65072 7.84884 4.25 12.0789 4.25V3.5ZM3.67981 11.8333H2.92981L2.92981 13.5H3.67981H4.42981L4.42981 11.8333H3.67981ZM3.67981 13.5L4.20805 14.0324L5.88787 12.3657L5.35962 11.8333L4.83138 11.3009L3.15157 12.9676L3.67981 13.5ZM3.67981 13.5L4.20805 12.9676L2.52824 11.3009L2 11.8333L1.47176 12.3657L3.15157 14.0324L3.67981 13.5ZM19.2545 7.5L19.8934 7.10721C18.287 4.49427 15.3873 2.75 12.0789 2.75V3.5V4.25C14.8484 4.25 17.2727 5.70845 18.6156 7.89279L19.2545 7.5Z"
+                        fill="white" />
+                    <path
+                        d="M20.3139 11.5L20.8411 10.9666C20.549 10.6778 20.0788 10.6778 19.7867 10.9666L20.3139 11.5ZM18.1004 12.6333C17.8058 12.9244 17.8031 13.3993 18.0942 13.6939C18.3854 13.9885 18.8603 13.9913 19.1549 13.7001L18.1004 12.6333ZM21.4729 13.7001C21.7675 13.9913 22.2424 13.9885 22.5335 13.6939C22.8247 13.3993 22.822 12.9244 22.5274 12.6332L21.4729 13.7001ZM5.31794 17.1061C5.1004 16.7536 4.6383 16.6442 4.28581 16.8618C3.93331 17.0793 3.82391 17.5414 4.04144 17.8939L5.31794 17.1061ZM11.8827 21.5V22.25C16.9451 22.25 21.0639 18.1915 21.0639 13.1667H20.3139H19.5639C19.5639 17.3466 16.1332 20.75 11.8827 20.75V21.5ZM20.3139 13.1667H21.0639V11.5H20.3139H19.5639V13.1667H20.3139ZM20.3139 11.5L19.7867 10.9666L18.1004 12.6333L18.6277 13.1667L19.1549 13.7001L20.8411 12.0334L20.3139 11.5ZM20.3139 11.5L19.7867 12.0334L21.4729 13.7001L22.0001 13.1667L22.5274 12.6332L20.8411 10.9666L20.3139 11.5ZM4.67969 17.5L4.04144 17.8939C5.65405 20.507 8.56403 22.25 11.8827 22.25V21.5V20.75C9.10023 20.75 6.66584 19.2903 5.31794 17.1061L4.67969 17.5Z"
+                        fill="white" />
+                </svg>
+                <div class="d-flex flex-column justify-content-start align-items-start">
+                    <p class="M-boton">Versátil</p>
+                    <p class="M-body-s" style="text-align: start;">El comodín del equipo, jugás donde haga falta.</p>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="posicion" id="checkbox-versatil" value="Versátil" {% if jugador.posicion_preferida == 'Versátil' %}checked{% endif %} />
+                    <span class="custom-checkbox"></span>
+                </label>
+            </div>
+
+        </div>
+    </div>
+    <input type="hidden" name="posicion_preferida" id="input-posicion">
+    <input type="hidden" name="nombre" value="{{ request.user.jugador.nombre }}">
+    <input type="hidden" name="fecha_nacimiento" value="{{ request.user.jugador.fecha_nacimiento|date:'Y-m-d' }}">
+    <div class="container-botones w-100 d-flex justify-content-end align-items-end"
+        style="gap: 2%; padding-bottom: 25px;">
+        <button type="button" class="btn-secundario" style="color: #4F9639;" id="btnAnterior">Anterior</button>
+        <button type="submit" class="btn-primario btn-disabled" style="color: #FFF;"
+            id="btnSiguiente">Siguiente</button>
+    </div>
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const contenedores = document.querySelectorAll('.container-posicion');
+        const checkboxes = document.querySelectorAll('input[name="posicion"]');
+        const btnSiguiente = document.getElementById('btnSiguiente');
+        const btnAnterior = document.getElementById('btnAnterior');
+        const hidden = document.getElementById('input-posicion');
+
+        // Helpers
+        const setNextEnabled = (on) => {
+            btnSiguiente.disabled = !on;
+            btnSiguiente.classList.toggle('btn-disabled', !on); // <- tu clase real
+        };
+
+        const selectByValue = (val) => {
+            if (!val) return false;
+            let found = false;
+            checkboxes.forEach(cb => {
+                const cont = cb.closest('.container-posicion');
+                const match = cb.value === val;
+                cb.checked = match;
+                cont.classList.toggle('selected', match);
+                if (match) found = true;
+            });
+            if (found) {
+                hidden.value = val;
+                setNextEnabled(true);
+            }
+            return found;
+        };
+
+        // ===== Estado inicial =====
+        // 1) Si vino marcado desde el server:
+        const checked = document.querySelector('input[name="posicion"]:checked');
+        if (checked) {
+            selectByValue(checked.value);
+        } else {
+            // 2) Sino, intentá desde localStorage:
+            selectByValue(localStorage.getItem('posicion_seleccionada'));
+            // si tampoco hay, queda deshabilitado
+            if (!hidden.value) setNextEnabled(false);
+        }
+
+        // ===== Interacciones =====
+        contenedores.forEach(container => {
+            container.addEventListener('click', () => {
+                const cb = container.querySelector('input[name="posicion"]');
+                selectByValue(cb.value);
+                localStorage.setItem('posicion_seleccionada', cb.value);
+            });
+        });
+
+        // Por si cambian el checkbox directo
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (cb.checked) {
+                    selectByValue(cb.value);
+                    localStorage.setItem('posicion_seleccionada', cb.value);
+                } else {
+                    const alguno = Array.from(checkboxes).some(c => c.checked);
+                    if (!alguno) {
+                        hidden.value = '';
+                        contenedores.forEach(c => c.classList.remove('selected'));
+                        localStorage.removeItem('posicion_seleccionada');
+                        setNextEnabled(false);
+                    }
+                }
+            });
+        });
+
+        // Botones navegación
+        btnSiguiente.addEventListener('click', (e) => {
+            if (!hidden.value) { // seguridad extra
+                e.preventDefault();
+                setNextEnabled(false);
+            }
+        });
+
+        btnAnterior.addEventListener('click', () => {
+            window.location.href = "{% url 'crear_perfil_1' %}";
+        });
+    });
+</script>
+
+
+{% endblock %}

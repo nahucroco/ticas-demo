@@ -1,0 +1,907 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #221140;
+    }
+
+    .historia-container {
+        height: 100dvh;
+        background-color: #221140;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .slides {
+        flex: 1;
+        width: 100%;
+        height: 100dvh;
+        position: relative;
+    }
+
+    .slide {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .slide.active {
+        display: flex;
+    }
+
+    .bg-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        filter: saturate(1.05) contrast(1.05);
+    }
+
+    /* Overlays */
+    .overlay-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100dvh;
+    }
+
+    .caption {
+        font-size: 14px;
+        background: rgba(0, 0, 0, .45);
+        padding: 6px 10px;
+        border-radius: 8px;
+    }
+
+    /* Indicadores */
+    .indicadores {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 16px;
+        display: flex;
+        gap: 6px;
+        width: 80%;
+        max-width: 360px;
+        z-index: 3;
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 6px;
+        background: #3f3f3f;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .progress-inner {
+        height: 100%;
+        width: 0%;
+        background: #9c63ff;
+        transition: width 0s;
+    }
+
+    /* Tapx area */
+    .navegacion-historias {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        height: 90vh !important;
+    }
+
+    /* Contenedor de tarjetas */
+    .cards-wrap {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 16px 24px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        /*  grid-template-columns: 1fr; */
+        gap: 12px;
+    }
+
+    @media (min-width: 520px) {
+        .cards-wrap {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .card-ticas {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        flex-direction: column;
+        gap: 5px;
+        border-radius: 20px;
+        background: var(--Terciario, #535368);
+        width: 105px;
+    }
+
+    .card-ticas .container-valor {
+        width: 100%;
+        display: flex;
+        padding: 10px 8px;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 15px;
+        background: var(--Secundario, #3F374E);
+        box-shadow: 0 54px 15px 0 rgba(89, 0, 255, 0.00), 0 34px 14px 0 rgba(89, 0, 255, 0.01), 0 19px 12px 0 rgba(89, 0, 255, 0.05), 0 9px 9px 0 rgba(89, 0, 255, 0.09), 0 2px 5px 0 rgba(89, 0, 255, 0.10);
+    }
+
+    /* Contenedor absoluto para ubicar la tarjeta */
+    .card-spot {
+        position: absolute;
+        z-index: 3;
+        /* separación segura de bordes (soporta notch) */
+        /* --safe: max(12px, env(safe-area-inset-left, 12px));
+        --safe-top: max(12px, env(safe-area-inset-top, 12px));
+        --safe-right: max(12px, env(safe-area-inset-right, 12px));
+        --safe-bottom: max(20px, env(safe-area-inset-bottom, 20px)); */
+    }
+
+    /* Goles: abajo-centro (default stories) */
+    .pos-goles {
+        left: 50%;
+        bottom: 10%;
+    }
+
+    /* Asistencias: arriba-derecha */
+    .pos-asistencias {
+        top: 10%;
+        right: 10%;
+    }
+
+    /* Atajadas: arriba-izquierda */
+    .pos-atajadas {
+        top: 20%;
+        left: 10%;
+    }
+
+    /* Defensa: centro-izquierda */
+    .pos-defensa {
+        top: 50%;
+        left: 10%;
+    }
+
+    /* Habilidad: centro-derecha */
+    .pos-habilidad {
+        top: 80%;
+        right: 10%;
+    }
+
+    /* Ajustes responsivos para pantallas chicas */
+    @media (max-width: 420px) {
+        .card-ticas {
+            transform: scale(0.95);
+        }
+
+        .pos-defensa,
+        .pos-habilidad {
+            transform: translateY(-50%) scale(0.95);
+        }
+    }
+
+    /* Odometro */
+    .odometer {
+        display: inline-flex;
+        align-items: center;
+        gap: 1px;
+        height: 1em;
+        line-height: 1em;
+        overflow: hidden;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+    }
+
+    .odometer .digit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        width: 15px;
+        height: 1em;
+        overflow: hidden;
+    }
+
+    .odometer .digit-strip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        will-change: transform;
+        transform: translateY(0);
+        width: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .odometer .digit-strip p {
+        display: block;
+        height: 1em;
+        line-height: 1em;
+        margin: 0;
+    }
+
+    .odometer .char {
+        display: inline-block;
+        line-height: 1em;
+    }
+
+    /* Ventana de recorte */
+    .radar-window {
+        width: 328px;
+        /* ajustá como necesites */
+        height: 264px;
+        border-radius: 15px;
+        overflow: hidden;
+        /* 👈 recorta */
+        position: relative;
+        background: #535368;
+        /* o el fondo que quieras */
+        top: -190%;
+        opacity: 0.87;
+    }
+
+    /* Escenario grande donde se pinta Lottie */
+    .radar-stage {
+        position: absolute;
+        inset: 0;
+        /* por defecto la dejamos “grande”; luego JS puede ajustar */
+        width: 328px;
+        height: 264px;
+        transform-origin: top left;
+    }
+
+    /* Si el renderer es SVG, afinamos el <svg> hijo para que no se achique */
+    .radar-stage svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 328px;
+        height: 264px;
+        opacity: 0.87;
+    }
+
+    /* Si el renderer es canvas, Lottie crea un <canvas> con 100% del contenedor.
+     Como el contenedor (.radar-stage) ya es grande, la “ventana” recorta. */
+    .radar-stage canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 328px !important;
+        height: 264px !important;
+    }
+    /* Tamaño mínimo y que ocupe su caja */
+.lottie-icono-mejora {
+  width: 28px;        /* ajustá a tu diseño */
+  height: 28px;
+  display: inline-block;
+  line-height: 0;
+  overflow: visible;  /* evita recortes indeseados */
+}
+
+/* Story final */
+.story-final{
+    display: flex;
+    flex-direction: column;
+    border-radius: 30px 30px 0 0;
+    background: var(--Fondo, #161618);
+    width: 100%;
+    height:90vh;
+    padding: 30px 25px;
+}
+
+</style>
+
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalletorneo.css' %}">
+<link rel="stylesheet" href="{% static 'css/cargar_estadisticas.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Demo Stories{% endblock %}
+
+{% block navbar_extra %}
+{% include 'app_torneo_f5/notificacion.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="historia-container">
+
+    <div class="slides">
+        {% for story in stories %}
+        <div class="slide{% if forloop.first %} active{% endif %}" data-index="{{ forloop.counter0 }}" {% if story.kind == "violet" and story.duration %}data-duration="{{ story.duration }}" {% endif %}>
+
+            {# Fondo: video o fondo violeta #}
+            {% if story.video_url %}
+            <video class="bg-video" src="{{ story.video_url }}" muted playsinline preload="auto" loop></video>
+            {% elif story.kind == "violet" %}
+            <div style="background:#221140;position:absolute;inset:0;"></div>
+            {% endif %}
+
+            <div class="overlay-content">
+
+                {# ---- STAT CARD ---- #}
+                {% if story.kind == "stat" and story.card %}
+                {% with story.card.tipo as t %}
+                {% if t == "goles" %}
+                {% with "pos-goles" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% elif t == "asistencias" %}
+                {% with "pos-asistencias" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% elif t == "atajadas" %}
+                {% with "pos-atajadas" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% elif t == "defensa" %}
+                {% with "pos-defensa" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% elif t == "habilidad" %}
+                {% with "pos-habilidad" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% else %}
+                {% with "pos-goles" as pos_class %}
+                <div class="card-spot {{ pos_class }}">
+                    {% include "carga_estadisticas/_card_ticas.html" with card=story.card %}
+                </div>
+                {% endwith %}
+                {% endif %}
+                {% endwith %}
+
+                {# ---- RADAR (con Lottie superpuesta si viene en story.lottie) ---- #}
+                {% elif story.kind == "radar" %}
+                  {% if story.lottie and story.lottie.url %}
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                      <!-- Ventana de recorte -->
+                      <div class="radar-window">
+                        <!-- Escenario grande (contenedor real de Lottie) -->
+                        <div class="radar-stage lottie-radar"
+                             data-lottie-src="{{ story.lottie.url }}"
+                             data-lottie-renderer="{{ story.lottie.renderer|default:'svg' }}"
+                             data-scale="1.20"    
+                             data-offset-x="-30"       
+                             data-offset-y="-40"        
+                             data-stage-w="328"          
+                             data-stage-h="264"></div>
+                      </div>
+                  
+                      {% if story.headline %}
+                        <div class="caption" style="font-size:16px;font-weight:600;">
+                          {{ story.headline }}
+                        </div>
+                      {% endif %}
+                      {% if story.sub %}
+                        <div class="caption">{{ story.sub }}</div>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                <div class="caption">{{ story.caption|default:"Jugadas destacadas" }}</div>
+                {% endif %}
+
+                {# ---- VIOLET (sin overlay extra) ---- #}
+                {% elif story.kind == "violet" %}
+                {# No overlay necesario #}
+                <div style="display: flex; width: 100%; padding: 16px; flex-direction: column; align-items: center; gap: 28px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="204" height="188" viewBox="0 0 204 188" fill="none">
+                      <path d="M173.188 35.5964L137.601 71.1827H137.591C126.378 74.8682 114.397 76.8611 101.945 76.8611C89.493 76.8611 77.622 74.8882 66.4587 71.2328L66.4086 71.1827L30.8223 35.5964L57.7123 8.69629L66.4086 0L92.1903 25.7817L102.005 35.5964L111.83 25.7617L137.591 0L146.227 8.6362L173.188 35.5964Z" fill="#733BDE"/>
+                      <path d="M98.2473 139.277V139.287L98.2172 139.378L85.1912 188L48.4464 178.155L36.5788 174.974L46.0128 139.758L49.6082 126.348L36.1682 122.753L0.982422 113.319L4.1438 101.521L14.0085 64.6963L62.6209 77.7224H62.6309C71.4307 85.5941 79.1522 94.9781 85.3714 105.757C91.564 116.48 95.8103 127.784 98.2473 139.271V139.277Z" fill="#733BDE"/>
+                      <path d="M167.81 122.756L154.4 126.352L158.006 139.792L167.43 174.967L155.642 178.129L118.807 187.993L105.781 139.391V139.381C108.208 127.824 112.475 116.447 118.697 105.667C124.89 94.9448 132.548 85.6042 141.287 77.7525H141.297L141.378 77.7325L189.99 64.7064L199.835 101.451L203.016 113.329L167.81 122.763V122.756Z" fill="#733BDE"/>
+                    </svg>
+                    <p class="M-titulo" style="text-align: center;">Lo que pasa en la cancha, que quede en Ticas</p>
+                </div>
+                <div class="story-final">
+                    <p class="M-body" style="margin-bottom: 30px;">Ya viste cómo tu fútbol puede ser con Ticas:</p>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-row justify-content-between" style="padding: 10px 0; border-top: 1px solid black;">
+                            <p>Registrar estadísticas</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M3 13.4L7.85714 19L20 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between" style="padding: 10px 0; border-top: 1px solid black;">
+                            <p>Registrar estadísticas</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M3 13.4L7.85714 19L20 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between" style="padding: 10px 0; border-top: 1px solid black; border-bottom: 1px solid black;">
+                            <p>Registrar estadísticas</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M3 13.4L7.85714 19L20 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p style="margin-top: 5px; padding: 10px 0; text-align: center;">Y muchísimo más...</p>
+                    <a href="https://www.instagram.com/ticas.app/" class="btn-primario" style="width: 100%; margin-top: auto; text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                          <path d="M12 1.5C9.01488 1.5 8.6395 1.51375 7.46663 1.566C6.29375 1.621 5.49487 1.80525 4.795 2.0775C4.06054 2.35295 3.39544 2.78617 2.84663 3.34663C2.28617 3.89544 1.85295 4.56054 1.5775 5.295C1.30525 5.9935 1.11963 6.79375 1.066 7.9625C1.01375 9.13812 1 9.51213 1 12.5014C1 15.4879 1.01375 15.8619 1.066 17.0347C1.121 18.2063 1.30525 19.0051 1.5775 19.705C1.85938 20.4282 2.23475 21.0415 2.84663 21.6534C3.45713 22.2652 4.07037 22.642 4.79363 22.9225C5.49487 23.1947 6.29238 23.3804 7.46388 23.434C8.63813 23.4862 9.01213 23.5 12 23.5C14.9879 23.5 15.3605 23.4862 16.5347 23.434C17.7049 23.379 18.5065 23.1947 19.2064 22.9225C19.9403 22.6469 20.605 22.2137 21.1534 21.6534C21.7652 21.0415 22.1406 20.4282 22.4225 19.705C22.6934 19.0051 22.879 18.2063 22.934 17.0347C22.9862 15.8619 23 15.4879 23 12.5C23 9.51213 22.9862 9.13813 22.934 7.96388C22.879 6.79375 22.6934 5.9935 22.4225 5.295C22.1471 4.56054 21.7138 3.89544 21.1534 3.34663C20.6046 2.78617 19.9395 2.35295 19.205 2.0775C18.5037 1.80525 17.7035 1.61963 16.5334 1.566C15.3591 1.51375 14.9865 1.5 11.9973 1.5H12ZM11.0141 3.48275H12.0014C14.9384 3.48275 15.2863 3.49238 16.4454 3.546C17.5179 3.59413 18.1009 3.77425 18.4886 3.92412C19.0015 4.1235 19.3686 4.36275 19.7536 4.74775C20.1386 5.13275 20.3765 5.4985 20.5759 6.01275C20.7271 6.39913 20.9059 6.98213 20.954 8.05463C21.0076 9.21375 21.0186 9.56163 21.0186 12.4973C21.0186 15.4329 21.0076 15.7821 20.954 16.9412C20.9059 18.0138 20.7257 18.5954 20.5759 18.9831C20.3983 19.4601 20.117 19.8917 19.7522 20.2467C19.3672 20.6318 19.0015 20.8696 18.4873 21.069C18.1023 21.2203 17.5192 21.399 16.4454 21.4485C15.2863 21.5007 14.9384 21.5131 12.0014 21.5131C9.06438 21.5131 8.71513 21.5007 7.556 21.4485C6.4835 21.399 5.90188 21.2203 5.51412 21.069C5.03677 20.892 4.6047 20.6111 4.24913 20.2467C3.88375 19.8915 3.60195 19.4594 3.42412 18.9818C3.27425 18.5954 3.09413 18.0124 3.046 16.9399C2.99375 15.7808 2.98275 15.4329 2.98275 12.4945C2.98275 9.55612 2.99375 9.211 3.046 8.05187C3.0955 6.97937 3.27425 6.39638 3.4255 6.00863C3.62488 5.49575 3.86412 5.12862 4.24913 4.74362C4.63412 4.35862 4.99988 4.12075 5.51412 3.92138C5.90188 3.77013 6.4835 3.59138 7.556 3.54188C8.57075 3.49513 8.964 3.48138 11.0141 3.48V3.48275ZM17.8726 5.30875C17.6993 5.30875 17.5276 5.34289 17.3675 5.40923C17.2073 5.47557 17.0618 5.5728 16.9392 5.69537C16.8167 5.81794 16.7194 5.96346 16.6531 6.12361C16.5868 6.28376 16.5526 6.45541 16.5526 6.62875C16.5526 6.80209 16.5868 6.97374 16.6531 7.13389C16.7194 7.29404 16.8167 7.43956 16.9392 7.56213C17.0618 7.6847 17.2073 7.78193 17.3675 7.84827C17.5276 7.91461 17.6993 7.94875 17.8726 7.94875C18.2227 7.94875 18.5585 7.80968 18.806 7.56213C19.0536 7.31458 19.1926 6.97884 19.1926 6.62875C19.1926 6.27866 19.0536 5.94292 18.806 5.69537C18.5585 5.44782 18.2227 5.30875 17.8726 5.30875ZM12.0014 6.8515C11.2521 6.83981 10.508 6.97729 9.81234 7.25594C9.11671 7.5346 8.48346 7.94885 7.94946 8.47458C7.41546 9.00032 6.99138 9.62703 6.70191 10.3182C6.41244 11.0094 6.26336 11.7513 6.26336 12.5007C6.26336 13.2501 6.41244 13.9919 6.70191 14.6831C6.99138 15.3743 7.41546 16.0011 7.94946 16.5268C8.48346 17.0525 9.11671 17.4668 9.81234 17.7454C10.508 18.0241 11.2521 18.1616 12.0014 18.1499C13.4844 18.1267 14.8988 17.5214 15.9393 16.4645C16.9799 15.4076 17.5631 13.9839 17.5631 12.5007C17.5631 11.0175 16.9799 9.59382 15.9393 8.53691C14.8988 7.47999 13.4844 6.87464 12.0014 6.8515ZM12.0014 8.83288C12.4829 8.83288 12.9598 8.92773 13.4047 9.11202C13.8496 9.29631 14.2539 9.56643 14.5944 9.90695C14.9349 10.2475 15.2051 10.6517 15.3894 11.0967C15.5736 11.5416 15.6685 12.0184 15.6685 12.5C15.6685 12.9816 15.5736 13.4584 15.3894 13.9033C15.2051 14.3483 14.9349 14.7525 14.5944 15.093C14.2539 15.4336 13.8496 15.7037 13.4047 15.888C12.9598 16.0723 12.4829 16.1671 12.0014 16.1671C11.0288 16.1671 10.096 15.7808 9.40833 15.093C8.72061 14.4053 8.33425 13.4726 8.33425 12.5C8.33425 11.5274 8.72061 10.5947 9.40833 9.90695C10.096 9.21923 11.0288 8.83288 12.0014 8.83288Z" fill="white"/>
+                        </svg>
+                        <p class="M-boton">Conocer Ticas</p>
+                    </a>
+                </div>
+
+                {% endif %}
+
+            </div> {# overlay-content #}
+        </div> {# slide #}
+        {% endfor %}
+    </div> {# slides #}
+
+    <div class="indicadores">
+        {% for _ in stories %}
+        <div class="progress-bar">
+            <div class="progress-inner"></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="navegacion-historias"></div>
+</div>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<script>
+    function buildOdometer(el, targetValue, startDelayMs = 0, staggerMs = 100, durationMs = 1400) {
+        if (!el) return;
+        const str = String(targetValue ?? '').trim();
+        if (!str) return;
+        el.innerHTML = '';
+
+        const digitEntries = [];
+        for (const ch of str) {
+            if (/\d/.test(ch)) {
+                const digit = document.createElement('div');
+                digit.className = 'digit';
+                const strip = document.createElement('div');
+                strip.className = 'digit-strip';
+                for (let i = 0; i <= 9; i++) {
+                    const s = document.createElement('p');
+                    s.textContent = i;
+                    strip.appendChild(s);
+                }
+                digit.appendChild(strip);
+                el.appendChild(digit);
+                digitEntries.push({ digit, strip, to: parseInt(ch, 10) });
+            } else {
+                const sep = document.createElement('p');
+                sep.className = 'char';
+                sep.textContent = ch;
+                el.appendChild(sep);
+            }
+        }
+
+        // Esperar a que pinte, medir y fijar alturas en "pixel entero"
+        requestAnimationFrame(() => {
+            const sample = el.querySelector('.digit-strip p');
+            let h = sample ? sample.getBoundingClientRect().height : 0;
+            if (!h) {
+                const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+                h = fs;
+            }
+            // Redondeo a la rejilla física (evita subpíxeles)
+            const dpr = window.devicePixelRatio || 1;
+            h = Math.round(h * dpr) / dpr;
+
+            // Fijar alturas exactas para cada elemento
+            digitEntries.forEach(({ digit, strip }) => {
+                digit.style.height = `${h}px`;
+                Array.from(strip.children).forEach(p => { p.style.height = `${h}px`; p.style.lineHeight = `${h}px`; });
+                // estado base
+                strip.style.transform = `translate3d(0,0,0)`;
+            });
+
+            // Segundo frame para asegurar layout antes de animar
+            requestAnimationFrame(() => {
+                digitEntries.forEach(({ strip, to }, idx) => {
+                    // transición
+                    strip.style.willChange = 'transform';
+                    strip.style.transition = `transform ${durationMs}ms cubic-bezier(.15,.85,.15,1)`;
+                    strip.style.transitionDelay = `${startDelayMs + idx * staggerMs}ms`;
+
+                    // Fuerza reflow
+                    void strip.offsetHeight;
+
+                    // Animar a múltiplo exacto de h
+                    const finalY = -(h * to);
+                    strip.style.transform = `translate3d(0, ${finalY}px, 0)`;
+
+                    // Al terminar, quitar transición y volver a fijar exactamente (snap)
+                    const onEnd = () => {
+                        strip.removeEventListener('transitionend', onEnd);
+                        strip.style.transition = 'none';
+                        strip.style.transform = `translate3d(0, ${finalY}px, 0)`;
+                    };
+                    strip.addEventListener('transitionend', onEnd);
+                });
+            });
+        });
+    }
+</script>
+
+<script>
+    function initOdometersIn(root) {
+        if (!root) return;
+        const odos = root.querySelectorAll('.odometer');
+        odos.forEach((el) => {
+            if (el._odoBuilt) return;                 // evita reconstruir al volver a la slide
+            const target = el.getAttribute('data-target');
+            if (target == null || target === '') return;
+            // pequeño delay para asegurar que el contenedor ya está pintado
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    buildOdometer(el, String(target), 450, 180, 2400);
+                    el._odoBuilt = true;
+                }, 50); // pequeño colchón para fuentes web
+            });
+        });
+    }
+    function resetOdometersIn(root) {
+        if (!root) return;
+        const odos = root.querySelectorAll('.odometer');
+        odos.forEach((el) => {
+            // limpiar DOM y estado
+            el.innerHTML = '';
+            el._odoBuilt = false;
+            // opcional: cancelar transiciones previas
+            el.style.transition = 'none';
+            // forzar reflow por si la misma slide se activa muy rápido
+            void el.offsetWidth;
+        });
+    }
+</script>
+
+<script>
+    (async function () {
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const bars = Array.from(document.querySelectorAll('.progress-inner'));
+        const tapArea = document.querySelector('.navegacion-historias');
+
+        // Fallback si no hay video o no se pudo leer duración
+        const FALLBACK_MS = 5000;
+        const MIN_MS = 800; // evita barras "instantáneas" en videos muy cortos
+
+        // Duración por slide en ms (se completa con loadedmetadata)
+        const durations = new Array(slides.length).fill(null);
+
+        function getVideoAt(i) {
+            return slides[i]?.querySelector('video') || null;
+        }
+
+        // Pre-cargar duraciones de los videos
+        const metadataPromises = slides.map((slide, i) => {
+            const v = slide.querySelector('video');
+            return new Promise((resolve) => {
+                if (!v) {
+                    const custom = slide.getAttribute('data-duration');
+                    durations[i] = custom ? parseInt(custom, 10) : FALLBACK_MS;
+                    return resolve();
+                }
+                // Si ya hay metadata
+                if (!isNaN(v.duration) && v.duration > 0) {
+                    durations[i] = Math.max(MIN_MS, v.duration * 1000);
+                    return resolve();
+                }
+                // Esperar metadata o caer en fallback rápido
+                const done = () => {
+                    if (!isNaN(v.duration) && v.duration > 0) {
+                        durations[i] = Math.max(MIN_MS, v.duration * 1000);
+                    } else if (!durations[i]) {
+                        durations[i] = FALLBACK_MS;
+                    }
+                    resolve();
+                };
+                v.addEventListener('loadedmetadata', done, { once: true });
+                // Fallback por si never fires (algunos navegadores con autoplay muted)
+                setTimeout(done, 1500);
+            });
+        });
+
+        await Promise.all(metadataPromises);
+
+        let current = 0;
+        let isPaused = false;
+        let timer = null;
+        let lastStart = 0;
+        let remaining = durations[0] ?? FALLBACK_MS;
+        let currentDuration = durations[0] ?? FALLBACK_MS;
+
+        function setBarInstantStates(activeIndex) {
+            bars.forEach((b, idx) => {
+                b.style.transition = 'none';
+                b.style.width = (idx < activeIndex) ? '100%' : '0%';
+            });
+        }
+
+        function animateActiveBar(ms) {
+            const b = bars[current];
+            if (!b) return;
+            // Forzar reflow para aplicar nueva transición
+            void b.offsetWidth;
+            b.style.transition = `width ${ms}ms linear`;
+            b.style.width = '100%';
+        }
+
+        function stopAllVideosExcept(i) {
+            slides.forEach((s, idx) => {
+                const v = s.querySelector('video');
+                if (!v) return;
+                if (idx === i) {
+                    v.currentTime = 0;
+                    v.play?.().catch(() => { /* ignore autoplay blocking */ });
+                } else {
+                    v.pause?.();
+                }
+            });
+        }
+
+        function clearTimer() {
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+        }
+
+        function getDuration(i) {
+            return durations[i] || FALLBACK_MS;
+        }
+
+        function setActive(i) {
+            current = i;
+            slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+            setBarInstantStates(i);
+
+            currentDuration = getDuration(i);
+            remaining = currentDuration;
+
+            animateActiveBar(currentDuration);
+            stopAllVideosExcept(i);
+
+            clearTimer();
+            lastStart = Date.now();
+            timer = setTimeout(next, currentDuration);
+
+            // Lottie
+            slides.forEach((s, idx) => { if (idx !== i) destroyLottiesIn(s); });
+            initLottiesIn(slides[i]);
+
+            // 💡 Odometers: resetear los que NO están activos y re-inicializar el activo
+            slides.forEach((s, idx) => { if (idx !== i) resetOdometersIn(s); });
+            initOdometersIn(slides[i]);
+        }
+
+
+        function next() {
+            const i = (current + 1) % slides.length;
+            setActive(i);
+        }
+
+        function prev() {
+            const i = (current - 1 + slides.length) % slides.length;
+            setActive(i);
+        }
+
+        // Tap izq/der
+        tapArea.addEventListener('click', (e) => {
+            const x = e.clientX || (e.touches?.[0]?.clientX ?? 0);
+            if (x < window.innerWidth / 2) prev(); else next();
+        });
+
+        // Pausa / Resume manteniendo presionado
+        function pause() {
+            if (isPaused) return;
+            isPaused = true;
+            clearTimer();
+
+            // calcular restante
+            const elapsed = Date.now() - lastStart;
+            remaining = Math.max(0, currentDuration - elapsed);
+
+            // congelar barra
+            const b = bars[current];
+            if (b) {
+                const w = getComputedStyle(b).width;
+                b.style.transition = 'none';
+                b.style.width = w;
+            }
+
+            // pausar video actual
+            const v = getVideoAt(current);
+            v?.pause?.();
+        }
+
+        function resume() {
+            if (!isPaused) return;
+            isPaused = false;
+
+            // Reanudar barra con el tiempo restante
+            const b = bars[current];
+            if (b) {
+                void b.offsetWidth;
+                b.style.transition = `width ${remaining}ms linear`;
+                b.style.width = '100%';
+            }
+
+            // Reanudar video
+            const v = getVideoAt(current);
+            v?.play?.().catch(() => { });
+
+            lastStart = Date.now();
+            clearTimer();
+            timer = setTimeout(next, remaining);
+        }
+
+        ['mousedown', 'touchstart'].forEach(ev =>
+            tapArea.addEventListener(ev, pause, { passive: true })
+        );
+        ['mouseup', 'touchend', 'touchcancel', 'mouseleave'].forEach(ev =>
+            tapArea.addEventListener(ev, resume, { passive: true })
+        );
+
+        // Start
+        setActive(0);
+
+        // Si algún video terminó reportando duración más tarde (raro), la actualizamos sin romper nada.
+        slides.forEach((_, i) => {
+            const v = getVideoAt(i);
+            if (!v) return;
+            v.addEventListener('loadedmetadata', () => {
+                const ms = Math.max(MIN_MS, v.duration * 1000);
+                durations[i] = ms;
+                // Si es el slide actual y seguimos en él, ajustar barra/timer
+                if (i === current && !isPaused) {
+                    const elapsed = Date.now() - lastStart;
+                    const newRemaining = Math.max(0, ms - elapsed);
+                    currentDuration = ms;
+                    remaining = newRemaining;
+
+                    const b = bars[current];
+                    if (b) {
+                        b.style.transition = 'none';
+                        const w = (elapsed / ms) * 100;
+                        // set width proporcional, luego reanimar el resto
+                        b.style.width = `${w}%`;
+                        void b.offsetWidth;
+                        b.style.transition = `width ${newRemaining}ms linear`;
+                        b.style.width = '100%';
+                    }
+                    clearTimer();
+                    timer = setTimeout(next, newRemaining);
+                }
+            }, { once: true });
+        });
+    })();
+</script>
+
+<script>
+  function initLottiesIn(root) {
+    if (!window.lottie || !root) return;
+
+    // Detecta TODO lo que tenga data-lottie-src (radar + iconos)
+    const nodes = root.querySelectorAll('[data-lottie-src]');
+    nodes.forEach((stage) => {
+      if (stage._lottieInstance) return;
+
+      const path      = stage.getAttribute('data-lottie-src');
+      const renderer  = (stage.getAttribute('data-lottie-renderer') || 'svg').toLowerCase();
+      const loop      = (stage.getAttribute('data-loop') ?? '1') !== '0';
+      const autoplay  = (stage.getAttribute('data-autoplay') ?? '1') !== '0';
+
+      // Parámetros opcionales para encuadre (usados en radar)
+      const scale   = parseFloat(stage.getAttribute('data-scale') || '1') || 1;
+      const offX    = parseFloat(stage.getAttribute('data-offset-x') || '0') || 0;
+      const offY    = parseFloat(stage.getAttribute('data-offset-y') || '0') || 0;
+      const stageW  = parseInt(stage.getAttribute('data-stage-w') || stage.getAttribute('data-w') || stage.clientWidth || 250, 10);
+      const stageH  = parseInt(stage.getAttribute('data-stage-h') || stage.getAttribute('data-h') || stage.clientHeight || 250, 10);
+
+      // Asegurar tamaño del contenedor
+      stage.style.width  = stageW + 'px';
+      stage.style.height = stageH + 'px';
+
+      const anim = window.lottie.loadAnimation({
+        container: stage,
+        renderer,
+        loop,
+        autoplay,
+        path,
+        rendererSettings: {
+          preserveAspectRatio: 'xMidYMid meet',
+          progressiveLoad: true,
+          clearCanvas: false
+        }
+      });
+      stage._lottieInstance = anim;
+
+      const applyFraming = () => {
+        // Solo aplicar encuadre “grande” al radar (no a iconos pequeños)
+        const isRadar = stage.classList.contains('lottie-radar');
+
+        if (renderer === 'svg') {
+          const svg = stage.querySelector('svg');
+          if (svg) {
+            svg.style.width  = stageW + 'px';
+            svg.style.height = stageH + 'px';
+
+            if (isRadar) {
+              svg.style.transformOrigin = 'top left';
+              svg.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
+              svg.style.opacity = ''; // por si había estilos heredados
+            } else {
+              // Íconos: sin encuadre especial, solo aseguramos que se vean
+              svg.style.transform = '';
+              svg.style.opacity = '';
+            }
+          }
+        } else {
+          // canvas
+          if (isRadar) {
+            stage.style.transformOrigin = 'top left';
+            stage.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
+          } else {
+            stage.style.transform = '';
+          }
+        }
+      };
+
+      anim.addEventListener('DOMLoaded', applyFraming);
+      setTimeout(applyFraming, 300); // fallback
+
+      anim.addEventListener('data_failed', () =>
+        console.error('[Lottie] data_failed', path)
+      );
+    });
+  }
+
+  function destroyLottiesIn(root) {
+    if (!root) return;
+    const nodes = root.querySelectorAll('[data-lottie-src]');
+    nodes.forEach((el) => {
+      if (el._lottieInstance) {
+        try { el._lottieInstance.destroy(); } catch (e) {}
+        el._lottieInstance = null;
+      }
+      el.style.transform = '';
+    });
+  }
+</script>
+
+{% endblock %}

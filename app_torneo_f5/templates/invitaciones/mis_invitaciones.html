@@ -1,0 +1,29 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+<h2>Mis Invitaciones</h2>
+
+<ul>
+  {% for inv in invitaciones %}
+    <li>
+      <strong>Partido en:</strong> {{ inv.partido.cancha.nombre }} <br>
+      <strong>Fecha:</strong> {{ inv.partido.fecha|date:"d/m/Y H:i" }} <br>
+
+      {% if inv.aceptada %}
+        <span class="text-success">✅ Aceptada</span>
+      {% else %}
+        <form action="{% url 'aceptar_invitacion' inv.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-primary">Aceptar</button>
+        </form>
+      {% endif %}
+    </li>
+    <hr>
+  {% empty %}
+    <li>No tenés invitaciones por ahora.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

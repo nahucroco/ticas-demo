@@ -1,0 +1,271 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .container-volver {
+        padding: 0 28px !important;
+        margin: 18px 0 !important;
+    }
+
+    .container-titulo {
+        margin: 0 16px !important;
+    }
+
+    .pantalla-crear {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0 !important;
+    }
+
+    .main {
+        max-width: 450px !important;
+        width: 100% !important;
+        overflow-y: scroll;
+        /* Mantiene el scroll */
+        scrollbar-width: none;
+    }
+
+    main::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari, Edge */
+    }
+
+    .circle-progress {
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        background: conic-gradient(#8b42f4 0 37.25%, #3d3750 24.83% 74.5%, #161618 74.5% 100%) !important;
+        transform: rotate(225deg)
+    }
+
+    .container-1 {
+        max-width: 328px;
+    }
+
+    .footer-boton {
+        max-width: 450px !important;
+    }
+
+    .container-selects {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0 !important;
+    }
+
+    .container-main {
+        margin: 16px;
+        background: #535368;
+        border-radius: 10px;
+        padding: 15px 10px;
+        gap: 15px;
+    }
+
+    .container-opcion {
+        background: #3F374E;
+        width: 100%;
+        border-radius: 5px;
+        padding: 10px 10px 20px 10px;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_2.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+{% block content %}
+<div class="main">
+    <!-- Botón de volver -->
+    <div class="container-volver">
+        <a href="{{ url_volver }}" class="icono-volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+    </div>
+    <div class="container-titulo">
+        <p class="M-subtitulos">Propuesta partido torneo</p>
+    </div>
+    <div class="d-flex flex-column align-items-start container-main">
+
+        <p class="M-titulo">Día y hora</p>
+        <div class="container-opcion d-flex flex-column">
+            <p class="M-boton">Opción 1</p>
+            <div class="d-flex flex-row justify-content-center gap-3">
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Fecha</p>
+                    <p class="M-subtitulos">{{ propuesta.fecha1 }}</p>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Horario</p>
+                    <p class="M-subtitulos">{{ propuesta.hora1 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="container-opcion d-flex flex-column">
+            <p class="M-boton">Opción 2</p>
+            <div class="d-flex flex-row justify-content-center gap-3">
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Fecha</p>
+                    <p class="M-subtitulos">{{ propuesta.fecha2 }}</p>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Horario</p>
+                    <p class="M-subtitulos">{{ propuesta.hora2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="container-opcion d-flex flex-column">
+            <p class="M-boton">Opción 3</p>
+            <div class="d-flex flex-row justify-content-center gap-3">
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Fecha</p>
+                    <p class="M-subtitulos">{{ propuesta.fecha3 }}</p>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Horario</p>
+                    <p class="M-subtitulos">{{ propuesta.hora3 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="M-titulo">Cancha</p>
+        <div class="container-opcion d-flex flex-column">
+            <p class="M-boton">Opción 1</p>
+            <div class="d-flex flex-column justify-content-center gap-3">
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Cancha</p>
+                    <p class="M-subtitulos">{{ propuesta.cancha1.nombre }}</p>
+                    <p class="M-body text-center">{{ propuesta.cancha1.direccion }}</p>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Precio c/u</p>
+                    <p class="M-subtitulos">${{ precio_unitario1 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="container-opcion d-flex flex-column">
+            <p class="M-boton">Opción 2</p>
+            <div class="d-flex flex-column justify-content-center gap-3">
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Cancha</p>
+                    <p class="M-subtitulos">{{ propuesta.cancha2.nombre }}</p>
+                    <p class="M-body text-center">{{ propuesta.cancha2.direccion }}</p>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <p class="M-body texto-transparente">Precio c/u</p>
+                    <p class="M-subtitulos">${{ precio_unitario2 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const campos = ["fecha1", "hora1", "fecha2", "hora2", "fecha3", "hora3"];
+    const fechasIds = ["fecha1", "fecha2", "fecha3"];
+    const horasIds = ["hora1", "hora2", "hora3"];
+    let guardadoConfirmado = false;
+
+    // Al cargar la página, restaurar (si existiera) y validar
+    window.addEventListener("DOMContentLoaded", () => {
+        campos.forEach(id => {
+            const el = document.getElementById(id);
+            const val = localStorage.getItem(`partido_${id}`);
+            if (el && val) {
+                el.value = val;
+                const altInput = el._flatpickr?.altInput;
+                if (altInput && val.trim() !== "") {
+                    altInput.classList.add("con-valor");
+                }
+            }
+        });
+        validarCamposCompletos();
+    });
+
+    // Flatpickr para fechas
+    fechasIds.forEach(id => {
+        flatpickr(`#${id}`, {
+            altInput: true,
+            altFormat: "d / M / y",
+            dateFormat: "Y-m-d",
+            locale: "es",
+            disableMobile: true,
+            minDate: "today",
+            defaultDate: null,
+            onChange: function (selectedDates, dateStr, instance) {
+                const visibleInput = instance.altInput;
+                if (visibleInput) {
+                    visibleInput.classList.toggle("con-valor", dateStr.trim() !== "");
+                }
+                validarCamposCompletos();
+            }
+        });
+    });
+
+    // Flatpickr para horas
+    horasIds.forEach(id => {
+        flatpickr(`#${id}`, {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            minuteIncrement: 30,
+            locale: "es",
+            disableMobile: true,
+            defaultDate: null,
+            onChange: function (selectedDates, timeStr) {
+                const input = document.getElementById(id);
+                if (input) input.classList.toggle("con-valor", !!timeStr);
+                validarCamposCompletos();
+            }
+        });
+    });
+
+    // Validar que los 6 campos estén llenos
+    function validarCamposCompletos() {
+        const completos = campos.every(id => {
+            const val = document.getElementById(id)?.value.trim();
+            return val !== "";
+        });
+
+        const btn = document.getElementById("btn-siguiente");
+        btn.disabled = !completos;
+        btn.classList.toggle("btn-disabled", !completos);
+    }
+
+    // Guardar solo si se pulsa el botón "Siguiente"
+    document.getElementById("btn-siguiente").addEventListener("click", () => {
+        if (!document.getElementById("btn-siguiente").disabled) {
+            campos.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    localStorage.setItem(`partido_${id}`, el.value.trim());
+                }
+            });
+            guardadoConfirmado = true;
+            window.location.href = "{% url 'propuesta_partido_2' partido.id %}";
+        }
+    });
+
+    // Borrar si el usuario sale sin confirmar
+    window.addEventListener("beforeunload", () => {
+        if (!guardadoConfirmado) {
+            campos.forEach(id => localStorage.removeItem(`partido_${id}`));
+        }
+    });
+</script>
+
+
+
+{% endblock %}

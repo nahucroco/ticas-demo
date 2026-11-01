@@ -1,0 +1,51 @@
+[
+    {
+        "nombre": "EL PREDIO VGG",
+        "direccion": "Buenos Aires 1906, S2124 Villa Gobernador Gálvez, Santa Fe",
+        "telefono": "0341 310-8358",
+        "web": "https://alquilatucancha.com/",
+        "link_maps": "https://maps.app.goo.gl/hoGD8Vs4kPHiRcxn6"
+    },
+    {
+        "nombre": "Complejo LA ROTONDA Futbol 5y6",
+        "direccion": "Av. San Martín 2472, S2124 Villa Gobernador Gálvez, Santa Fe",
+        "telefono": "0341 211-2950",
+        "web": "https://alquilatucancha.com/",
+        "link_maps": "https://maps.app.goo.gl/griqx8HPhQy5wt4Z8"
+    },
+    {
+        "nombre": "FÚTBOL 5",
+        "direccion": "Eva Perón 2174, S2124IVR Villa Gobernador Gálvez, Santa Fe",
+        "telefono": "0341 492-8359",
+        "web": null,
+        "link_maps": "https://maps.app.goo.gl/tD26yMLxLitvVsem7"
+    },
+    {
+        "nombre": "Cancha Futbol 5 La Mano De Dios. VGG",
+        "direccion": "Monte Hermoso 470, Villa Gdor. Gálvez, Santa Fe",
+        "telefono": "0341 675-4317",
+        "web": null,
+        "link_maps": "https://maps.app.goo.gl/XuLSAAYJcvryoEdJ8"
+    },
+    {
+        "nombre": "Laprida fútbol 5",
+        "direccion": "Laprida 2100, S2124FZB Villa Gdor. Gálvez, Santa Fe",
+        "telefono": "0341 723-7916",
+        "web": null,
+        "link_maps": "https://maps.app.goo.gl/ct174NyAmhWCMnDg6"
+    },
+    {
+        "nombre": "Juventus Futbol 5",
+        "direccion": "Garay 2255, S2124MNC Villa Gdor. Gálvez, Santa Fe",
+        "telefono": "0341 15-277-2738",
+        "web": null,
+        "link_maps": "https://maps.app.goo.gl/FaHu3zBHjjgSDRJu7"
+    },
+    {
+        "nombre": "Fútbol 5 \"El Lírico\"",
+        "direccion": "Roque Sáenz Peña 586, S2000 Villa Gdor. Gálvez, Santa Fe",
+        "telefono": "0341 250-8046",
+        "web": null,
+        "link_maps": "https://maps.app.goo.gl/B7jhWBJMDHoT9ancA"
+    }
+]

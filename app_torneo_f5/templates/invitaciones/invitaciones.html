@@ -1,0 +1,132 @@
+{# invitaciones/invitaciones.html #}
+{% extends "app_torneo_f5/base.html" %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+  <link rel="stylesheet" href="{% static 'css/invitaciones2.css' %}">
+{% endblock %}
+
+{% block title %}Ticas{% endblock %}
+
+{% block content %}
+<style>
+  .btn-ver{ color:#4F9639; text-decoration:none; }
+  .btn-ver:hover{ color:#4F9639; text-decoration:none; }
+</style>
+
+<div class="noti-container">
+  <button onclick="window.history.back()" class="btn-back" aria-label="Volver">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" aria-hidden="true">
+      <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="noti-title"><h1 class="M-titulo">Notificaciones</h1></div>
+
+  <div class="notificaciones">
+    {% if notificaciones %}
+      {% for n in notificaciones %}
+        <div class="card-noti {% if n.visto %}noti-visto{% endif %}"
+             data-id="{{ n.id }}"
+             data-visto="{% if n.visto %}1{% else %}0{% endif %}">
+          <div class="noti-header M-body-s">
+            <span>{{ n.header }}</span>
+            <svg width="5" height="5" viewBox="0 0 5 5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="2.5" cy="2.5" r="2.5" fill="#D9D9D9"/>
+            </svg>
+            <span>{{ n.fecha|date:"d/M/Y" }}</span>
+          </div>
+
+          <div class="noti-body">
+            <div class="noti-body-header">
+              <div class="noti-background-icon {% if n.visto %}noti-visto{% endif %}">
+                <!-- Ícono genérico -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20.1847 17.75..." fill="white"/>
+                </svg>
+              </div>
+              <span class="M-body">{{ n.titulo }}</span>
+            </div>
+
+            {% if n.mensaje %}
+              <div class="noti-body-body M-body-s">
+                <span>{{ n.mensaje }}</span>
+              </div>
+            {% endif %}
+          </div>
+
+          {% if n.url %}
+            <a href="{{ n.url }}" class="noti-boton-footer M-boton btn-ver">
+              <span>Ver</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 5L15 12L9 19" stroke="#4F9639" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-notificaciones" style="text-align:center;width:100%;">
+        <p class="M-body">No hay notificaciones aún.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if page_obj %}
+    <div class="paginador">
+      {% if page_obj.has_previous %}
+        <a class="btn-ver" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+      {% endif %}
+      <span class="M-body-s">Página {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="btn-ver" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  // --- CSRF desde cookie (Django) ---
+  function getCookie(name) {
+    const value = `; ${document.cookie}`.split(`; ${name}=`).pop();
+    return value ? value.split(';').shift() : null;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  // --- Marcar "visto" cuando la card está mayormente visible ---
+  document.addEventListener('DOMContentLoaded', function () {
+    const cards = document.querySelectorAll('.card-noti');
+    if (!('IntersectionObserver' in window) || cards.length === 0) return;
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        const el = entry.target;
+        if (el.dataset.visto === '1') { obs.unobserve(el); return; }
+
+        fetch(`/notificaciones/${el.dataset.id}/visto/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken || '',
+            'Accept': 'application/json'
+          }
+        })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(() => {
+          el.classList.add('noti-visto');
+          el.dataset.visto = '1';
+          obs.unobserve(el);
+        })
+        .catch(() => {
+          // opcional: reintento/backoff
+        });
+      });
+    }, { threshold: 0.6 });
+
+    cards.forEach(el => obs.observe(el));
+  });
+</script>
+{% endblock %}

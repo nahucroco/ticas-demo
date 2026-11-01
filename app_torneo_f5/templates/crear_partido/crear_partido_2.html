@@ -1,0 +1,263 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_2.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+
+{% block title %}Ticas - Partidos{% endblock %}
+
+{% block content %}
+<div class="main">
+    <div class="container-titulo">
+        <p class="M-subtitulos">Creando partido amistoso</p>
+    </div>
+    <div class="container-progress">
+        <div class="circle-container">
+            <div class="circle-progress" id="progressCircle"></div>
+            <div class="M-titulo circle-center" id="circleLabel">2/3</div>
+        </div>
+    </div>
+    <div class="container-selects" style="padding: 0 16px;">
+        <div class="container-1 d-flex flex-column align-items-center">
+            <div class="campo-fecha d-flex flex-row w-100 justify-content-between">
+                <label for="fecha" class="label-fecha texto-transparente">Día</label>
+                <div class="selector-fecha">
+                    <span class="container-icono"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12Z"
+                                stroke="white" stroke-width="1.5" />
+                            <path d="M7 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M17 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path d="M2.5 9H21.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                            <path
+                                d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
+                                fill="white" />
+                            <path
+                                d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
+                                fill="white" />
+                            <path
+                                d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
+                                fill="white" />
+                            <path
+                                d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
+                                fill="white" />
+                            <path
+                                d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
+                                fill="white" />
+                            <path
+                                d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
+                                fill="white" />
+                        </svg></span>
+                    <input type="text" id="fecha" class="input-fecha-custom input-custom form-control input con-valor"
+                        placeholder="__/__/__">
+                </div>
+            </div>
+            <div class="campo-hora d-flex flex-row w-100 justify-content-between">
+                <label for="hora" class="label-hora texto-transparente">Hora</label>
+                <div class="selector-hora">
+                    <span class="container-icono"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                            <path d="M12 8V12L14.5 14.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg></span>
+                    <input type="text" id="hora" class="input-hora-custom input-custom" placeholder="--:--">
+                </div>
+            </div>
+        </div>
+        <div class="container-2">
+            <div class="label">
+                <p class="titulo">Duración partido</p>
+            </div>
+            <div class="selector-duracion">
+                <button id="restar" class="boton-control"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none">
+                        <path d="M21 12L3.00003 12" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg></button>
+                <div id="valor-duracion" class="valor bg-cero">0 minutos</div>
+                <button id="sumar" class="boton-control"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none">
+                        <path d="M21 12L3.00003 12M12 3L12 21" stroke="white" stroke-width="1.5"
+                            stroke-linecap="round" />
+                    </svg></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer-boton">
+    <button id="btn-anterior" type="button" class="btn-secundario">
+        <p class="M-boton">Volver</p>
+    </button>
+    <button id="btn-siguiente" type="button" class="btn-primario btn-disabled" disabled>
+        <p class="M-boton">Siguiente</p>
+    </button>
+</div>
+
+<script>
+    
+</script>
+
+<script>
+    const STORAGE_FECHA = 'partidoAmistoso_fecha';
+    const STORAGE_HORA = 'partidoAmistoso_hora';
+    const STORAGE_DURACION = 'partidoAmistoso_duracion';
+    const maximo = 240;
+    const paso = 30;
+    let minutos = 0;
+    let fechaAltInput = null;
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const fechaGuardada = localStorage.getItem(STORAGE_FECHA);
+        const defaultFecha = fechaGuardada || new Date(); // Hoy por defecto
+        const horaGuardada = localStorage.getItem(STORAGE_HORA);
+        const defaultHora = horaGuardada || "20:00";
+
+        // Setear valor por defecto en el input
+        document.getElementById("hora").value = defaultHora;
+        localStorage.setItem(STORAGE_HORA, defaultHora); // opcional
+
+        if (defaultHora) {
+            document.getElementById("hora").classList.add("con-valor");
+        }
+
+        const picker = flatpickr("#fecha", {
+            altInput: true,
+            altFormat: "d / M / y",
+            dateFormat: "Y-m-d",
+            locale: "es",
+            disableMobile: true,
+            minDate: "today",
+            defaultDate: defaultFecha,
+            onChange: function (selectedDates, dateStr) {
+                localStorage.setItem(STORAGE_FECHA, dateStr);
+                const inputShowed = document.getElementsByClassName("input-fecha-custom")[1];
+                inputShowed?.classList.toggle("con-valor", !!dateStr);
+                validarCampos();
+            }
+        });
+        if (!fechaGuardada && picker.selectedDates.length) {
+            const dateStr = picker.input.value;
+            localStorage.setItem(STORAGE_FECHA, dateStr);
+        }
+
+        if (fechaGuardada) {
+            picker.setDate(fechaGuardada, true);
+        }
+
+        const hora = localStorage.getItem(STORAGE_HORA);
+        const duracion = parseInt(localStorage.getItem(STORAGE_DURACION)) || 0;
+
+        if (hora) {
+            const horaInput = document.getElementById("hora");
+            horaInput.value = hora;
+            horaInput.classList.add("con-valor");  // ← lo que hacía actualizarEstilo
+        }
+
+        if (duracion > 0 && duracion <= maximo) {
+            minutos = duracion;
+            actualizar();
+        }
+
+        validarCampos();
+    });
+    flatpickr("#hora", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 30,
+        locale: "es",
+        disableMobile: true,
+        onChange: function () {
+            const input = document.getElementById("hora");
+            if (input.value) {
+                input.classList.add("con-valor");
+            } else {
+                input.classList.remove("con-valor");
+            }
+            validarCampos();
+        }
+    });
+
+    function actualizar() {
+        const valor = document.getElementById("valor-duracion");
+        valor.textContent = `${minutos} minutos`;
+        if (minutos === 0) {
+            valor.classList.add('bg-cero');
+            valor.classList.remove('bg-activo');
+        } else {
+            valor.classList.add('bg-activo');
+            valor.classList.remove('bg-cero');
+        }
+        validarCampos();
+    }
+
+    document.getElementById("sumar").addEventListener("click", () => {
+        if (minutos + paso <= maximo) {
+            minutos += paso;
+            actualizar();
+            localStorage.setItem(STORAGE_DURACION, minutos);
+        }
+    });
+
+    document.getElementById("restar").addEventListener("click", () => {
+        if (minutos >= paso) {
+            minutos -= paso;
+            actualizar();
+            localStorage.setItem(STORAGE_DURACION, minutos);
+        }
+    });
+
+    function validarCampos() {
+        const fecha = document.getElementById("fecha").value.trim();
+        const hora = document.getElementById("hora").value.trim();
+        const btnSiguiente = document.getElementById("btn-siguiente");
+        const validado = fecha !== "" && hora !== "" && minutos > 0 && fechaHoraValida();
+        btnSiguiente.disabled = !validado;
+        btnSiguiente.classList.toggle("btn-disabled", !validado);
+    }
+
+    document.getElementById("fecha").addEventListener("change", () => {
+        /* localStorage.setItem(STORAGE_FECHA, document.getElementById("fecha").value); */
+        const fechaISO = document.getElementById("fecha").value;
+        localStorage.setItem(STORAGE_FECHA, fechaISO);
+    });
+
+    document.getElementById("hora").addEventListener("change", () => {
+        localStorage.setItem(STORAGE_HORA, document.getElementById("hora").value);
+    });
+
+    document.getElementById("btn-anterior").addEventListener("click", () => {
+        window.location.href = "{% url 'crear_partido_1' %}";
+    });
+
+    document.getElementById("btn-siguiente").addEventListener("click", () => {
+        if (!document.getElementById("btn-siguiente").disabled) {
+            window.location.href = "{% url 'crear_partido_3' %}";
+        }
+    });
+
+    const fechaHoraValida = () => {
+        const fecha = document.getElementById("fecha").value.trim();
+        const hora = document.getElementById("hora").value.trim();
+
+        if (!fecha || !hora || minutos <= 0) return false;
+
+        const ahora = new Date();
+        const [h, m] = hora.split(":").map(Number);
+
+        const fechaSeleccionada = new Date(`${fecha}T${hora}`);
+        const fechaMinima = new Date(ahora.getTime() + 15 * 60 * 1000);  // ahora + 15 min
+
+        return fechaSeleccionada >= fechaMinima;
+    };
+
+</script>
+{% endblock %}

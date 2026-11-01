@@ -1,0 +1,277 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido_final.css' %}">
+{% endblock %}
+
+{% block title %}Ticas - Confirmar partido{% endblock %}
+
+{% block content %}
+<div class="main">
+
+    <div class="container-titulo" style="margin-bottom: 20px;">
+        <p class="M-titulo">Partido amistoso</p>
+    </div>
+
+    <div class="container-datos">
+        <div class="container-2">
+            <div>
+                <p class="M-body texto-transparente">Fecha</p>
+                <p id="resumen-fecha" class="M-subtitulos"></p>
+            </div>
+            <div>
+                <p class="M-body texto-transparente">Horario</p>
+                <p id="resumen-hora" class="M-subtitulos"></p>
+            </div>
+            <div>
+                <p class="M-body texto-transparente">Precio c/u</p>
+                <p id="resumen-precio-jugador" class="M-subtitulos"></p>
+            </div>
+        </div>
+        <div class="container-1">
+            <p class="M-body texto-transparente">Cancha</p>
+            <p class="M-subtitulos" id="resumen-cancha"></p>
+            <p class="M-body" id="resumen-ubicacion"></p>
+        </div>
+
+        <div class="container-3">
+            <p class="M-subtitulos" id="resumen-formato"></p>
+            <p class="M-subtitulos" id="resumen-duracion"></p>
+        </div>
+    </div>
+
+
+    <div class="container-card">
+        <div class="card-partido">
+            <div class="card-partido-contenido">
+                <div class="container-1">
+                    <img src="{% static url_escudo_1 %}" alt="" style="width: 76px; border-radius: 5px;">
+                    <div class="info-central">
+                        <div class="fecha">
+                            <p id="resumen-fecha-card"></p>
+                            <span class="separador">-</span>
+                            <p id="resumen-hora-card"></p>
+                        </div>
+                        <p class="vs">VS</p>
+                    </div>
+                    <img src="{% static url_escudo_2 %}" alt="" style="width: 76px; border-radius: 5px;">
+                </div>
+
+                <div class="container-2">
+                    <p class="equipo-nombre izq">Equipo 1</p>
+                    <p class="equipo-nombre der">Equipo 2</p>
+                </div>
+
+            </div>
+
+            <div class="badge-cancha">
+                <img src="{% static 'svg/cancha-icon.svg' %}" alt="">
+                <p class="M-body" id="resumen-cancha-card"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="footer-boton">
+    <button id="btn-siguiente" type="button" class="btn-primario">
+        <p class="M-boton">Confirmar</p>
+    </button>
+    <button id="btn-anterior" type="button" class="btn-secundario">
+        <p class="M-boton">Cancelar partido</p>
+    </button>
+</div>
+
+<style>
+    .resumen-box {
+        background-color: #2b2b2e;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .resumen-box .emoji {
+        margin-right: 5px;
+    }
+</style>
+<script>
+    const parejas = JSON.parse('{{ colores_pareja|escapejs }}');
+</script>
+
+<script>
+    console.log(parejas);  // Agrega esto para verificar en consola
+
+    const indice = Math.floor(Math.random() * parejas.length);
+    const [colorLocal, colorVisitante] = parejas[indice];
+
+    console.log('Color local:', colorLocal);  // Asegurate que diga "bg-b-equipo1", etc.
+
+    // Guardar en localStorage
+    localStorage.setItem('color_local', colorLocal);
+    localStorage.setItem('color_visitante', colorVisitante);
+
+    // Aplicar al HTML correctamente
+    document.querySelector('.equipo-1').classList.add(...colorLocal.split(' '));
+    document.querySelector('.equipo-2').classList.add(...colorVisitante.split(' '));
+</script>
+
+
+<script>
+    // Cargar datos desde localStorage
+    const resumen = {
+        fecha: localStorage.getItem('partidoAmistoso_fecha'),
+        hora: localStorage.getItem('partidoAmistoso_hora'),
+        duracion: localStorage.getItem('partidoAmistoso_duracion'),
+        jugadores: localStorage.getItem('partidoAmistoso_jugadores'),
+        precio: localStorage.getItem('partidoAmistoso_precio'),
+        cancha: localStorage.getItem('crearPartido_nombreCancha'),
+        ubicacion: localStorage.getItem('crearPartido_ubicacionCancha'),
+        formato: localStorage.getItem('crearPartido_nombreFormato'),
+    };
+
+    // Función reutilizable para actualizar un campo
+    function actualizarCampo(id, valor, sufijo = "") {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = valor ? `${valor}${sufijo}` : "-";
+        }
+    }
+
+    function formatearFecha(fechaISO) {
+        const [anio, mes, dia] = fechaISO.split('-');  // "2025-07-15"
+        const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        return `${dia} / ${meses[parseInt(mes) - 1]}`;
+    }
+
+    // Mostrar los datos en el DOM
+    if (resumen.fecha) {
+        const fechaFormateada = formatearFecha(resumen.fecha);
+        actualizarCampo('resumen-fecha', fechaFormateada);
+        actualizarCampo('resumen-fecha-card', fechaFormateada);
+    } else {
+        actualizarCampo('resumen-fecha', "-");
+    }
+
+    actualizarCampo('resumen-hora', resumen.hora);
+    actualizarCampo('resumen-duracion', resumen.duracion, " minutos");
+    actualizarCampo('resumen-jugadores', resumen.jugadores);
+    actualizarCampo('resumen-cancha', resumen.cancha);
+    actualizarCampo('resumen-ubicacion', resumen.ubicacion);
+    actualizarCampo('resumen-formato', resumen.formato);
+
+    actualizarCampo('resumen-cancha-card', resumen.cancha);
+    actualizarCampo('resumen-hora-card', resumen.hora);
+    actualizarCampo('resumen-cancha-card', resumen.cancha);
+
+    // Calcular y mostrar precio por jugador
+    function toNumeroAR(valor) {
+        if (typeof valor === 'number') return valor;
+        const s = String(valor || '').trim();
+        if (!s) return NaN;
+        // quita símbolos/espacios, elimina puntos de miles y usa coma como decimal
+        const limpio = s.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+        return Number(limpio);
+    }
+
+    function jugadoresTotales(res) {
+        // 1) si ya viene total de jugadores, úsalo
+        const j = toNumeroAR(res.jugadores);
+        if (j > 0) return j;
+        // 2) fallback: si viene el formato "Fútbol 5", duplica el número
+        const n = Number((res.formato || '').match(/\d+/)?.[0] || 0);
+        return n > 0 ? n * 2 : NaN;
+    }
+
+    // --- precio por jugador ---
+    (() => {
+        const precioTotal = toNumeroAR(resumen.precio);                // ej: "35.000" -> 35000
+        const totalJugadores = jugadoresTotales(resumen);              // ej: 10
+        if (!Number.isNaN(precioTotal) && totalJugadores > 0) {
+            const precioPorJugador = Math.ceil(precioTotal / totalJugadores);
+            actualizarCampo('resumen-precio-jugador', `$${precioPorJugador.toLocaleString('es-AR')}`);
+        } else {
+            actualizarCampo('resumen-precio-jugador', "-");
+        }
+    })();
+
+    console.log(resumen);
+</script>
+<script>
+    const btnAnterior = document.getElementById("btn-anterior");
+    btnAnterior.addEventListener("click", () => {
+        if (!btnAnterior.disabled) {
+            window.location.href = "{% url 'crear_partido' %}";
+        }
+    });
+</script>
+<script>
+
+
+    function getCookie(name) {
+        const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return m ? m.pop() : '';
+    }
+
+    document.getElementById("btn-siguiente").addEventListener("click", () => {
+        const resumen = {
+            fecha: localStorage.getItem('partidoAmistoso_fecha'),
+            hora: localStorage.getItem('partidoAmistoso_hora'),
+            duracion: localStorage.getItem('partidoAmistoso_duracion'),
+            jugadores: localStorage.getItem('partidoAmistoso_jugadores'),
+            precio: localStorage.getItem('partidoAmistoso_precio'),
+            cancha: localStorage.getItem('crearPartido_nombreCancha'),
+            ubicacion: localStorage.getItem('crearPartido_ubicacionCancha'),
+            formato: localStorage.getItem('crearPartido_nombreFormato'),
+        };
+
+        const data = {
+            fecha: (resumen.fecha || '').trim(),
+            hora: (resumen.hora || '').trim(),
+            duracion: parseInt(resumen.duracion || 0, 10),
+            jugadores: parseInt(resumen.jugadores || 0, 10),
+            precio: Number((resumen.precio || '0').toString().replace(/[^\d.,-]/g, '').replace(/\./g, '').replace(',', '.')) || 0,
+            cancha: (resumen.cancha || '').trim(),
+            ubicacion: (resumen.ubicacion || '').trim(),
+            formato: (resumen.formato || '').trim(),
+            color_local: localStorage.getItem('color_local') || 'bg-d-equipo1',
+            color_visitante: localStorage.getItem('color_visitante') || 'bg-d-equipo2',
+        };
+
+        if (!data.fecha || !data.hora || !data.cancha) {
+            alert("Faltan completar algunos campos necesarios (fecha, hora, cancha).");
+            return;
+        }
+
+        fetch("{% url 'crear_partido_final' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie('csrftoken')
+            },
+            credentials: "same-origin",
+            body: JSON.stringify(data)
+        })
+            .then(async response => {
+                const json = await response.json().catch(() => null);
+                if (!response.ok || !json?.success) {
+                    throw new Error(json?.error || "Error al crear el partido.");
+                }
+                // OK → ir al detalle/listado
+                window.location.href = `/partido/amistoso/${json.id}/`;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("No se pudo crear el partido: " + error.message);
+            });
+    });
+</script>
+
+{% endblock %}

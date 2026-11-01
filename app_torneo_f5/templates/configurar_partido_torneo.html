@@ -1,0 +1,1283 @@
+﻿{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="{% static 'css/crear_partido.css' %}">
+<link rel="stylesheet" href="{% static 'css/configurar_partido_torneo.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block title %}Ticas - Configurar partido{% endblock %}
+
+{% block content %}
+<div class="main">
+
+  <div class="contenido-scroll">
+
+    <!-- Botón de volver -->
+    <div class="container-volver">
+      <button id="btnVolver" class="icono-volver" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+          <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Título -->
+    <div class="container-titulo">
+      <p class="M-subtitulos">Definiendo partido de torneo</p>
+    </div>
+
+    <!-- Marcador -->
+    <div class="container-marcador">
+      <div class="container-1">
+        <div class="container-icon activado">
+          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
+            <path
+              d="M7.60714 8.74986C7.60714 9.65917 7.96837 10.5312 8.61135 11.1742C9.25433 11.8172 10.1264 12.1784 11.0357 12.1784C11.945 12.1784 12.8171 11.8172 13.4601 11.1742C14.1031 10.5312 14.4643 9.65917 14.4643 8.74986C14.4643 7.84055 14.1031 6.96848 13.4601 6.32549C12.8171 5.68251 11.945 5.32129 11.0357 5.32129C10.1264 5.32129 9.25433 5.68251 8.61135 6.32549C7.96837 6.96848 7.60714 7.84055 7.60714 8.74986ZM0.75 5.32129H4.17857V12.1784H0.75V5.32129ZM17.8929 5.32129H21.3214V12.1784H17.8929V5.32129Z"
+              stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M11.0357 0.75V16.75M0.75 3.03571C0.75 2.42951 0.990816 1.84812 1.41947 1.41947C1.84812 0.990816 2.42951 0.75 3.03571 0.75H19.0357C19.6419 0.75 20.2233 0.990816 20.652 1.41947C21.0806 1.84812 21.3214 2.42951 21.3214 3.03571V14.4643C21.3214 15.0705 21.0806 15.6519 20.652 16.0805C20.2233 16.5092 19.6419 16.75 19.0357 16.75H3.03571C2.42951 16.75 1.84812 16.5092 1.41947 16.0805C0.990816 15.6519 0.75 15.0705 0.75 14.4643V3.03571Z"
+              stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="linea-divisora"></div>
+        <div class="container-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12Z"
+              stroke="white" stroke-width="1.5" />
+            <path d="M7 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M17 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M2.5 9H21.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path
+              d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
+              fill="white" />
+            <path
+              d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
+              fill="white" />
+            <path
+              d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
+              fill="white" />
+            <path
+              d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
+              fill="white" />
+            <path
+              d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
+              fill="white" />
+            <path
+              d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
+              fill="white" />
+          </svg>
+        </div>
+        <div class="linea-divisora"></div>
+        <div class="container-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M16 4.00195C18.175 4.01406 19.3529 4.11051 20.1213 4.87889C21 5.75757 21 7.17179 21 10.0002V16.0002C21 18.8286 21 20.2429 20.1213 21.1215C19.2426 22.0002 17.8284 22.0002 15 22.0002H9C6.17157 22.0002 4.75736 22.0002 3.87868 21.1215C3 20.2429 3 18.8286 3 16.0002V10.0002C3 7.17179 3 5.75757 3.87868 4.87889C4.64706 4.11051 5.82497 4.01406 8 4.00195"
+              stroke="white" stroke-width="1.5" />
+            <path d="M8 14H16" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M7 10.5H17" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M9 17.5H15" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path
+              d="M8 3.5C8 2.67157 8.67157 2 9.5 2H14.5C15.3284 2 16 2.67157 16 3.5V4.5C16 5.32843 15.3284 6 14.5 6H9.5C8.67157 6 8 5.32843 8 4.5V3.5Z"
+              stroke="white" stroke-width="1.5" />
+          </svg>
+        </div>
+      </div>
+      <div class="container-2">
+        <div class="M-body-s">Lugar</div>
+        <div class="M-body-s">Día y hora</div>
+        <div class="M-body-s">Vista</div>
+      </div>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="container-selects" id="paso1">
+
+      <!-- CANCHA -->
+      <div class="container-select">
+        <div class="container-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
+            <path
+              d="M7.60714 8.74986C7.60714 9.65917 7.96837 10.5312 8.61135 11.1742C9.25433 11.8172 10.1264 12.1784 11.0357 12.1784C11.945 12.1784 12.8171 11.8172 13.4601 11.1742C14.1031 10.5312 14.4643 9.65917 14.4643 8.74986C14.4643 7.84055 14.1031 6.96848 13.4601 6.32549C12.8171 5.68251 11.945 5.32129 11.0357 5.32129C10.1264 5.32129 9.25433 5.68251 8.61135 6.32549C7.96837 6.96848 7.60714 7.84055 7.60714 8.74986ZM0.75 5.32129H4.17857V12.1784H0.75V5.32129ZM17.8929 5.32129H21.3214V12.1784H17.8929V5.32129Z"
+              stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M11.0357 0.75V16.75M0.75 3.03571C0.75 2.42951 0.990816 1.84812 1.41947 1.41947C1.84812 0.990816 2.42951 0.75 3.03571 0.75H19.0357C19.6419 0.75 20.2233 0.990816 20.652 1.41947C21.0806 1.84812 21.3214 2.42951 21.3214 3.03571V14.4643C21.3214 15.0705 21.0806 15.6519 20.652 16.0805C20.2233 16.5092 19.6419 16.75 19.0357 16.75H3.03571C2.42951 16.75 1.84812 16.5092 1.41947 16.0805C0.990816 15.6519 0.75 15.0705 0.75 14.4643V3.03571Z"
+              stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="container-general">
+          <div class="container-placeholder">
+            <p class="cancha-opacity">Cancha</p>
+          </div>
+          <div class="container" id="s2-cancha">
+            <div class="campo">
+              <select id="select-cancha" class="select-unico input-select select2" multiple data-placeholder="Cancha">
+                <option></option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UBICACIÓN -->
+      <div class="container-select">
+        <div class="container-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 10.1433C4 5.64588 7.58172 2 12 2C16.4183 2 20 5.64588 20 10.1433C20 14.6055 17.4467 19.8124 13.4629 21.6744C12.5343 22.1085 11.4657 22.1085 10.5371 21.6744C6.55332 19.8124 4 14.6055 4 10.1433Z"
+              stroke="white" stroke-width="1.5" />
+            <path
+              d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+              stroke="white" stroke-width="1.5" />
+          </svg>
+        </div>
+        <div class="container-general">
+          <div class="container-placeholder">
+            <p class="ubicacion-opacity">Ubicación</p>
+          </div>
+          <div class="container">
+            <div class="campo">
+              <input type="text" id="direccion-cancha" class="input-ubicacion input-text" placeholder="Ubicación"
+                spellcheck="false" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="container-selects" id="paso2" style="display:none;">
+
+      <div class="container-1 d-flex flex-column align-items-center" style="gap: 20px;">
+
+        <!-- Campo dia -->
+        <div class="campo-fecha d-flex flex-row w-100 justify-content-between align-items-center">
+          <label for="fecha" class="label-fecha texto-transparente">Día</label>
+          <div class="selector-fecha">
+            <span class="container-icono">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12Z"
+                  stroke="white" stroke-width="1.5" />
+                <path d="M7 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M17 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M2.5 9H21.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                <path
+                  d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
+                  fill="white" />
+                <path
+                  d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
+                  fill="white" />
+                <path
+                  d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
+                  fill="white" />
+                <path
+                  d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
+                  fill="white" />
+                <path
+                  d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
+                  fill="white" />
+                <path
+                  d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
+                  fill="white" />
+              </svg>
+            </span>
+            <input type="text" id="fecha" class="input-fecha-custom input-custom form-control input"
+              placeholder="__/__/__">
+          </div>
+        </div>
+
+        <!-- Campo hora -->
+        <div class="campo-hora d-flex flex-row w-100 justify-content-between align-items-center">
+          <label for="hora" class="label-hora texto-transparente">Hora</label>
+          <div class="selector-hora">
+            <span class="container-icono">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" />
+                <path d="M12 8V12L14.5 14.5" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </span>
+            <input type="text" id="hora" class="input-hora-custom input-custom" placeholder="--:--">
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="container-selects" id="paso3" style="display:none;">
+
+      <div class="container-datos">
+        <div class="container-2">
+          <div style="width: 83px;">
+            <p class="M-body texto-transparente">Día</p>
+            <p id="resumen-dia" class="M-subtitulos"></p>
+          </div>
+          <div style="width: 83px;">
+            <p class="M-body texto-transparente">Horario</p>
+            <p id="resumen-hora" class="M-subtitulos"></p>
+          </div>
+          <div style="width: 83px;">
+            <p class="M-body texto-transparente">Precio c/u</p>
+            <p id="resumen-precio-jugador" class="M-subtitulos">-</p>
+          </div>
+        </div>
+
+        <div class="container-1">
+          <p class="M-body texto-transparente">Cancha</p>
+          <p class="M-subtitulos" id="resumen-cancha" style="text-align: center;"></p>
+          <p class="M-body" id="resumen-ubicacion" style="text-align: center;"></p>
+        </div>
+
+        <div class="container-3" style="gap: 10px;">
+          <p class="M-subtitulos" id="resumen-formato"></p>
+          <p class="M-subtitulos" id="resumen-duracion"></p>
+        </div>
+      </div>
+
+      <div class="container-card">
+        <div class="card-partido">
+          <div class="card-partido-contenido">
+            <div class="container-1">
+              <img src="{% static url_escudo_1 %}" alt="Escudo equipo 1" style="width: 76px; border-radius: 5px;">
+              <div class="info-central">
+                <div class="fecha">
+                  <p id="resumen-fecha-card"></p>
+                  <span class="separador">-</span>
+                  <p id="resumen-hora-card"></p>
+                </div>
+                <p class="vs">VS</p>
+              </div>
+              <img src="{% static url_escudo_2 %}" alt="Escudo equipo 2" style="width: 76px; border-radius: 5px;">
+            </div>
+
+            <div class="container-2">
+              <p class="M-body izq">Equipo 1</p>
+              <p class="M-body der">Equipo 2</p>
+            </div>
+          </div>
+
+          <div class="badge-cancha">
+            <img src="{% static 'svg/cancha-icon.svg' %}" alt="Ícono cancha">
+            <p class="M-body" id="resumen-cancha-card"></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER GLOBAL FIJO -->
+  <div class="footer-fijo">
+    <button id="btnVolverGlobal" class="btn-secundario">Volver</button>
+    <button id="btnSiguienteGlobal" class="btn-primario">Siguiente</button>
+  </div>
+
+</div>
+
+<!-- ==================== JS ==================== -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+
+<!-- <script>
+  // ==================== FUNCIONES GLOBALES ====================
+  function getCookie(name) {
+    const cookieValue = document.cookie
+      .split("; ")
+      .find(row => row.startsWith(name + "="));
+    return cookieValue ? decodeURIComponent(cookieValue.split("=")[1]) : "";
+  }
+  document.addEventListener("DOMContentLoaded", async () => {
+    // ==================== VARIABLES ====================
+    function getPartidoIdFromURL() {
+      const m = window.location.pathname.match(/partidos\/(\d+)\/configurar/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+    const partidoIdTpl = Number("{{ partido.id|default:'0' }}") || 0;
+    const partidoId = partidoIdTpl || getPartidoIdFromURL();
+    if (!partidoId) {
+      console.error("No se pudo determinar partidoId");
+    }
+
+    const torneoId = {{ torneo.id }};
+  let pasoActual = 0;
+
+  // ==================== ELEMENTOS ====================
+  const paso1 = document.getElementById("paso1");
+  const paso2 = document.getElementById("paso2");
+  const paso3 = document.getElementById("paso3");
+  const $selectCancha = $("#select-cancha");
+  const direccionInput = document.getElementById("direccion-cancha");
+  direccionInput.addEventListener("input", () => {
+    actualizarFondo(direccionInput);
+    validarPaso1();
+  });
+
+  const fechaInput = document.getElementById("fecha");
+  const horaInput = document.getElementById("hora");
+  const btnSiguiente = document.getElementById("btnSiguienteGlobal");
+  const btnVolverGlobal = document.getElementById("btnVolverGlobal");
+
+  // --- Botones de volver ---
+  const btnVolverArriba = document.getElementById("btnVolver");
+
+  // Ambos botones usan la misma lógica
+  function handleVolver() {
+    if (pasoActual > 0) {
+      mostrarPaso(pasoActual - 1);
+    } else {
+      window.location.href = "{{ url_volver }}";
+    }
+  }
+
+  // Asignar eventos
+  btnVolverArriba?.addEventListener("click", handleVolver);
+  btnVolverGlobal?.addEventListener("click", handleVolver);
+
+
+  // ==================== MARCADOR ====================
+  const iconos = document.querySelectorAll(".container-marcador .container-1 .container-icon");
+  const lineas = document.querySelectorAll(".container-marcador .container-1 .linea-divisora");
+  const textos = document.querySelectorAll(".container-marcador .container-2 .M-body-s");
+
+  function activarPaso(n) {
+    iconos.forEach((icon, i) => {
+      icon.classList.remove("activado", "completado");
+      if (i < n) icon.classList.add("completado");
+      if (i === n) icon.classList.add("activado");
+    });
+    lineas.forEach((l, i) => {
+      l.classList.remove("activado", "completado");
+      if (i < n - 1) l.classList.add("completado");
+      if (i === n - 1) l.classList.add("activado");
+    });
+    textos.forEach((txt, i) => {
+      txt.classList.remove("activado", "completado");
+      if (i < n) txt.classList.add("completado");
+      if (i === n) txt.classList.add("activado");
+    });
+  }
+
+  function mostrarPaso(n) {
+    [paso1, paso2, paso3].forEach((p, i) => p.style.display = i === n ? "block" : "none");
+    activarPaso(n);
+    pasoActual = n;
+    btnSiguiente.textContent = n === 2 ? "Confirmar" : "Siguiente";
+
+    if (n === 0) {
+      validarPaso1();
+    } else if (n === 1) {
+      validarPaso2();
+    } else if (n === 2) {
+      // En el último paso no hay validación de campos, se habilita directamente
+      btnSiguiente.disabled = false; // ✅ Habilitar el botón Confirmar
+    }
+  }
+
+
+  // ==================== SELECT2 ====================
+  $selectCancha.select2({
+    placeholder: "Cancha",
+    multiple: true,
+    maximumSelectionLength: 1,
+    tags: true,
+    createTag: params => {
+      const term = $.trim(params.term);
+      return term ? { id: term, text: term, newTag: true } : null;
+    },
+    width: "100%",
+    dropdownParent: $("#s2-cancha")
+  });
+
+  function syncSelect2Filled($select) {
+    const hasValue = Array.isArray($select.val()) ? $select.val().length > 0 : !!$select.val();
+    const $selection = $select.next('.select2').find('.select2-selection');
+    $selection.toggleClass('filled', hasValue);
+  }
+
+  syncSelect2Filled($selectCancha);
+  $selectCancha.on('change select2:select select2:unselect select2:clear', () => syncSelect2Filled($selectCancha));
+
+  // ==================== CARGAR CANCHAS ====================
+  // CARGAR CANCHAS
+  try {
+    const res = await fetch("/api/canchas/");
+    const canchas = await res.json();
+    $selectCancha.empty().append('<option></option>');
+    canchas.forEach(c => $selectCancha.append(new Option(c.nombre, c.id)));
+  } catch (e) { console.error("Error cargando canchas:", e); }
+
+
+  // ==================== UBICACIÓN ====================
+  function actualizarFondo(input) {
+    if (!input) return;
+    const tieneValor = (input.value || "").trim() !== "";
+    input.classList.toggle("filled", tieneValor);
+  }
+
+  function setDireccion(text, readOnly) {
+    direccionInput.value = text || "";
+    if (readOnly) direccionInput.setAttribute("readonly", "readonly");
+    else direccionInput.removeAttribute("readonly");
+    direccionInput.classList.toggle("filled", !!direccionInput.value.trim());
+    validarPaso1();
+  }
+
+  $selectCancha.on("change", async function () {
+    const val = $(this).val();
+    const id = Array.isArray(val) ? val[0] : val;
+    const text = $selectCancha.find(":selected").text().trim();
+
+    if (!id && !text) return setDireccion("", false);
+
+    if (!isNaN(id)) {
+      try {
+        const res = await fetch(`/api/canchas/${id}/`);
+        const cancha = await res.json();
+        if ((cancha.direccion || "").trim()) setDireccion(cancha.direccion, true);
+        else setDireccion("", false);
+      } catch {
+        setDireccion("", false);
+      }
+    } else {
+      // Nueva cancha escrita por el usuario
+      setDireccion("", false);
+      localStorage.setItem("cancha_nueva_nombre", text);
+    }
+  });
+
+
+  // ==================== VALIDACIONES ====================
+  function validarPaso1() {
+    const hayCancha = !!($selectCancha.val() && $selectCancha.val().length);
+    const hayDir = !!direccionInput.value.trim();
+    btnSiguiente.disabled = !(hayCancha && hayDir);
+  }
+
+  function validarPaso2() {
+    const altFecha = document.querySelector('.flatpickr-input[readonly]');
+    const fecha = altFecha ? altFecha.value.trim() : "";
+    const hora = horaInput.value.trim();
+    btnSiguiente.disabled = !(fecha && hora);
+  }
+
+  // ==================== FLATPICKR ====================
+  const fpFecha = flatpickr(fechaInput, {
+    altInput: true,
+    altFormat: "d / m / Y",
+    dateFormat: "Y-m-d",
+    locale: "es",
+    disableMobile: true,
+    minDate: "today",
+    onChange: validarPaso2
+  });
+
+  const fpHora = flatpickr(horaInput, {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    locale: "es",
+    disableMobile: true,
+    onChange: validarPaso2
+  });
+
+  // ==================== API: Obtener Partido ====================
+  async function obtenerDatosPartido() {
+    if (!partidoId) return null;
+    try {
+      const resp = await fetch(`/api/partido/${partidoId}/`);  // Tu endpoint exacto
+      if (!resp.ok) throw new Error("No se pudo obtener el partido");
+      const data = await resp.json();
+
+      console.log("Datos del partido:", data); // Para debug
+
+      // Validar que los datos necesarios estén presentes
+      if (!data.torneo || !data.torneo.modo_seleccion) {
+        console.warn("Modo de selección no definido en la respuesta:", data);
+        data.torneo = data.torneo || {};
+        data.torneo.modo_seleccion = data.torneo.modo_seleccion || 'POR_DEFECTO';
+      }
+
+      return data;
+    } catch (e) {
+      console.error("❌ Error al obtener datos del partido:", e);
+      // Retornar estructura por defecto
+      return {
+        torneo: {
+          modo_seleccion: 'POR_DEFECTO',
+          tipo_cancha: { nombre: '-' },
+          duracion_partido: 60
+        },
+        equipo_local: null,
+        equipo_visitante: null,
+        duracion: 60,
+        cancha: null
+      };
+    }
+  }
+
+  // ==================== Mostrar Resumen ====================
+  async function mostrarResumen() {
+    // Primero intentamos leer los datos del localStorage
+    const canchaId = localStorage.getItem("cancha");
+    const ubicacion = localStorage.getItem("ubicacion");
+    const dia = localStorage.getItem("dia");
+    const hora = localStorage.getItem("hora_inicio");
+
+    let canchaNombre = "-";
+
+    // Si hay un id de cancha, buscamos su nombre en la API
+    if (canchaId && !isNaN(canchaId)) {
+      try {
+        const res = await fetch(`/api/canchas/${canchaId}/`);
+        const cancha = await res.json();
+        canchaNombre = cancha.nombre || "-";
+      } catch {
+        canchaNombre = "-";
+      }
+    } else {
+      canchaNombre = localStorage.getItem("cancha_nueva_nombre") || "-";
+    }
+
+    // 🔹 Mostramos los datos temporales
+    function formatearFecha(fechaISO) {
+      if (!fechaISO) return "-";
+      try {
+        const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const f = new Date(fechaISO);
+        const dia = f.getDate();
+        const mes = meses[f.getMonth()];
+        return `${dia}/${mes}`;
+      } catch (e) {
+        return "-";
+      }
+    }
+
+    document.getElementById("resumen-dia").textContent = formatearFecha(dia);
+    document.getElementById("resumen-fecha-card").textContent = formatearFecha(dia);
+    document.getElementById("resumen-hora").textContent = hora || "-";
+    document.getElementById("resumen-cancha").textContent = canchaNombre;
+    document.getElementById("resumen-cancha-card").textContent = canchaNombre;
+    document.getElementById("resumen-ubicacion").textContent = ubicacion || "-";
+
+    // 🔹 Para los equipos y escudos, usamos la API
+    try {
+      const partido = await obtenerDatosPartido();
+      if (partido && partido.torneo) {
+        // Usar los datos del serializer - nota que tipo_cancha es un objeto
+        const tipoCancha = partido.torneo.tipo_cancha?.nombre || "-";
+        const local = partido.equipo_local?.nombre || "Equipo Local";
+        const visitante = partido.equipo_visitante?.nombre || "Equipo Visitante";
+        const escudoLocal = partido.equipo_local?.escudo || null;
+        const escudoVisitante = partido.equipo_visitante?.escudo || null;
+        const duracionPartido = partido.duracion || partido.torneo.duracion_partido || 60;
+
+        document.querySelector(".M-body.izq").textContent = local;
+        document.querySelector(".M-body.der").textContent = visitante;
+        document.getElementById("resumen-formato").textContent = tipoCancha;
+        document.getElementById("resumen-duracion").textContent = duracionPartido + ' minutos';
+
+        const base = window.location.origin;
+        const imgs = document.querySelectorAll(".card-partido .container-1 img");
+        if (imgs.length >= 2) {
+          imgs[0].src = escudoLocal
+            ? (escudoLocal.startsWith("/") ? base + escudoLocal : escudoLocal)
+            : "{% static 'images/escudo-default.png' %}";
+          imgs[1].src = escudoVisitante
+            ? (escudoVisitante.startsWith("/") ? base + escudoVisitante : escudoVisitante)
+            : "{% static 'images/escudo-default.png' %}";
+        }
+      }
+    } catch (e) {
+      console.warn("No se pudieron obtener los equipos:", e);
+      // Valores por defecto
+      document.querySelector(".M.body.izq").textContent = "Equipo Local";
+      document.querySelector(".M.body.der").textContent = "Equipo Visitante";
+      document.getElementById("resumen-formato").textContent = "-";
+      document.getElementById("resumen-duracion").textContent = "60 minutos";
+    }
+
+    document.getElementById("resumen-hora-card").textContent = hora || "-";
+  }
+
+async function guardarConfiguracionPartido() {
+  let canchaId = localStorage.getItem("cancha");
+  const ubicacion = localStorage.getItem("ubicacion");
+  const dia = localStorage.getItem("dia");
+  const horaInicio = localStorage.getItem("hora_inicio");
+
+  // ⚡️ Si canchaId no es un número, creamos la cancha primero
+  if (isNaN(Number(canchaId))) {
+    try {
+      const nombreNuevaCancha = localStorage.getItem("cancha_nueva_nombre") || canchaId;
+      const res = await fetch("/api/canchas/nueva/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({
+          nombre: nombreNuevaCancha,
+          direccion: ubicacion || "",
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        canchaId = data.id;
+        localStorage.setItem("cancha", canchaId);
+        console.log("✅ Nueva cancha creada:", data.nombre);
+      } else {
+        console.error("❌ Error creando cancha:", data);
+        alert("Error al crear la nueva cancha.");
+        return;
+      }
+    } catch (e) {
+      console.error("❌ Error creando cancha:", e);
+      alert("Error de conexión al crear la cancha.");
+      return;
+    }
+  }
+
+  // Ahora sí, enviamos el PATCH con el ID correcto
+  const payload = {
+    cancha: canchaId,
+    ubicacion: ubicacion,
+    dia: dia,
+    hora_inicio: horaInicio,
+    duracion: 90
+  };
+
+  console.log("📤 Enviando PATCH para partido:", partidoId, "con payload:", payload);
+
+  try {
+    const resp = await fetch(`/api/partidos/${partidoId}/configurar/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      console.error("❌ Error al guardar:", err);
+      alert("Error al guardar la configuración del partido.");
+      return;
+    }
+
+    console.log("✅ Partido actualizado correctamente.");
+    await mostrarResumen();
+    setTimeout(() => {
+      window.location.href = `/partido/torneo/${partidoId}/`;
+    }, 500);
+  } catch (e) {
+    console.error("❌ Error al enviar PATCH:", e);
+    alert("No se pudo guardar la configuración.");
+  }
+}
+
+  // ==================== NAVEGACIÓN ====================
+  btnSiguiente.addEventListener("click", async () => {
+    if (pasoActual === 0) {
+      localStorage.setItem("cancha", $selectCancha.val()?.[0] || "");
+      localStorage.setItem("ubicacion", direccionInput.value || "");
+      mostrarPaso(1);
+    } else if (pasoActual === 1) {
+      localStorage.setItem("dia", fechaInput.value || "");
+      localStorage.setItem("hora_inicio", horaInput.value || "");
+      mostrarPaso(2);
+      await mostrarResumen(); // ✅ mostrar el resumen local
+    } else if (pasoActual === 2) {
+      await guardarConfiguracionPartido(); // recién ahí se guarda en DB
+    }
+  });
+
+
+
+  btnVolverGlobal.addEventListener("click", () => {
+    if (pasoActual > 0) mostrarPaso(pasoActual - 1);
+    else window.location.href = "{{ url_volver }}";
+  });
+
+  // ==================== INICIO ====================
+  activarPaso(0);
+  mostrarPaso(0);
+  syncSelect2Filled($selectCancha);
+  actualizarFondo(direccionInput);
+  validarPaso1();
+});
+// ==================== CARGAR DATOS EXISTENTES ====================
+async function cargarDatosExistentes() {
+  try {
+    const partido = await obtenerDatosPartido();
+    if (partido && partido.cancha) {
+      // Si el partido ya tiene cancha configurada, seleccionarla
+      $selectCancha.val([partido.cancha.id]).trigger('change');
+      
+      // Cargar ubicación existente
+      if (partido.ubicacion) {
+        direccionInput.value = partido.ubicacion;
+        actualizarFondo(direccionInput);
+      }
+      
+      // Cargar fecha y hora existentes
+      if (partido.dia) {
+        fechaInput.value = partido.dia;
+      }
+      if (partido.hora_inicio) {
+        horaInput.value = partido.hora_inicio;
+      }
+    }
+  } catch (e) {
+    console.warn("No se pudieron cargar los datos existentes:", e);
+  }
+}
+
+// Y llama esta función después de inicializar todo
+// En la sección de INICIO, agrega:
+activarPaso(0);
+mostrarPaso(0);
+syncSelect2Filled($selectCancha);
+actualizarFondo(direccionInput);
+validarPaso1();
+
+// ✅ Cargar datos existentes después de inicializar
+await cargarDatosExistentes();
+</script>
+
+ -->
+
+
+<script>
+  // ==================== FUNCIONES GLOBALES ====================
+  function getCookie(name) {
+    const cookieValue = document.cookie
+      .split("; ")
+      .find(row => row.startsWith(name + "="));
+    return cookieValue ? decodeURIComponent(cookieValue.split("=")[1]) : "";
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // ==================== VARIABLES ====================
+    function getPartidoIdFromURL() {
+      const m = window.location.pathname.match(/partidos\/(\d+)\/configurar/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+    const partidoIdTpl = Number("{{ partido.id|default:'0' }}") || 0;
+    const partidoId = partidoIdTpl || getPartidoIdFromURL();
+
+    // ✅ VERIFICACIÓN ROBUSTA DE partidoId
+    console.log("🔍 partidoIdTpl:", partidoIdTpl);
+    console.log("🔍 partidoId desde URL:", getPartidoIdFromURL());
+    console.log("🔍 partidoId final:", partidoId);
+
+    if (!partidoId || partidoId === 0) {
+      console.error("❌ No se pudo determinar partidoId - Redirigiendo");
+      alert("Error: No se pudo cargar el partido. Volviendo atrás.");
+      window.location.href = "{{ url_volver }}";
+      return;
+    }
+
+    const torneoId = {{ torneo.id }};
+  let pasoActual = 0;
+
+  // ==================== ELEMENTOS ====================
+  const paso1 = document.getElementById("paso1");
+  const paso2 = document.getElementById("paso2");
+  const paso3 = document.getElementById("paso3");
+  const $selectCancha = $("#select-cancha");
+  const direccionInput = document.getElementById("direccion-cancha");
+  const fechaInput = document.getElementById("fecha");
+  const horaInput = document.getElementById("hora");
+  const btnSiguiente = document.getElementById("btnSiguienteGlobal");
+  const btnVolverGlobal = document.getElementById("btnVolverGlobal");
+  const btnVolverArriba = document.getElementById("btnVolver");
+
+  // ==================== BOTONES DE VOLVER ====================
+  function handleVolver() {
+    if (pasoActual > 0) {
+      mostrarPaso(pasoActual - 1);
+    } else {
+      window.location.href = "{{ url_volver }}";
+    }
+  }
+
+  if (btnVolverArriba) {
+    btnVolverArriba.addEventListener("click", handleVolver);
+  }
+  if (btnVolverGlobal) {
+    btnVolverGlobal.addEventListener("click", handleVolver);
+  }
+
+  // ==================== MARCADOR ====================
+  const iconos = document.querySelectorAll(".container-marcador .container-1 .container-icon");
+  const lineas = document.querySelectorAll(".container-marcador .container-1 .linea-divisora");
+  const textos = document.querySelectorAll(".container-marcador .container-2 .M-body-s");
+
+  function activarPaso(n) {
+    iconos.forEach((icon, i) => {
+      icon.classList.remove("activado", "completado");
+      if (i < n) icon.classList.add("completado");
+      if (i === n) icon.classList.add("activado");
+    });
+    lineas.forEach((l, i) => {
+      l.classList.remove("activado", "completado");
+      if (i < n - 1) l.classList.add("completado");
+      if (i === n - 1) l.classList.add("activado");
+    });
+    textos.forEach((txt, i) => {
+      txt.classList.remove("activado", "completado");
+      if (i < n) txt.classList.add("completado");
+      if (i === n) txt.classList.add("activado");
+    });
+  }
+
+  function mostrarPaso(n) {
+    [paso1, paso2, paso3].forEach((p, i) => p.style.display = i === n ? "block" : "none");
+    activarPaso(n);
+    pasoActual = n;
+    btnSiguiente.textContent = n === 2 ? "Confirmar" : "Siguiente";
+
+    if (n === 0) {
+      validarPaso1();
+    } else if (n === 1) {
+      validarPaso2();
+    } else if (n === 2) {
+      btnSiguiente.disabled = false;
+    }
+  }
+
+  // ==================== SELECT2 ====================
+  $selectCancha.select2({
+    placeholder: "Cancha",
+    multiple: true,
+    maximumSelectionLength: 1,
+    tags: true,
+    createTag: params => {
+      const term = $.trim(params.term);
+      return term ? { id: term, text: term, newTag: true } : null;
+    },
+    width: "100%",
+    dropdownParent: $("#s2-cancha")
+  });
+
+  function syncSelect2Filled($select) {
+    const hasValue = Array.isArray($select.val()) ? $select.val().length > 0 : !!$select.val();
+    const $selection = $select.next('.select2').find('.select2-selection');
+    $selection.toggleClass('filled', hasValue);
+  }
+
+  syncSelect2Filled($selectCancha);
+  $selectCancha.on('change select2:select select2:unselect select2:clear', () => syncSelect2Filled($selectCancha));
+
+  // ==================== CARGAR CANCHAS ====================
+  try {
+    const res = await fetch("/api/canchas/");
+    const canchas = await res.json();
+    $selectCancha.empty().append('<option></option>');
+    canchas.forEach(c => $selectCancha.append(new Option(c.nombre, c.id)));
+  } catch (e) {
+    console.error("Error cargando canchas:", e);
+  }
+
+  // ==================== UBICACIÓN ====================
+  function actualizarFondo(input) {
+    if (!input) return;
+    const tieneValor = (input.value || "").trim() !== "";
+    input.classList.toggle("filled", tieneValor);
+  }
+
+  function setDireccion(text, readOnly) {
+    direccionInput.value = text || "";
+    if (readOnly) direccionInput.setAttribute("readonly", "readonly");
+    else direccionInput.removeAttribute("readonly");
+    direccionInput.classList.toggle("filled", !!direccionInput.value.trim());
+    validarPaso1();
+  }
+
+  direccionInput.addEventListener("input", () => {
+    actualizarFondo(direccionInput);
+    validarPaso1();
+  });
+
+  $selectCancha.on("change", async function () {
+    const val = $(this).val();
+    const id = Array.isArray(val) ? val[0] : val;
+    const text = $selectCancha.find(":selected").text().trim();
+
+    if (!id && !text) return setDireccion("", false);
+
+    if (!isNaN(id)) {
+      try {
+        const res = await fetch(`/api/canchas/${id}/`);
+        const cancha = await res.json();
+        if ((cancha.direccion || "").trim()) setDireccion(cancha.direccion, true);
+        else setDireccion("", false);
+      } catch {
+        setDireccion("", false);
+      }
+    } else {
+      setDireccion("", false);
+      localStorage.setItem("cancha_nueva_nombre", text);
+    }
+  });
+
+  // ==================== VALIDACIONES ====================
+  function validarPaso1() {
+    const hayCancha = !!($selectCancha.val() && $selectCancha.val().length);
+    const hayDir = !!direccionInput.value.trim();
+    btnSiguiente.disabled = !(hayCancha && hayDir);
+  }
+
+  function validarPaso2() {
+    const fecha = fechaInput.value.trim();
+    const hora = horaInput.value.trim();
+    btnSiguiente.disabled = !(fecha && hora);
+  }
+
+  // ==================== FLATPICKR ====================
+  const fpFecha = flatpickr(fechaInput, {
+    altInput: true,
+    altFormat: "d / m / Y",
+    dateFormat: "Y-m-d",
+    locale: "es",
+    disableMobile: true,
+    minDate: "today",
+    onChange: validarPaso2
+  });
+
+  const fpHora = flatpickr(horaInput, {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    locale: "es",
+    disableMobile: true,
+    onChange: validarPaso2
+  });
+
+  // ==================== API: Obtener Partido ====================
+  async function obtenerDatosPartido() {
+    console.log("🔍 Obteniendo datos del partido:", partidoId);
+    if (!partidoId) {
+      console.error("❌ partidoId no definido en obtenerDatosPartido");
+      return null;
+    }
+
+    try {
+      const resp = await fetch(`/api/partido/${partidoId}/`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      const data = await resp.json();
+
+      console.log("✅ Datos del partido recibidos:", data);
+
+      if (!data.torneo || !data.torneo.modo_seleccion) {
+        console.warn("⚠️ Modo de selección no definido, usando valor por defecto");
+        data.torneo = data.torneo || {};
+        data.torneo.modo_seleccion = data.torneo.modo_seleccion || 'POR_DEFECTO';
+      }
+
+      return data;
+    } catch (e) {
+      console.error("❌ Error al obtener datos del partido:", e);
+      return {
+        torneo: {
+          modo_seleccion: 'POR_DEFECTO',
+          tipo_cancha: { nombre: '-' },
+          duracion_partido: 60
+        },
+        equipo_local: null,
+        equipo_visitante: null,
+        duracion: 60,
+        cancha: null
+      };
+    }
+  }
+
+  // ==================== CARGAR DATOS EXISTENTES ====================
+  async function cargarDatosExistentes() {
+    try {
+      console.log("🔄 Cargando datos existentes del partido...");
+      const partido = await obtenerDatosPartido();
+      if (partido) {
+        console.log("📋 Datos existentes:", partido);
+
+        // Cargar cancha existente
+        if (partido.cancha && partido.cancha.id) {
+          console.log("🏟️ Cargando cancha existente:", partido.cancha);
+          $selectCancha.val([partido.cancha.id]).trigger('change');
+          setTimeout(() => {
+            if (partido.ubicacion) {
+              direccionInput.value = partido.ubicacion;
+              actualizarFondo(direccionInput);
+            }
+          }, 500);
+        }
+
+        // Cargar fecha y hora existentes
+        if (partido.dia) {
+          fechaInput.value = partido.dia;
+        }
+        if (partido.hora_inicio) {
+          horaInput.value = partido.hora_inicio;
+        }
+
+        validarPaso1();
+        validarPaso2();
+        
+      }
+    } catch (e) {
+      console.warn("⚠️ No se pudieron cargar los datos existentes:", e);
+    }
+  }
+
+  // ==================== Mostrar Resumen ====================
+  async function mostrarResumen() {
+    const canchaId = localStorage.getItem("cancha");
+    const ubicacion = localStorage.getItem("ubicacion");
+    const dia = localStorage.getItem("dia");
+    const hora = localStorage.getItem("hora_inicio");
+
+    let canchaNombre = "-";
+
+    if (canchaId && !isNaN(canchaId)) {
+      try {
+        const res = await fetch(`/api/canchas/${canchaId}/`);
+        const cancha = await res.json();
+        canchaNombre = cancha.nombre || "-";
+      } catch {
+        canchaNombre = "-";
+      }
+    } else {
+      canchaNombre = localStorage.getItem("cancha_nueva_nombre") || "-";
+    }
+
+    /* function formatearFecha(fechaISO) {
+      if (!fechaISO) return "-";
+      try {
+        const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const f = new Date(fechaISO);
+        const dia = f.getDate();
+        const mes = meses[f.getMonth()];
+        return `${dia}/${mes}`;
+      } catch (e) {
+        return "-";
+      }
+    } */
+   function formatearFecha(fechaISO) {
+  if (!fechaISO) return "-";
+
+  const [year, month, day] = fechaISO.split("-");
+
+  const meses = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  return `${day}/${meses[parseInt(month, 10) - 1]}`;
+}
+
+
+
+
+    // Actualizar resumen
+    document.getElementById("resumen-dia").textContent = formatearFecha(dia);
+    document.getElementById("resumen-fecha-card").textContent = formatearFecha(dia);
+    document.getElementById("resumen-hora").textContent = hora || "-";
+    document.getElementById("resumen-cancha").textContent = canchaNombre;
+    document.getElementById("resumen-cancha-card").textContent = canchaNombre;
+    document.getElementById("resumen-ubicacion").textContent = ubicacion || "-";
+    document.getElementById("resumen-hora-card").textContent = hora || "-";
+
+    // Cargar datos de equipos
+    try {
+      const partido = await obtenerDatosPartido();
+      if (partido && partido.torneo) {
+        const tipoCancha = partido.torneo.tipo_cancha?.nombre || "-";
+        const local = partido.equipo_local?.nombre || "Equipo Local";
+        const visitante = partido.equipo_visitante?.nombre || "Equipo Visitante";
+        const escudoLocal = partido.equipo_local?.escudo || null;
+        const escudoVisitante = partido.equipo_visitante?.escudo || null;
+        const duracionPartido = partido.duracion || partido.torneo.duracion_partido || 60;
+
+        document.querySelector(".M-body.izq").textContent = local;
+        document.querySelector(".M-body.der").textContent = visitante;
+        document.getElementById("resumen-formato").textContent = tipoCancha;
+        document.getElementById("resumen-duracion").textContent = 60 + ' minutos';
+
+        const base = window.location.origin;
+        const imgs = document.querySelectorAll(".card-partido .container-1 img");
+        if (imgs.length >= 2) {
+          imgs[0].src = escudoLocal
+            ? (escudoLocal.startsWith("/") ? base + escudoLocal : escudoLocal)
+            : "{% static 'images/escudo-default.png' %}";
+          imgs[1].src = escudoVisitante
+            ? (escudoVisitante.startsWith("/") ? base + escudoVisitante : escudoVisitante)
+            : "{% static 'images/escudo-default.png' %}";
+        }
+      }
+    } catch (e) {
+      console.warn("No se pudieron obtener los equipos:", e);
+      document.querySelector(".M-body.izq").textContent = "Equipo Local";
+      document.querySelector(".M-body.der").textContent = "Equipo Visitante";
+      document.getElementById("resumen-formato").textContent = "-";
+      document.getElementById("resumen-duracion").textContent = "60 minutos";
+    }
+  }
+
+  // ==================== Guardar Configuración ====================
+  async function guardarConfiguracionPartido() {
+    let canchaId = localStorage.getItem("cancha");
+    const ubicacion = localStorage.getItem("ubicacion");
+    const dia = localStorage.getItem("dia");            // 👈 ya lo tenés
+    const horaInicio = localStorage.getItem("hora_inicio"); // 👈 ya lo tenés
+
+    console.log("💾 Guardando configuración...");
+
+    if (isNaN(Number(canchaId))) {
+      try {
+        const nombreNuevaCancha = localStorage.getItem("cancha_nueva_nombre") || canchaId;
+        const res = await fetch("/api/canchas/nueva/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({
+            nombre: nombreNuevaCancha,
+            direccion: ubicacion || "",
+          }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          canchaId = data.id;
+          localStorage.setItem("cancha", canchaId);
+          console.log("✅ Nueva cancha creada:", data.nombre);
+        } else {
+          console.error("❌ Error creando cancha:", data);
+          alert("Error al crear la nueva cancha.");
+          return;
+        }
+      } catch (e) {
+        console.error("❌ Error creando cancha:", e);
+        alert("Error de conexión al crear la cancha.");
+        return;
+      }
+    }
+
+    const payload = {
+      cancha: canchaId,
+      ubicacion: ubicacion,
+      dia: dia,
+      hora_inicio: horaInicio,
+      duracion: 60,
+    };
+
+    console.log("📤 Enviando PATCH para partido:", partidoId, "con payload:", payload);
+
+    try {
+      // 1️⃣ Guardar la config del partido
+      const resp = await fetch(`/api/partidos/${partidoId}/configurar/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        console.error("❌ Error al guardar:", err);
+        alert("Error al guardar la configuración del partido.");
+        return;
+      }
+
+      console.log("✅ Partido actualizado correctamente.");
+
+      // 2️⃣ Avisar a la API de Celery que el partido quedó definido
+      try {
+        const celeryResp = await fetch(`/api/celery/partido-definido/${partidoId}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({
+            dia: dia,          // "2025-11-20"
+            hora: horaInicio,  // "21:30"
+          }),
+        });
+
+        if (!celeryResp.ok) {
+          const errCelery = await celeryResp.json().catch(() => ({}));
+          console.error("⚠️ Error creando tarea Celery:", errCelery);
+          // Podés mostrar aviso si querés, pero no frenamos la redirección
+        } else {
+          console.log("✅ Tarea Celery creada / partido marcado como definido.");
+        }
+      } catch (e) {
+        console.error("⚠️ Error llamando a la API de Celery:", e);
+        //Acordarse de hacer algun feedback a un admin de ticas
+      }
+
+      // 3️⃣ Redirigir a la vista del partido
+      setTimeout(() => {
+        window.location.href = `/partido/torneo/${partidoId}/`;
+      }, 500);
+    } catch (e) {
+      console.error("❌ Error al enviar PATCH:", e);
+      alert("No se pudo guardar la configuración.");
+    }
+  }
+  // ==================== NAVEGACIÓN ====================
+  btnSiguiente.addEventListener("click", async () => {
+    if (pasoActual === 0) {
+      localStorage.setItem("cancha", $selectCancha.val()?.[0] || "");
+      localStorage.setItem("ubicacion", direccionInput.value || "");
+      mostrarPaso(1);
+    } else if (pasoActual === 1) {
+      localStorage.setItem("dia", fechaInput.value || "");
+      localStorage.setItem("hora_inicio", horaInput.value || "");
+      mostrarPaso(2);
+      await mostrarResumen();
+    } else if (pasoActual === 2) {
+      await guardarConfiguracionPartido();
+    }
+  });
+
+  // ==================== INICIALIZACIÓN ====================
+  console.log("🚀 Inicializando configuración de partido...");
+  activarPaso(0);
+  mostrarPaso(0);
+  syncSelect2Filled($selectCancha);
+  actualizarFondo(direccionInput);
+  validarPaso1();
+
+  // Cargar datos existentes después de un breve delay
+  setTimeout(async () => {
+    await cargarDatosExistentes();
+  }, 1000);
+  });
+</script>
+
+
+{% endblock %}

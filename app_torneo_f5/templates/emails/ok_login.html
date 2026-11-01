@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <body style="font-family: Arial, sans-serif; background:#111; color:#eee; padding:24px;">
+    <h2>¡Hola {{ user.first_name|default:user.username }}!</h2>
+    <p>Para entrar a Ticas, hacé clic en <strong>OK</strong>:</p>
+    <p>
+      <a href="{{ ok_url }}" 
+         style="display:inline-block;background:#22c55e;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
+        OK
+      </a>
+    </p>
+    <p style="margin-top:16px; color:#aaa;">Si el botón no funciona, copiá este enlace:</p>
+    <p><a href="{{ ok_url }}" style="color:#22c55e;">{{ ok_url }}</a></p>
+    <hr style="border:none;border-top:1px solid #333; margin:24px 0;">
+    <p style="color:#aaa;font-size:13px;">
+      ¿Problemas con el correo? Escribinos por WhatsApp.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,342 @@
+{% extends 'app_torneo_f5/base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .pantalla-crear {
+        padding: 25px 16px;
+        box-sizing: border-box;
+        height: calc(100dvh + 500px);
+    }
+
+    .icon-volver svg {
+        margin: 13px;
+    }
+
+    .con-valor {
+        background-color: #3F374E;
+    }
+
+    .input-custom {
+        border: none;
+        background-color: #373639;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        flex: 1;
+        padding: 13px 10px 13px 50px;
+        border-radius: 5px;
+        width: 160px;
+    }
+
+    .input-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom.con-valor {
+        background-color: #3F374E !important;
+        color: white;
+    }
+
+    .input-fecha-custom.con-valor {
+        background-color: #3F374E !important;
+        color: white;
+    }
+
+    .input-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .input-fecha-custom:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    input:-internal-autofill-selected {
+        background-color: #3F374E !important;
+        color: white !important;
+    }
+
+    .campo-fecha {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selector-fecha {
+        position: relative;
+    }
+
+    .container-icono {
+        position: absolute;
+        margin-top: 8px;
+        margin-left: 13px;
+        pointer-events: none;
+        color: white;
+        font-size: 18px;
+        z-index: 1;
+    }
+
+    .container-input {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .input-fecha-custom {
+        padding: 13px 10px 13px 50px !important;
+        width: 160px !important;
+        border: none;
+        color: #FFF;
+    }
+
+    .input-fecha-custom::placeholder {
+        color: #FFF !important;
+    }
+
+    .input-custom {
+        padding: 13px 10px !important;
+        width: 160px !important;
+        min-width: 160px !important;
+        max-width: 160px !important;
+    }
+
+    .footer-boton {
+        z-index: 999;
+        bottom: 0;
+        left: 0;
+        position: fixed;
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        padding: 25px 16px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(0deg, var(--Fondo, #161618) 83.19%, rgba(22, 22, 24, 0.00) 100%);
+    }
+
+    .footer-boton button {
+        box-sizing: border-box;
+    }
+
+    .form-control{
+        background-color: #373639 !important;
+    }
+
+    form{
+        padding-bottom: 150px !important;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/configuracion_perfil.css' %}">
+<link rel="stylesheet" href="{% static 'css/varcolors.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<a href="{{ url_volver }}" class="icon-volver">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 19L9 12L15 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+</a>
+
+<p class="M-subtitulos" style="margin: 20px 0; color: #FFF;">Configurar perfil</p>
+
+<form method="POST" enctype="multipart/form-data" style="gap: 20px; display: flex; flex-direction: column;">
+    {% csrf_token %}
+
+    <div class="d-flex flex-column align-items-center" style="margin-bottom: 25px;">
+        {% if jugador.foto %}
+        <img src="{{ jugador.foto.url }}" class="foto-perfil" alt="Foto de perfil"
+            style="width: 100px; height: 100px; ">
+        {% else %}
+        <img src="{% static 'images/torneo-placeholder.png' %}" class="foto-perfil" alt="Sin foto">
+        {% endif %}
+
+        <button class="btn-secundario btn-cambiar-foto">
+            <p class="M-boton">Cambiar foto</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                <path
+                    d="M14.3601 4.57866L15.2869 3.65178C16.8226 2.11607 19.3125 2.11607 20.8482 3.65178C22.3839 5.18748 22.3839 7.67735 20.8482 9.21306L19.9213 10.1399M14.3601 4.57866C14.3601 4.57866 14.4759 6.54828 16.2138 8.28618C17.9517 10.0241 19.9213 10.1399 19.9213 10.1399M14.3601 4.57866L5.83882 13.0999C5.26166 13.6771 4.97308 13.9656 4.7249 14.2838C4.43213 14.6592 4.18114 15.0653 3.97634 15.495C3.80273 15.8593 3.67368 16.2465 3.41556 17.0208L2.32181 20.3021M19.9213 10.1399L11.4001 18.6612C10.8229 19.2383 10.5344 19.5269 10.2162 19.7751C9.84082 20.0679 9.43469 20.3189 9.00498 20.5237C8.6407 20.6973 8.25352 20.8263 7.47918 21.0844L4.19792 22.1782M4.19792 22.1782L3.39584 22.4456C3.01478 22.5726 2.59466 22.4734 2.31063 22.1894C2.0266 21.9053 1.92743 21.4852 2.05445 21.1042L2.32181 20.3021M4.19792 22.1782L2.32181 20.3021"
+                    stroke="#4F9639" stroke-width="1.5" />
+            </svg>
+        </button>
+        <input type="file" name="foto" id="input-foto" accept="image/*" style="display: none;">
+    </div>
+
+    <div class="container-input">
+        <label>Nombre y apellido</label>
+        {{ form.nombre }}
+    </div>
+
+    <div class="container-input">
+        <label>Altura (cm)</label>
+        {{ form.altura }}
+    </div>
+
+    <div class="container-input">
+        <label>Ciudad</label>
+        {{ form.ciudad }}
+    </div>
+
+    <div class="container-input">
+        <label>Provincia</label>
+        {{ form.provincia }}
+    </div>
+
+    <!-- <label>Fecha de nacimiento</label>
+    <input type="date" name="fecha_nacimiento" value="{{ jugador.fecha_nacimiento|date:'Y-m-d' }}">
+
+ -->
+    <div class="linea-divisora"></div>
+
+    <div class="campo-fecha">
+        <label for="fecha" class="label-fecha">Fecha de nacimiento</label>
+        <div class="selector-fecha">
+            <span class="container-icono">
+                <!-- Ícono de calendario -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12Z"
+                        stroke="white" stroke-width="1.5" />
+                    <path d="M7 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M17 4V2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M2.5 9H21.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    <path
+                        d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
+                        fill="white" />
+                    <path
+                        d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
+                        fill="white" />
+                    <path
+                        d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
+                        fill="white" />
+                    <path
+                        d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
+                        fill="white" />
+                    <path
+                        d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
+                        fill="white" />
+                    <path
+                        d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
+                        fill="white" />
+                </svg>
+            </span>
+            <input type="text" name="fecha_nacimiento" id="fecha" class="input-fecha-custom form-control input"
+                placeholder="__/__/__" value="{{ jugador.fecha_nacimiento|date:'Y-m-d' }}">
+        </div>
+    </div>
+
+    <div class="d-flex flex-row justify-content-between align-items-center">
+        <label>Posición</label>
+        {{ form.posicion_preferida }}
+    </div>
+
+    <div class="d-flex flex-row justify-content-between align-items-center">
+        <label>Pie preferido</label>
+        {{ form.pie_preferido }}
+    </div>
+
+    <div class="linea-divisora"></div>
+
+    <div class="container-input">
+        <label>Fortalezas</label>
+        {{ form.fortalezas }}
+    </div>
+
+    <div class="container-input">
+        <label>Debilidades</label>
+        {{ form.debilidades }}
+    </div>
+
+    {% if form.errors %}
+    <div style="color: red; margin-bottom: 15px;">
+        <ul>
+            {% for field, errors in form.errors.items %}
+            <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="footer-boton">
+        <button type="submit" class="btn-primario" style="width: 100%; margin-top: 20px;">
+            <p class="M-boton">Guardar cambios</p>
+        </button>
+    </div>
+</form>
+<script>
+    document.querySelector('.btn-cambiar-foto').addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById('input-foto').click();
+    });
+</script>
+<script>
+    const inputFoto = document.getElementById('input-foto');
+    const imagenPreview = document.querySelector('.foto-perfil');
+
+    inputFoto.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagenPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll("input, select, textarea");
+
+        inputs.forEach(input => {
+            // Si tiene valor, le agregamos la clase
+            if (input.value && input.value.trim() !== "") {
+                input.classList.add("con-valor");
+            }
+
+            // Si querés que se actualice dinámicamente cuando el usuario escribe:
+            input.addEventListener('input', () => {
+                if (input.value.trim() !== "") {
+                    input.classList.add("con-valor");
+                } else {
+                    input.classList.remove("con-valor");
+                }
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#fecha", {
+            altInput: true,
+            altFormat: "d / M / y",
+            dateFormat: "Y-m-d",
+            locale: "es",
+            disableMobile: true,
+            maxDate: "today",
+            onChange: function (selectedDates, dateStr) {
+                const inputShowed = document.getElementsByClassName("input-fecha-custom")[1];
+                inputShowed?.classList.toggle("con-valor", !!dateStr);
+            }
+        });
+
+        const inputFecha = document.getElementById("fecha");
+        if (inputFecha && inputFecha.value.trim() !== "") {
+            inputFecha.classList.add("con-valor");
+        }
+    });
+</script>
+
+
+{% endblock %}

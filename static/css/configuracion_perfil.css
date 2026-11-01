@@ -1,0 +1,62 @@
+body {
+    background-color: #161618;
+    padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* .config-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 25px 16px 100px 16px;
+    color: white;
+} */
+
+.pantalla-crear{
+    background: #161618;
+}
+
+.foto-perfil {
+    width: 100px;
+    height: 100px;
+    border-radius: 5%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #2b2a2e;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 15px;
+}
+
+textarea {
+    resize: none;
+    height: 75px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label{
+    opacity: 0.5;
+    width: 100%;
+    padding-left: 10px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.linea-divisora{
+    height: 1px;
+    width: 100%;
+    background: #000;
+    margin: 20px 0;
+}

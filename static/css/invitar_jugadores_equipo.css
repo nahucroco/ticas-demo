@@ -1,0 +1,38 @@
+.container-volver .icono-volver{
+    background-color: transparent;
+    border: none;
+}
+
+#form-busqueda{
+    margin-bottom: 20px;
+}
+
+.lista-jugadores{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lista-jugadores .jugador-card{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background: transparent;
+    border-radius: 5px;
+    gap: 6px;
+    padding-right: 9px;
+}
+
+.lista-jugadores .jugador-card img{
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+}
+
+#lista-invitados .jugador-card{
+    background-color: #733BDE;
+}
+
+#contenedor-jugadores{
+    margin-top: 10px;
+}
