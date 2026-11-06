@@ -3,7 +3,7 @@
 Ticas es una aplicación web para organizar partidos y torneos de fútbol amateur: armado de
 partidos amistosos con invitaciones, torneos con fixture y tabla de posiciones, carga de
 estadísticas por jugador y perfiles con valoraciones. Se publicó en Google Play en beta cerrada,
-con más de 150 usuarios, y se usó en un torneo real.
+con más de 100 usuarios, y se usó en un torneo real.
 
 Esta es una **versión de demostración** con datos ficticios. Para probarla, entrá con el botón
 **"Entrar como invitado"**: no hace falta registrarse. Los datos se reinician en cada despliegue.
